@@ -12,11 +12,11 @@ const baseQuery = fetchBaseQuery({
         }
 
         return headers;
-    } 
+    }, 
 }); 
 
 export const apiSlice = createApi({
         baseQuery,
-        endpoints: () => ({})
+        endpoints: () => ({}),
     }
 );
