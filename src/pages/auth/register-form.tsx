@@ -4,17 +4,18 @@ import { z } from "zod"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Google } from "react-bootstrap-icons"
 import { Spinner } from "@/components/custom/spinner"
+import { GoogleOAuthProvider } from "@react-oauth/google"
+import { CustomGoogleLogin, CustomGoogleLoginProps } from "@/components/custom/google-login-button"
 
 export type  RegisterFormProps = {
     form: UseFormReturn<z.infer<typeof registerFormSchema>, any, undefined >,
     onSubmit: (values: z.infer<typeof registerFormSchema>) => void,
-    isLoading: boolean
-}
+    isLoading: boolean,
+} & CustomGoogleLoginProps;
 
 const RegisterForm = (props: RegisterFormProps) => {
-    const { form, onSubmit, isLoading } = props;
+    const { form, onSubmit, isLoading, onGoogleAuthSuccess, onGoogleAuthError } = props;
 
     return (
         <Form {...form}>
@@ -25,10 +26,9 @@ const RegisterForm = (props: RegisterFormProps) => {
                 <div>
                     <p>Register with</p>
                     <div className="w-full flex justify-center">
-                        <Button className="font-semibold">
-                            <Google />
-                            Google
-                        </Button>
+                        <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID}>
+                            <CustomGoogleLogin onGoogleAuthSuccess={onGoogleAuthSuccess} onGoogleAuthError={onGoogleAuthError} />
+                        </GoogleOAuthProvider>
                     </div>
                 </div>
                 <div className="flex items-center my-4">

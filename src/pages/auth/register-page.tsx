@@ -1,21 +1,32 @@
 import RegisterForm from "./register-form";
 import authBgImage from '../../assets/auth-background.svg';
 import { useForm } from "react-hook-form";
-import { custom, z } from "zod";
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import registerFormSchema from "@/lib/validation/register-form-schema";
-import { useRegisterMutation } from "@/app/api/auth/auth-api-slice";
+import { useGoogleLoginMutation, useRegisterMutation } from "@/app/api/auth/auth-api-slice";
 import { CreateUserReq } from "@/app/api/types/auth.type";
 import { getErrorResponseData } from "@/lib/helpers/get-error-response-data";
 import { customApiCode } from "@/app/api/constants";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
+import { TokenResponse } from "@react-oauth/google";
 
 const RegisterPage = () => {
 
     const [registerUser,  {isLoading, isSuccess, isError, error}] = useRegisterMutation();
 
     const { toast } = useToast();
+
+    const [ googleLoginMutation, { isLoading: isGgLoading } ] = useGoogleLoginMutation();
+
+    const onGoogleAuthSuccess = (tokenRes: Omit<TokenResponse, "error" | "error_description" | "error_uri">) => {
+        googleLoginMutation({token: tokenRes.access_token});
+    }
+
+    const onGoogleAuthError = () => {
+        console.log("Login failed");
+    }
 
     const form = useForm<z.infer<typeof registerFormSchema>>({
         resolver: zodResolver(registerFormSchema),
@@ -74,7 +85,9 @@ const RegisterPage = () => {
             <RegisterForm 
                 form={form} 
                 onSubmit={onSubmit}
-                isLoading={isLoading}
+                isLoading={isLoading || isGgLoading}
+                onGoogleAuthError={onGoogleAuthError}
+                onGoogleAuthSuccess={onGoogleAuthSuccess}
             />
         </div>
     )
