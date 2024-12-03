@@ -1,7 +1,7 @@
 import { apiSlice } from "../base/api-slice";
 import { Response } from "../types/response";
 import { UserRes } from "../types/user.type";
-import { CreateUserReq } from "../types/auth.type";
+import { CreateUserReq, LoginReq, TokeRes } from "../types/auth.type";
 import { apiEndpoints } from "../constants";
 
 export const authApiSlice = apiSlice.injectEndpoints({
@@ -19,11 +19,19 @@ export const authApiSlice = apiSlice.injectEndpoints({
                 method: 'POST',
                 body
             })
-        })
+        }),
+        login: builder.mutation<Response<TokeRes>, LoginReq>({
+            query: body => ({
+                url: apiEndpoints.LOGIN,
+                method: 'POST',
+                body   
+            })
+        }),
     })
 });
 
 export const {
     useRegisterMutation,
-    useGoogleLoginMutation
+    useGoogleLoginMutation,
+    useLoginMutation,
 } = authApiSlice

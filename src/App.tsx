@@ -1,15 +1,15 @@
 import { Provider } from 'react-redux'
 import { AuthLayout } from './layouts/auth-layout'
-import RegisterPage from './pages/auth/register-page'
 import { store } from './app/api/store'
 import { Toaster } from './components/ui/toaster'
+import LoginPage from './pages/auth/login-page'
 
 function App() {
 
   return (
     <Provider store={store}>
       <AuthLayout>
-          <RegisterPage />
+          <LoginPage />
       </AuthLayout>
       <Toaster />
     </Provider>
