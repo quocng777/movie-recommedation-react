@@ -11,7 +11,8 @@ const registerFormSchema = z.object({
     password: z.string()
         .min(authFormSchema.PASSWORD_MIN_LENGTH)
         .max(authFormSchema.PASSWORD_MAX_LENGTH),
-    confirmPassword: z.string()
+    confirmPassword: z.string(),
+    email: z.string().email(),
 }).refine((data) => data.password === data.confirmPassword, {
     message: 'Password and confirm password do not match each other',
     path: ['confirmPassword']

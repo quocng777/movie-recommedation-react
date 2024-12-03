@@ -1,31 +1,23 @@
 import registerFormSchema from "@/lib/vallidation/register-form-schema"
-import { useForm } from "react-hook-form"
+import { UseFormReturn } from "react-hook-form"
 import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Google } from "react-bootstrap-icons"
 
-const RegisterForm = () => {
-    const form = useForm<z.infer<typeof registerFormSchema>>({
-        resolver: zodResolver(registerFormSchema),
-        defaultValues: {
-            username: '',
-            fullname: '',
-            password: '',
-            confirmPassword: ''
-        }
-    });
+export type  RegisterFormProps = {
+    form: UseFormReturn<z.infer<typeof registerFormSchema>, any, undefined >,
+    onSubmit: (values: z.infer<typeof registerFormSchema>) => void,
+    isLoading: boolean
+}
 
-    const onSubmit = (values: z.infer<typeof registerFormSchema>
-    ) => {
-        console.log(values);
-    };
+const RegisterForm = (props: RegisterFormProps) => {
+    const { form, onSubmit, isLoading } = props;
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-[440px] w-full rounded-xl px-8 py-4 border-white border">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-[450px] w-full rounded-xl px-8 py-4 border-white border">
             <p className="text-3xl font-semibold mb-4">Create an account</p>
             <div>
                 <p>Register with</p>
@@ -69,10 +61,23 @@ const RegisterForm = () => {
             />
             <FormField
                 control={form.control}
+                name="email"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                    <Input placeholder="Enter your email" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+            <FormField
+                control={form.control}
                 name="password"
                 render={({ field }) => (
                 <FormItem>
-                    <FormLabel>Username</FormLabel>
+                    <FormLabel>Password</FormLabel>
                     <FormControl>
                     <Input placeholder="Enter your password" {...field} />
                     </FormControl>
