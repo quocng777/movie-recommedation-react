@@ -11,6 +11,11 @@ import { customApiCode } from "@/app/api/constants";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 import { TokenResponse } from "@react-oauth/google";
+import { useRedirectToHomePage } from "@/hooks/use-redirect-to-hompage";
+import { useDispatch } from "react-redux";
+import { useLazyGetAuthenticationQuery } from "@/app/api/user/user.api.slice";
+import { setAuthenticatedUser } from "@/app/api/auth/auth-slice";
+import { useNavigate } from "react-router-dom";
 
 const RegisterPage = () => {
 
@@ -18,7 +23,14 @@ const RegisterPage = () => {
 
     const { toast } = useToast();
 
-    const [ googleLoginMutation, { isLoading: isGgLoading } ] = useGoogleLoginMutation();
+    const [ googleLoginMutation, { isLoading: isGgLoading, isSuccess: isGgSuccess, data: ggData } ] = useGoogleLoginMutation();
+
+    const [ getAuth, { isSuccess : isAuthSuccess, data : authData }] = useLazyGetAuthenticationQuery();
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    useRedirectToHomePage();
 
     const onGoogleAuthSuccess = (tokenRes: Omit<TokenResponse, "error" | "error_description" | "error_uri">) => {
         googleLoginMutation({token: tokenRes.access_token});
@@ -46,7 +58,7 @@ const RegisterPage = () => {
 
     useEffect(() => {
         if(isSuccess) {
-            alert('sucess');
+            navigate('/login', {replace: true});
             return;
         }
     }, [isSuccess]);
@@ -75,6 +87,22 @@ const RegisterPage = () => {
             })
         }
     }, [isError]);
+
+    useEffect(() => {
+        if(isGgSuccess) {
+            const tokens = (ggData?.data)!;
+            localStorage.setItem('access_token', tokens.accessToken);
+            localStorage.setItem('refresh_token', tokens.refreshToken);
+
+            getAuth();
+        }
+    }, [isGgSuccess]);
+
+    useEffect(() => {
+        if(isAuthSuccess) {
+            dispatch(setAuthenticatedUser(authData.data!));
+        }
+    }, [isAuthSuccess, authData]);
 
     return (
         <div className="flex w-full justify-center h-full min-h-screen items-center gap-10">

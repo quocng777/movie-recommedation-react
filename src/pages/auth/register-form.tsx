@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/custom/spinner"
 import { GoogleOAuthProvider } from "@react-oauth/google"
 import { CustomGoogleLogin, CustomGoogleLoginProps } from "@/components/custom/google-login-button"
+import { Link } from "react-router-dom"
 
 export type  RegisterFormProps = {
     form: UseFormReturn<z.infer<typeof registerFormSchema>, any, undefined >,
@@ -92,7 +93,7 @@ const RegisterForm = (props: RegisterFormProps) => {
                     control={form.control}
                     name="confirmPassword"
                     render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="mb-4">
                         <FormLabel>Confirm your password</FormLabel>
                         <FormControl>
                         <Input placeholder="Enter your password again!" {...field} />
@@ -101,6 +102,7 @@ const RegisterForm = (props: RegisterFormProps) => {
                     </FormItem>
                     )}
                 />
+                <Link className=" text-blue-500 hover:underline mt-8" to={'/login'}>Already have an account?</Link>
                 <Button type="submit" className="mt-6 w-full" disabled={Object.keys(form.formState.errors).length > 0}>Create account</Button>
             </div>
             </form>

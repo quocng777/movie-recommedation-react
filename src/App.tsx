@@ -1,17 +1,18 @@
 import { Provider } from 'react-redux'
-import { AuthLayout } from './layouts/auth-layout'
 import { store } from './app/api/store'
 import { Toaster } from './components/ui/toaster'
-import LoginPage from './pages/auth/login-page'
+import { RouterProvider } from 'react-router-dom'
+import { router } from './routes'
+import { AuthLoader } from './app/context/auth-loader'
 
 function App() {
 
   return (
     <Provider store={store}>
-      <AuthLayout>
-          <LoginPage />
-      </AuthLayout>
-      <Toaster />
+      <AuthLoader>
+        <RouterProvider router={router}></RouterProvider>
+        <Toaster />
+      </AuthLoader>
     </Provider>
   )
 }

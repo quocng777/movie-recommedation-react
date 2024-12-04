@@ -8,6 +8,7 @@ import { Spinner } from "@/components/custom/spinner"
 import { GoogleOAuthProvider } from "@react-oauth/google"
 import { CustomGoogleLogin, CustomGoogleLoginProps } from "@/components/custom/google-login-button"
 import loginFormSchema from "@/lib/validation/login-form-schema"
+import { Link } from "react-router-dom"
 
 export type  RegisterFormProps = {
     form: UseFormReturn<z.infer<typeof loginFormSchema>, any, undefined >,
@@ -21,11 +22,11 @@ const LoginForm = (props: RegisterFormProps) => {
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className={`relative max-w-[450px] w-full rounded-xl px-8 py-4 border-white border ${isLoading ? 'pointer-events-none' : ''}`}>
-            <p className="text-3xl font-semibold mb-4">Create an account</p>
+            <p className="text-3xl font-semibold mb-4">Welcome back!</p>
             <Spinner className="absolute inset-1/2" isOpening={isLoading} />
             <div className={`${isLoading ? 'invisible' : ''}`}>
                 <div>
-                    <p>Register with</p>
+                    <p>Login with</p>
                     <div className="w-full flex justify-center">
                         <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID}>
                             <CustomGoogleLogin onGoogleAuthSuccess={onGoogleAuthSuccess} onGoogleAuthError={onGoogleAuthError} />
@@ -63,7 +64,7 @@ const LoginForm = (props: RegisterFormProps) => {
                     </FormItem>
                     )}
                 />
-                <a className=" text-blue-500 hover:underline mt-8">Register an account?</a>
+                <Link className=" text-blue-500 hover:underline mt-8" to={'/register'}>Register an account?</Link>
                 <Button type="submit" className="mt-6 w-full" disabled={Object.keys(form.formState.errors).length > 0}>Login</Button>
             </div>
             </form>

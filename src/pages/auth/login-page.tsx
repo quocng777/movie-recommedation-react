@@ -3,21 +3,31 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useGoogleLoginMutation, useLoginMutation} from "@/app/api/auth/auth-api-slice";
-import { CreateUserReq } from "@/app/api/types/auth.type";
+import { LoginReq } from "@/app/api/types/auth.type";
 import { getErrorResponseData } from "@/lib/helpers/get-error-response-data";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 import { TokenResponse } from "@react-oauth/google";
 import LoginForm from "./login-form";
 import loginFormSchema from '@/lib/validation/login-form-schema';
+import { useDispatch } from 'react-redux';
+import { useLazyGetAuthenticationQuery } from '@/app/api/user/user.api.slice';
+import { setAuthenticatedUser } from '@/app/api/auth/auth-slice';
+import { useRedirectToHomePage } from '@/hooks/use-redirect-to-hompage';
 
 const LoginPage = () => {
 
-    const [registerUser,  {isLoading, isSuccess, isError, error}] = useLoginMutation();
+    const [loginUser,  {isLoading, isSuccess, isError, error, data}] = useLoginMutation();
 
     const { toast } = useToast();
 
-    const [ googleLoginMutation, { isLoading: isGgLoading } ] = useGoogleLoginMutation();
+    const [ googleLoginMutation, { isLoading: isGgLoading, isSuccess: isGgSuccess, data: ggData } ] = useGoogleLoginMutation();
+
+    const [ getAuth, { isSuccess : isAuthSuccess, data : authData }] = useLazyGetAuthenticationQuery();
+
+    useRedirectToHomePage();
+
+    const dispatch = useDispatch();
 
     const onGoogleAuthSuccess = (tokenRes: Omit<TokenResponse, "error" | "error_description" | "error_uri">) => {
         googleLoginMutation({token: tokenRes.access_token});
@@ -35,22 +45,25 @@ const LoginPage = () => {
         }
     });
 
+
     const onSubmit = async (values: z.infer<typeof loginFormSchema>
     ) => {
-        await registerUser(values as CreateUserReq);
+        await loginUser(values as LoginReq);
     };
 
     useEffect(() => {
-        if(isSuccess) {
-            alert('sucess');
-            return;
+        if(isSuccess || isGgSuccess) {
+            const tokens = (data?.data || ggData?.data)!;
+            localStorage.setItem('access_token', tokens.accessToken);
+            localStorage.setItem('refresh_token', tokens.refreshToken);
+
+            getAuth();
         }
-    }, [isSuccess]);
+    }, [isSuccess, isGgSuccess]);
 
     useEffect(() => {
         if(isError) {
             const errorData = getErrorResponseData(error);
-            console.log(errorData)
             if(!errorData) {
                 return;
             }
@@ -63,6 +76,12 @@ const LoginPage = () => {
             })
         }
     }, [isError]);
+
+    useEffect(() => {
+        if(isAuthSuccess) {
+            dispatch(setAuthenticatedUser(authData.data!));
+        }
+    }, [isAuthSuccess, authData]);
 
     return (
         <div className="flex w-full justify-center h-full min-h-screen items-center gap-10">

@@ -10,7 +10,7 @@ export type LoginReq = {
     password: string
 };
 
-export type TokeRes = {
+export type TokenRes = {
     accessToken: string,
     refreshToken: string
 };

@@ -2,6 +2,8 @@ export const apiEndpoints = {
     REGISTER: '/auth/register',
     GOOGLE_AUTH: '/auth/google',
     LOGIN: '/auth/login',
+    REFRESH_TOKEN: '/auth/refresh',
+    ME: '/users/me',
 };
 
 export const customApiCode = {
