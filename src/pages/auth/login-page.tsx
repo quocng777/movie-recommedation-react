@@ -1,25 +1,23 @@
-import RegisterForm from "./register-form";
 import authBgImage from '../../assets/auth-background.svg';
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import registerFormSchema from "@/lib/validation/register-form-schema";
-import { useGoogleLoginMutation, useRegisterMutation } from "@/app/api/auth/auth-api-slice";
-import { CreateUserReq } from "@/app/api/types/auth.type";
+import { useGoogleLoginMutation, useLoginMutation} from "@/app/api/auth/auth-api-slice";
+import { LoginReq } from "@/app/api/types/auth.type";
 import { getErrorResponseData } from "@/lib/helpers/get-error-response-data";
-import { customApiCode } from "@/app/api/constants";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 import { TokenResponse } from "@react-oauth/google";
-import { useRedirectToHomePage } from "@/hooks/use-redirect-to-hompage";
-import { useDispatch } from "react-redux";
-import { useLazyGetAuthenticationQuery } from "@/app/api/user/user.api.slice";
-import { setAuthenticatedUser } from "@/app/api/auth/auth-slice";
-import { useNavigate } from "react-router-dom";
+import LoginForm from "./login-form";
+import loginFormSchema from '@/lib/validation/login-form-schema';
+import { useDispatch } from 'react-redux';
+import { useLazyGetAuthenticationQuery } from '@/app/api/user/user.api.slice';
+import { setAuthenticatedUser } from '@/app/api/auth/auth-slice';
+import { useRedirectToHomePage } from '@/hooks/use-redirect-to-hompage';
 
-const RegisterPage = () => {
+const LoginPage = () => {
 
-    const [registerUser,  {isLoading, isSuccess, isError, error}] = useRegisterMutation();
+    const [loginUser,  {isLoading, isSuccess, isError, error, data}] = useLoginMutation();
 
     const { toast } = useToast();
 
@@ -27,10 +25,9 @@ const RegisterPage = () => {
 
     const [ getAuth, { isSuccess : isAuthSuccess, data : authData }] = useLazyGetAuthenticationQuery();
 
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-
     useRedirectToHomePage();
+
+    const dispatch = useDispatch();
 
     const onGoogleAuthSuccess = (tokenRes: Omit<TokenResponse, "error" | "error_description" | "error_uri">) => {
         googleLoginMutation({token: tokenRes.access_token});
@@ -40,63 +37,45 @@ const RegisterPage = () => {
         console.log("Login failed");
     }
 
-    const form = useForm<z.infer<typeof registerFormSchema>>({
-        resolver: zodResolver(registerFormSchema),
+    const form = useForm<z.infer<typeof loginFormSchema>>({
+        resolver: zodResolver(loginFormSchema),
         defaultValues: {
-            username: '',
-            fullname: '',
             password: '',
-            confirmPassword: '',
             email: ''
         }
     });
 
-    const onSubmit = async (values: z.infer<typeof registerFormSchema>
+
+    const onSubmit = async (values: z.infer<typeof loginFormSchema>
     ) => {
-        await registerUser(values as CreateUserReq);
+        await loginUser(values as LoginReq);
     };
 
     useEffect(() => {
-        if(isSuccess) {
-            navigate('/login', {replace: true});
-            return;
-        }
-    }, [isSuccess]);
-
-    useEffect(() => {
-        if(isError) {
-            const errorData = getErrorResponseData(error);
-            console.log(errorData)
-            if(!errorData) {
-                return;
-            }
-            if (errorData.statusCode === customApiCode.EMAIL_DUPLICATED.customCode) {
-                form.setError('email', {type: 'custom', message: 'This email is used by others'});
-                return;
-            }
-            if (errorData.statusCode === customApiCode.USERNAME_DUPLICATED.customCode) {
-                form.setError('username', {type: 'custom', message: 'This username is used by others'});
-                return;
-            } 
-
-            toast({
-                variant: "destructive",
-                title: "Uh oh! Something went wrong.",
-                description: "There was a problem with your request.",
-                duration: 2000
-            })
-        }
-    }, [isError]);
-
-    useEffect(() => {
-        if(isGgSuccess) {
-            const tokens = (ggData?.data)!;
+        if(isSuccess || isGgSuccess) {
+            const tokens = (data?.data || ggData?.data)!;
             localStorage.setItem('access_token', tokens.accessToken);
             localStorage.setItem('refresh_token', tokens.refreshToken);
 
             getAuth();
         }
-    }, [isGgSuccess]);
+    }, [isSuccess, isGgSuccess]);
+
+    useEffect(() => {
+        if(isError) {
+            const errorData = getErrorResponseData(error);
+            if(!errorData) {
+                return;
+            }
+
+            toast({
+                variant: "destructive",
+                title: "Uh oh! Something went wrong.",
+                description: errorData.message,
+                duration: 2000
+            })
+        }
+    }, [isError]);
 
     useEffect(() => {
         if(isAuthSuccess) {
@@ -110,7 +89,7 @@ const RegisterPage = () => {
                 <h3 className=" text-4xl font-semibold">PopcornBox</h3>
                 <img src={authBgImage}/>
             </div>
-            <RegisterForm 
+            <LoginForm 
                 form={form} 
                 onSubmit={onSubmit}
                 isLoading={isLoading || isGgLoading}
@@ -121,4 +100,4 @@ const RegisterPage = () => {
     )
 };
 
-export default RegisterPage;
+export default LoginPage;
