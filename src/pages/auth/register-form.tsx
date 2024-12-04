@@ -70,7 +70,7 @@ const RegisterForm = (props: RegisterFormProps) => {
                     <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
-                        <Input placeholder="Enter your email" {...field} />
+                        <Input placeholder="Enter your email" {...field} type="email" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -83,7 +83,7 @@ const RegisterForm = (props: RegisterFormProps) => {
                     <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
-                        <Input placeholder="Enter your password" {...field} />
+                        <Input placeholder="Enter your password" {...field} type="password" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -96,7 +96,7 @@ const RegisterForm = (props: RegisterFormProps) => {
                     <FormItem className="mb-4">
                         <FormLabel>Confirm your password</FormLabel>
                         <FormControl>
-                        <Input placeholder="Enter your password again!" {...field} />
+                        <Input placeholder="Enter your password again!" {...field} type="password" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
