@@ -1,4 +1,3 @@
-import registerFormSchema from "@/lib/validation/register-form-schema"
 import { UseFormReturn } from "react-hook-form"
 import { z } from "zod"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -45,7 +44,7 @@ const LoginForm = (props: RegisterFormProps) => {
                     <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
-                        <Input placeholder="Enter your email" {...field} />
+                        <Input placeholder="Enter your email" {...field} type="email" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -58,7 +57,7 @@ const LoginForm = (props: RegisterFormProps) => {
                     <FormItem className="mb-6">
                         <FormLabel>Password</FormLabel>
                         <FormControl>
-                        <Input placeholder="Enter your password" {...field} />
+                        <Input placeholder="Enter your password" {...field} type="password" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
