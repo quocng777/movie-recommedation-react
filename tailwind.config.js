@@ -50,7 +50,10 @@ export default {
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
   			}
-  		}
+  		},
+		backgroundImage: {
+			'discover-bg': "url('https://hips.hearstapps.com/hmg-prod/images/spiderman-cruzando-el-multiverso-pelicula-estreno-647b17a4c14ca.jpg?crop=1xw:1xh;center,top&resize=1200:*')"
+		}
   	}
   },
   plugins: [require("tailwindcss-animate")],

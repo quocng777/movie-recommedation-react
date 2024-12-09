@@ -3,6 +3,7 @@ import { getCurrentAuthentication } from "../app/api/auth/auth-slice";
 import { useSelector } from "react-redux";
 import { AuthLayout } from "@/layouts/auth-layout";
 import { Homepage } from "@/pages/home/home-page";
+import { MainLayout } from "@/layouts/main-layout";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     const user = useSelector(getCurrentAuthentication);
@@ -36,8 +37,17 @@ export const router = createBrowserRouter([
     {
         path: '',
         element: (
+            <MainLayout>
+                    <Homepage />
+            </MainLayout>)
+    },
+    {
+        path: '/protected',
+        element: (
         <ProtectedRoute>
-            <Homepage />
+            <MainLayout>
+                <Homepage />
+            </MainLayout>
         </ProtectedRoute>),
     }
 ]);
