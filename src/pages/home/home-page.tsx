@@ -1,8 +1,26 @@
+import { useLazyMovieTrendingQuery, useMovieTrendingQuery } from "@/app/api/movies/movie-api-slice";
+import { Movie, MovieMediaType, MovieTrendingDuration } from "@/app/api/types/movie.type";
+import { MovieCard } from "@/components/custom/movie-card";
 import { SliderButton } from "@/components/custom/slider-button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 
 export const Homepage = () => {
+
+    const [trendingMovies, setTrendingMovies] = useState<Movie[]>([]);
+
+    const [ getTrendingMovies, {isSuccess: isGetTrendingMoviesSuccess, data: trendingMoviesData} ] = useLazyMovieTrendingQuery();
+
+    useEffect(() => {
+        getTrendingMovies({trendingType: {mediaType: MovieMediaType.MOVIE, duration: MovieTrendingDuration.DAY}});
+    }, []);
+
+    useEffect(() => {
+        if(isGetTrendingMoviesSuccess) {
+            setTrendingMovies(trendingMoviesData.data?.results!);
+        }
+    }, [isGetTrendingMoviesSuccess, trendingMoviesData]);
 
     return <div className="w-full">
         <section className="px-8 flex justify-center w-full bg-discover-bg py-8 bg-black bg-center relative">
@@ -25,6 +43,11 @@ export const Homepage = () => {
                 <SliderButton />
             </div>
 
+            <div className="flex gap-4 overflow-x-auto py-6">
+                {trendingMovies.map((movie) => {
+                    return <MovieCard key={movie.id} movie={movie}/>
+                })}
+            </div>
             
         </section>
     </div>
