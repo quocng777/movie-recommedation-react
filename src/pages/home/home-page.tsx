@@ -52,24 +52,25 @@ export const Homepage = () => {
             </div>
         </section>
 
-        <section className="px-8 mt-8">
-            <div className="max-w-[1300px] flex items-center space-x-6">
-                <h4 className="text-lg">Trending</h4>
-                <SliderButton 
-                    onLeftClick={onLeftDurationClick}
-                    onRightClick={onRightDurationClick}
-                />
-            </div>
+        <section className="px-8 mt-8 w-full flex justify-center">
+            <div className="max-w-[1300px]">
+                <div className="max-w-[1300px] flex items-center space-x-6">
+                    <h4 className="text-lg">Trending</h4>
+                    <SliderButton 
+                        onLeftClick={onLeftDurationClick}
+                        onRightClick={onRightDurationClick}
+                    />
+                </div>
 
-            <div className="flex gap-4 overflow-x-auto py-6">
-                {isTrendingLoading && new Array(10).fill(null).map((_, idx) => {
-                    return <MovieCardSkeleton key={idx} />
-                })}
-                {trendingMovies.map((movie) => {
-                    return <MovieCard key={movie.id} movie={movie}/>
-                })}
+                <div className="flex gap-4 overflow-x-auto py-6">
+                    {isTrendingLoading && new Array(10).fill(null).map((_, idx) => {
+                        return <MovieCardSkeleton key={idx} />
+                    })}
+                    {trendingMovies.map((movie) => {
+                        return <MovieCard key={movie.id} movie={movie}/>
+                    })}
+                </div>
             </div>
-            
         </section>
     </div>
 }
