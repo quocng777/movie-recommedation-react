@@ -4,6 +4,7 @@ export const apiEndpoints = {
     LOGIN: '/auth/login',
     REFRESH_TOKEN: '/auth/refresh',
     ME: '/users/me',
+    MOVIE_TRENDING: '/tmdb/trending'
 };
 
 export const customApiCode = {
