@@ -1,6 +1,12 @@
 import { useState } from "react";
 
-export const SliderButton = () => {
+export type SliderButtonProps = {
+    onLeftClick: () => void;
+    onRightClick: () => void;
+};
+
+export const SliderButton = (props: SliderButtonProps) => {
+    
     const [isLeftSelected, setIsLeftSelected] = useState(true);
 
     const onRightClick = () => {
@@ -8,6 +14,7 @@ export const SliderButton = () => {
             return;
         }
         setIsLeftSelected(false)
+        props.onRightClick();
     };
 
     const onLeftClick = () => {
@@ -15,6 +22,7 @@ export const SliderButton = () => {
             return;
         }
         setIsLeftSelected(true)
+        props.onLeftClick();
     };
     
     return (<div className=" flex rounded-full border w-fit">
