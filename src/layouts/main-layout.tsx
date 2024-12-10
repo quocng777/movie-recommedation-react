@@ -1,3 +1,4 @@
+import { UserPopover } from "@/components/custom/user-popover";
 import { Button } from "@/components/ui/button";
 import { useAuthentication } from "@/hooks/use-authentication"
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
@@ -9,6 +10,7 @@ export type AuthLayoutProps = {
 
 export const MainLayout = ({ children}: AuthLayoutProps) => {
     const { isAuthenticated, authentication } = useAuthentication();
+
     return (
         <>
             {
@@ -18,12 +20,14 @@ export const MainLayout = ({ children}: AuthLayoutProps) => {
                             <p>TMDB</p>
                             <div>
                                 {isAuthenticated && 
-                                <div className="border size-10 rounded-full flex justify-center items-center ">
-                                    <Avatar>
-                                            <AvatarImage src={authentication?.picture} className="size-6 rounded-full" />
-                                            <AvatarFallback>CN</AvatarFallback>
-                                    </Avatar>
-                                </div>
+                                <UserPopover>
+                                    <div className="border size-10 rounded-full flex justify-center items-center  cursor-pointer shrink-0">
+                                        <Avatar className="shrink-0">
+                                                <AvatarImage src={authentication?.picture} className="size-10 rounded-full shrink-0" />
+                                                <AvatarFallback>{authentication.username[0].toUpperCase()}</AvatarFallback>
+                                        </Avatar>
+                                    </div>
+                                </UserPopover>
                                 }
                                 {!isAuthenticated && 
                                     <div className="flex space-x-4">
