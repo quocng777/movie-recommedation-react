@@ -27,13 +27,13 @@ function App() {
     <>
       <LoadingBar ref={loaderRef} />
       <Provider store={store}>
+        <TopLoaderContextProvider values={{staticStart, complete, continuousStart}}>
           <AuthLoader>
-            <TopLoaderContextProvider values={{staticStart, complete, continuousStart}}>
-              <RouterProvider router={router}></RouterProvider>
-              <Toaster />
-            </TopLoaderContextProvider>
+            <RouterProvider router={router}></RouterProvider>
+            <Toaster />
           </AuthLoader>
-        </Provider>
+        </TopLoaderContextProvider>
+      </Provider>
     </>
   )
 }
