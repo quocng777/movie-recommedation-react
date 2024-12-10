@@ -28,8 +28,15 @@ export type Movie =  {
     vote_average: number;
     
     vote_count: number;
-};
+    
+    tagline: string;
 
+    genres: Genre[];
+};
+export type Genre = {
+    id: number;
+    name: string;
+  };
 export enum MovieMediaType  {
     ALL =  'all',
     MOVIE = 'movie',
@@ -53,3 +60,5 @@ export type TmdbPageResponse<T> = {
     totalPages: number;
     totalResults: number;
 }
+
+  

@@ -74,7 +74,7 @@ export const Homepage = () => {
                         return <MovieCardSkeleton key={idx} />
                     })}
                     {trendingMovies.map((movie) => {
-                        return <MovieCard key={movie.id} movie={movie}/>
+                        return <MovieCard key={movie.id} movie={movie} />
                     })}
                 </div>
             </div>

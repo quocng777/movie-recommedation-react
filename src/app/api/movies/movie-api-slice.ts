@@ -13,10 +13,18 @@ export const movieApiSlice = apiSlice.injectEndpoints({
                 method: 'GET' ,
             })
         }),
+        movieDetail: builder.query<Response<Movie>, { id: string }>({
+            query: ({ id }) => ({
+                url: `${apiEndpoints.MOVIE}/${id}`,
+                method: 'GET',
+            }),
+        }),
     })
 });
 
 export const {
     useMovieTrendingQuery,
-    useLazyMovieTrendingQuery
+    useLazyMovieTrendingQuery,
+    useMovieDetailQuery,
+    useLazyMovieDetailQuery
 } = movieApiSlice;
