@@ -1,5 +1,4 @@
 import { createContext, ReactNode } from "react";
-import { LoadingBarRef } from "react-top-loading-bar";
 
 export type TopLoaderContextValues = {
     staticStart : () => void;

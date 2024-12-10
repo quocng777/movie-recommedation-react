@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux"
 import { setAuthenticatedUser } from "../api/auth/auth-slice"
 import { useGetAuthenticationQuery } from "../api/user/user.api.slice"
 import { UserRes } from "../api/types/user.type"
+import { FallbackScreen } from "@/components/custom/fallback-screen"
 
 type AuthLoaderProps = {
     children: ReactNode
@@ -22,7 +23,7 @@ export const AuthLoader = ({ children}: AuthLoaderProps) => {
 
     return (
         <>
-            {isLoading && 'Loading'}
+            {isLoading && <FallbackScreen />}
             {(!accessToken || isSuccess || isError) && children}
         </>
     )
