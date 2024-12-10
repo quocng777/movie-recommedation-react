@@ -3,9 +3,12 @@ import { useState } from "react";
 export type SliderButtonProps = {
     onLeftClick: () => void;
     onRightClick: () => void;
+    leftLabel?: string;
+    rightLabel?: string
 };
 
 export const SliderButton = (props: SliderButtonProps) => {
+    const {leftLabel, rightLabel} = props;
     
     const [isLeftSelected, setIsLeftSelected] = useState(true);
 
@@ -26,7 +29,7 @@ export const SliderButton = (props: SliderButtonProps) => {
     };
     
     return (<div className=" flex rounded-full border w-fit">
-        <div className={`py-2 px-4  rounded-full font-semibold cursor-pointer ${isLeftSelected ? 'bg-white text-black' : 'bg-inherit'} transition-all animate-fadeOut `} onClick={onLeftClick}>Day</div>
-        <div className={`py-2 px-4  rounded-full font-semibold cursor-pointer ${!isLeftSelected ? 'bg-white text-black' : ''}`} onClick={onRightClick}>Week</div>
+        <div className={`py-2 px-4  rounded-full font-semibold cursor-pointer ${isLeftSelected ? 'bg-white text-black' : 'bg-inherit'} transition-all animate-fadeOut `} onClick={onLeftClick}>{leftLabel || 'Left'}</div>
+        <div className={`py-2 px-4  rounded-full font-semibold cursor-pointer ${!isLeftSelected ? 'bg-white text-black' : ''}`} onClick={onRightClick}>{rightLabel || 'Right'}</div>
      </div>)
 };
