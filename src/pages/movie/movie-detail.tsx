@@ -3,41 +3,43 @@ import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useLazyMovieDetailQuery } from "@/app/api/movies/movie-api-slice";
 import { Movie } from "@/app/api/types/movie.type";
+import { FallbackScreen } from "@/components/custom/fallback-screen";
 export const MovieDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const [movie, setMovie] = useState<Movie> ();
+  const [movie, setMovie] = useState<Movie>();
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null); 
 
   const [
     getMovieDetail,
-    { data: movieData, isSuccess: isGetMovieDataSuccess },
+    { data: movieData, isSuccess: isGetMovieDataSuccess, error: apiError },
   ] = useLazyMovieDetailQuery();
 
   useEffect(() => {
     if (id) {
       setIsLoading(true);
-      getMovieDetail({ id }); // Gọi API
+      setError(null);
+      getMovieDetail({ id });
     }
   }, [id]);
 
-
   useEffect(() => {
     if (isGetMovieDataSuccess && movieData) {
-        setMovie(movieData.data); // Lưu vào movie nếu có dữ liệu
+      setMovie(movieData.data);
       setIsLoading(false);
-    } 
+    }
+    if (apiError) {
+      setError("Something went wrong. Please try again later.");
+      setIsLoading(false);
+    }
   }, [isGetMovieDataSuccess, movieData]);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-  if (!movie) {
-    return <div>Movie not found</div>;
-  }
+  if (isLoading) return <FallbackScreen />;
+  if (error) return <div>{error}</div>;
+  if (!movie) return <div>Movie not found</div>;
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-900 text-white">
-      
       <div
         className="relative flex rounded-lg overflow-hidden shadow-lg"
         style={{
@@ -82,12 +84,10 @@ export const MovieDetail = () => {
             </div>
           </div>
         </div>
-      </div> 
+      </div>
 
       {/* Phần nội dung bên dưới */}
-      <div className="flex-1 p-6">
-       
-      </div>
+      <div className="flex-1 p-6"></div>
     </div>
   );
 };
