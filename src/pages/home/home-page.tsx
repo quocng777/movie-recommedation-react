@@ -4,6 +4,7 @@ import { MovieCard } from "@/components/custom/movie-card";
 import { MovieCardSkeleton } from "@/components/custom/movie-card-sekeleton";
 import { SliderButton } from "@/components/custom/slider-button";
 import { Input } from "@/components/ui/input";
+import { useTopBarLoader } from "@/hooks/use-top-loader";
 import { Search } from "lucide-react";
 import {  useEffect, useState } from "react";
 
@@ -12,6 +13,7 @@ export const Homepage = () => {
     const [trendingMovies, setTrendingMovies] = useState<Movie[]>([]);
     const [trendingDuration, setTrendingDuration] = useState<MovieTrendingDuration>(MovieTrendingDuration.DAY);
     const [isTrendingLoading, setIsTrendingLoading] = useState(true);
+    const { staticStart: startTopBar, complete: completeTopBar } = useTopBarLoader();
 
     const [ getTrendingMovies, {isSuccess: isGetTrendingMoviesSuccess, data: trendingMoviesData} ] = useLazyMovieTrendingQuery();
 
@@ -27,13 +29,16 @@ export const Homepage = () => {
             setTrendingMovies(trendingMoviesData.data?.results!);
             setIsTrendingLoading(false);
         }
+        completeTopBar();
     }, [isGetTrendingMoviesSuccess, trendingMoviesData]);
 
     const onLeftDurationClick = () => {
+        startTopBar();
         setTrendingDuration(MovieTrendingDuration.DAY);
     };
 
     const onRightDurationClick = () => {
+        startTopBar();
         setTrendingDuration(MovieTrendingDuration.WEEK);
     };
 
@@ -59,6 +64,8 @@ export const Homepage = () => {
                     <SliderButton 
                         onLeftClick={onLeftDurationClick}
                         onRightClick={onRightDurationClick}
+                        leftLabel="Today"
+                        rightLabel="This week"
                     />
                 </div>
 
