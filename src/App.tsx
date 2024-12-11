@@ -7,6 +7,7 @@ import { AuthLoader } from './app/context/auth-loader'
 import LoadingBar, {LoadingBarRef} from 'react-top-loading-bar'
 import { useRef } from 'react'
 import { TopLoaderContextProvider } from './app/context/top-bar-loader-context'
+import ErrorBoundary from './components/error-boundary'
 
 function App() {
   const loaderRef = useRef<LoadingBarRef>(null);
@@ -27,15 +28,19 @@ function App() {
     <>
       <LoadingBar ref={loaderRef} />
       <Provider store={store}>
-        <TopLoaderContextProvider values={{staticStart, complete, continuousStart}}>
-          <AuthLoader>
-            <RouterProvider router={router}></RouterProvider>
-            <Toaster />
-          </AuthLoader>
-        </TopLoaderContextProvider>
+          <TopLoaderContextProvider
+            values={{ staticStart, complete, continuousStart }}
+            >
+            <AuthLoader>
+            <ErrorBoundary>
+              <RouterProvider router={router}></RouterProvider>
+              <Toaster />
+            </ErrorBoundary>
+            </AuthLoader>
+          </TopLoaderContextProvider>
       </Provider>
     </>
-  )
+  );
 }
 
 export default App;

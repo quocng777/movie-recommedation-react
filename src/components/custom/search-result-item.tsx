@@ -1,7 +1,6 @@
 import { getResourceFromTmdb } from "@/lib/helpers/get-resource-tmbd";
 import React from "react";
 import DefaultImage from "./default-image";
-import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 type SearchResultItemProps = {

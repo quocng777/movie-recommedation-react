@@ -167,6 +167,9 @@ export const MovieDetail = () => {
               new Array(10).fill(null).map((_, idx) => {
                 return <MovieCardSkeleton key={idx} />;
               })}
+            {movieCast.length === 0 && !isMovieCastLoading && (
+              <p className="text-gray-500">No cast available</p>
+            )}
             {movieCast.map((cast) => {
               return <MoviecastCard key={cast.id} cast={cast} />;
             })}

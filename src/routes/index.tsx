@@ -7,6 +7,8 @@ import { SearchPage } from "@/pages/search/search-page";
 import { MainLayout } from "@/layouts/main-layout";
 import { Suspense } from "react";
 import { FallbackScreen } from "@/components/custom/fallback-screen";
+import InterruptsPage from "@/pages/error/interrupts";
+import NotFoundPage from "@/pages/error/not-found-page";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const user = useSelector(getCurrentAuthentication);
@@ -23,40 +25,51 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 export const router = createBrowserRouter([
-    {
-        path: "/search",
+  {
+    path: "/movie/:id",
+    lazy: async () => {
+      const { MovieDetail } = await import("../pages/movie/movie-detail");
+
+      return {
         element: (
-        <Suspense fallback={<FallbackScreen />}>
+          <Suspense fallback={<FallbackScreen />}>
             <MainLayout>
-                <SearchPage />
+              <AuthLayout>
+                {" "}
+                <MovieDetail />
+              </AuthLayout>
             </MainLayout>
-        </Suspense>
+          </Suspense>
         ),
+      };
     },
-    {
-        path: '/login',
-        lazy: async () => {
-            const { default: LoginPage } = await import('../pages/auth/login-page');
-            return {
-                element: (<Suspense fallback={<FallbackScreen/> }>
-                    <AuthLayout> <LoginPage /></AuthLayout>
-                </Suspense>)
-            };
-        }
+  },
+  {
+    path: "/search",
+    element: (
+      <Suspense fallback={<FallbackScreen />}>
+        <MainLayout>
+          <SearchPage />
+        </MainLayout>
+      </Suspense>
+    ),
+  },
+  {
+    path: "/login",
+    lazy: async () => {
+      const { default: LoginPage } = await import("../pages/auth/login-page");
+      return {
+        element: (
+          <Suspense fallback={<FallbackScreen />}>
+            <AuthLayout>
+              {" "}
+              <LoginPage />
+            </AuthLayout>
+          </Suspense>
+        ),
+      };
     },
-    {
-        path: '/register',
-        lazy: async () => {
-            const { default: RegisterPage } = await import('../pages/auth/register-page');
-            return {
-                element: (
-                    <Suspense fallback={<FallbackScreen />}>
-                        <AuthLayout> <RegisterPage /></AuthLayout>
-                    </Suspense>
-                )
-            };
-        }
-    },
+  },
   {
     path: "/register",
     lazy: async () => {
@@ -91,6 +104,10 @@ export const router = createBrowserRouter([
     },
   },
   {
+    path: "/interrupts",
+    element: <InterruptsPage />,
+  },
+  {
     path: "/protected",
     element: (
       <ProtectedRoute>
@@ -101,20 +118,7 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: "/movie/:id",
-    lazy: async () => {
-    const { MovieDetail} = await import("../pages/movie/movie-detail");
-
-      return {
-        element: (
-          <MainLayout>
-            <AuthLayout>
-              {" "}
-              <MovieDetail />
-            </AuthLayout>
-          </MainLayout>
-        ),
-      };
-    },
+    path: "*",
+    element: <NotFoundPage />,
   },
 ]);
