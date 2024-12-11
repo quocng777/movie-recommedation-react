@@ -13,10 +13,18 @@ export const movieApiSlice = apiSlice.injectEndpoints({
                 method: 'GET' ,
             })
         }),
+        searchMovies: builder.query<Response<TmdbPageResponse<Movie>>, { query: string }>({
+            query: ({ query }) => ({
+                url: `${apiEndpoints.MOVIE_SEARCH}`,
+                params: { query },
+                method: 'GET',
+            })
+        }),
     })
 });
 
 export const {
     useMovieTrendingQuery,
-    useLazyMovieTrendingQuery
+    useLazyMovieTrendingQuery,
+    useLazySearchMoviesQuery
 } = movieApiSlice;

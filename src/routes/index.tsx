@@ -3,6 +3,7 @@ import { getCurrentAuthentication } from "../app/api/auth/auth-slice";
 import { useSelector } from "react-redux";
 import { AuthLayout } from "@/layouts/auth-layout";
 import { Homepage } from "@/pages/home/home-page";
+import { SearchPage } from "@/pages/search/search-page";
 import { MainLayout } from "@/layouts/main-layout";
 import { Suspense } from "react";
 import { FallbackScreen } from "@/components/custom/fallback-screen";
@@ -18,6 +19,16 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 export const router = createBrowserRouter([
+    {
+        path: "/search",
+        element: (
+        <Suspense fallback={<FallbackScreen />}>
+            <MainLayout>
+                <SearchPage />
+            </MainLayout>
+        </Suspense>
+        ),
+    },
     {
         path: '/login',
         lazy: async () => {
