@@ -7,9 +7,10 @@ import { Input } from "@/components/ui/input";
 import { useTopBarLoader } from "@/hooks/use-top-loader";
 import { Search } from "lucide-react";
 import {  useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const Homepage = () => {
-
+    const navigate = useNavigate();
     const [trendingMovies, setTrendingMovies] = useState<Movie[]>([]);
     const [trendingDuration, setTrendingDuration] = useState<MovieTrendingDuration>(MovieTrendingDuration.DAY);
     const [isTrendingLoading, setIsTrendingLoading] = useState(true);
@@ -41,7 +42,10 @@ export const Homepage = () => {
         startTopBar();
         setTrendingDuration(MovieTrendingDuration.WEEK);
     };
-
+    const onMovieCardClick = (id: string)=>{
+        navigate('/movie/' + id);
+        return;
+    }
     return <div className="w-full">
         <section className="px-8 flex justify-center w-full bg-discover-bg py-8 bg-black bg-center relative">
             <div className="absolute inset-0 bg-black opacity-35 z-10"></div>
@@ -74,8 +78,8 @@ export const Homepage = () => {
                         return <MovieCardSkeleton key={idx} />
                     })}
                     {trendingMovies.map((movie) => {
-                        return <MovieCard key={movie.id} movie={movie}/>
-                    })}
+                            return <MovieCard key={movie.id} movie={movie} onClick={() => onMovieCardClick(movie.id.toString())} />;
+                        })}
                 </div>
             </div>
         </section>

@@ -28,8 +28,23 @@ export type Movie =  {
     vote_average: number;
     
     vote_count: number;
-};
+    
+    tagline: string;
 
+    genres: Genre[];
+
+    runtime: number;
+
+    status: string;
+
+    budget: number;
+
+    revenue: number;
+};
+export type Genre = {
+    id: number;
+    name: string;
+  };
 export enum MovieMediaType  {
     ALL =  'all',
     MOVIE = 'movie',
@@ -52,4 +67,34 @@ export type TmdbPageResponse<T> = {
     results: T[];
     totalPages: number;
     totalResults: number;
+}
+
+export type MovieCast ={
+    adult: boolean;
+
+    id: number;
+
+    profile_path: string;
+
+    name: string;
+
+    character: string;
+}
+
+export type MovieCastResponse<T> ={
+
+    id: number;
+
+    cast: T[];
+}
+
+export type MovieKeywords = {
+    id: number;
+
+    name: string;
+}
+
+export type MovieKeywordsResponse<T> = {
+    id: number;
+    keywords: T[];
 }
