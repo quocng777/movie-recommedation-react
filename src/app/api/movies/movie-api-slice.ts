@@ -1,7 +1,7 @@
 import { apiSlice } from "../base/api-slice";
 import { Response } from "../types/response";
 import { apiEndpoints } from "../constants";
-import { Movie, Moviecast, MoviecastResponse, MovieMediaType, MovieTrendingDuration, MovieTrendingType, TmdbPageResponse, MovieKeywords, MovieKeywordsResponse } from "../types/movie.type";
+import { Movie, MovieCast, MovieCastResponse, MovieMediaType, MovieTrendingDuration, MovieTrendingType, TmdbPageResponse, MovieKeywords, MovieKeywordsResponse } from "../types/movie.type";
 
 export const movieApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
@@ -20,7 +20,7 @@ export const movieApiSlice = apiSlice.injectEndpoints({
             }),
         }),
 
-        movieCast: builder.query<Response<MoviecastResponse<Moviecast>>, { id: string }>({
+        movieCast: builder.query<Response<MovieCastResponse<MovieCast>>, { id: string }>({
             query: ({ id }) => ({
                 url: `${apiEndpoints.MOVIE}/${id}/credits`,
                 method: 'GET',

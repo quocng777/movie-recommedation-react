@@ -69,7 +69,7 @@ export type TmdbPageResponse<T> = {
     totalResults: number;
 }
 
-export type Moviecast ={
+export type MovieCast ={
     adult: boolean;
 
     id: number;
@@ -81,7 +81,7 @@ export type Moviecast ={
     character: string;
 }
 
-export type MoviecastResponse<T> ={
+export type MovieCastResponse<T> ={
 
     id: number;
 

@@ -5,7 +5,7 @@ import {
   useLazyMovieDetailQuery,
   useLazyMovieKeywordsQuery,
 } from "@/app/api/movies/movie-api-slice";
-import { Movie, Moviecast, MovieKeywords } from "@/app/api/types/movie.type";
+import { Movie, MovieCast, MovieKeywords } from "@/app/api/types/movie.type";
 import { FallbackScreen } from "@/components/custom/fallback-screen";
 import { getResourceFromTmdb } from "@/lib/helpers/get-resource-tmbd";
 import { MoviecastCard } from "@/components/custom/moviecast-card";
@@ -17,11 +17,10 @@ const languageMap: { [key: string]: string } = {
 export const MovieDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [movie, setMovie] = useState<Movie>();
-  const [movieCast, setMovieCast] = useState<Moviecast[]>([]);
+  const [movieCast, setMovieCast] = useState<MovieCast[]>([]);
   const [movieKeywords, setMovieKeywords] = useState<MovieKeywords[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isMovieCastLoading, setIsMovieCastLoading] = useState(true);
-  const [isMovieKeywordLoading, setIsMovieKeywordLoading] = useState(true);
 
   const [error, setError] = useState<string | null>(null);
 
@@ -41,7 +40,6 @@ export const MovieDetail = () => {
     if (id) {
       setIsLoading(true);
       setIsMovieCastLoading(true);
-      setIsMovieKeywordLoading(true);
       setError(null);
       getMovieDetail({ id });
       getMovieCast({ id });
@@ -71,7 +69,6 @@ export const MovieDetail = () => {
   useEffect(() => {
     if (isGetMovieKeywordsSuccess) {
       setMovieKeywords(movieKeywordData.data?.keywords!);
-      setIsMovieCastLoading(false);
     }
   }, [isGetMovieKeywordsSuccess]);
 
@@ -106,11 +103,10 @@ export const MovieDetail = () => {
             {/* Title and Time */}
             <div className="flex justify-between items-center">
               <h1 className="text-5xl font-bold">{movie.title}</h1>
-              
             </div>
             <span className="text-lg">
-                {new Date(movie.release_date).toLocaleDateString()}
-              </span>
+              {new Date(movie.release_date).toLocaleDateString()}
+            </span>
             {/* Genres */}
             <div className="flex gap-4 flex-wrap mt-4">
               {movie.genres?.map((genre) => (
@@ -211,7 +207,7 @@ export const MovieDetail = () => {
                 ))}
               </div>
             ) : (
-              <FallbackScreen />
+              <div> Loading....</div>
             )}
           </div>
         </div>
