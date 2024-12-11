@@ -3,23 +3,25 @@ import { useLazySearchMoviesQuery } from "@/app/api/movies/movie-api-slice";
 import { Movie } from "@/app/api/types/movie.type";
 import { useEffect, useState } from "react";
 import { SearchResultItem } from "@/components/custom/search-result-item";
+import Pagination from "@/components/custom/pagination";
 
 export const SearchPage = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("query") || "";
-  console.log("query: ", query);
+  const page = searchParams.get("page") ? parseInt(searchParams.get("page")!) : 1;
+
+  const [currentPage, setCurrentPage] = useState(page);
   const [movies, setMovies] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const [searchMovies, {isSuccess: isGetSearchResultSuccess, data: searchResultData}] = useLazySearchMoviesQuery();
 
   useEffect(() => {
-    console.log("searching movies...", query);
     if (!isLoading) {
       setIsLoading(true);
     }
-    searchMovies({ query: query });
-  }, [searchParams]);
+    searchMovies({ query: query, page: currentPage });
+  }, [query, currentPage, searchMovies]);
 
   useEffect(() => {
     if (isGetSearchResultSuccess) {
@@ -28,9 +30,13 @@ export const SearchPage = () => {
     }
   }, [isGetSearchResultSuccess, searchResultData]);
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   return (
-    <div className="w-full">
-      <div className="max-w-[1300px] mx-auto px-8 py-6">
+    <div className="container mx-auto p-4">
+      <div className="px-8 py-6">
         <h3 className="text-xl font-bold mb-4">Search Results for "{query}"</h3>
         {isLoading ? (
           <p>Loading...</p>
@@ -51,6 +57,14 @@ export const SearchPage = () => {
           <p>There are no results that matched "{query}".</p>
         )}
       </div>
+      {isGetSearchResultSuccess &&
+        searchResultData?.data && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={searchResultData.data?.totalPages!}
+            onPageChange={handlePageChange}
+          />
+        )}
     </div>
   );
 };
