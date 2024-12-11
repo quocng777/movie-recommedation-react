@@ -1,8 +1,11 @@
 import { UserPopover } from "@/components/custom/user-popover";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useAuthentication } from "@/hooks/use-authentication"
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { Link } from "react-router-dom";
+import { Search } from "lucide-react";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 export type AuthLayoutProps = {
     children: React.ReactNode,
@@ -10,6 +13,15 @@ export type AuthLayoutProps = {
 
 export const MainLayout = ({ children}: AuthLayoutProps) => {
     const { isAuthenticated, authentication } = useAuthentication();
+    const [searchQuery, setSearchQuery] = useState("");
+    const navigate = useNavigate();
+    const handleSearch = (e: React.FormEvent) => {
+      e.preventDefault();
+      if (searchQuery) {
+        navigate(`/search?query=${searchQuery}`);
+      }
+    };
+
 
     return (
         <>
@@ -20,7 +32,18 @@ export const MainLayout = ({ children}: AuthLayoutProps) => {
                             <Link to={'/'}>
                                 <p className="font-bold">TMDB</p>
                             </Link>
-                            <div>
+                            <div className="flex items-center space-x-4">
+                                <div className="relative">
+                                    <Input
+                                        className="rounded-full px-4"
+                                        placeholder="Search..."
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        onKeyDown={(e) => e.key === "Enter" && handleSearch(e)}
+                                    />
+                                    <Search 
+                                            className="text-white cursor-pointer absolute top-2 right-3 end-5" 
+                                            onClick={handleSearch}/>
+                                </div>
                                 {isAuthenticated && 
                                 <UserPopover>
                                     <div className="border size-10 rounded-full flex justify-center items-center  cursor-pointer shrink-0">
@@ -39,7 +62,7 @@ export const MainLayout = ({ children}: AuthLayoutProps) => {
                                         </Link>
                                     </div>}
                             </div>
-                        </div>
+                        </div>     
                     </header>
                     {children}
                 </div>
