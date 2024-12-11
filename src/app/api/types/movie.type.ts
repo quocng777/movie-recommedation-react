@@ -32,6 +32,14 @@ export type Movie =  {
     tagline: string;
 
     genres: Genre[];
+
+    runtime: number;
+
+    status: string;
+
+    budget: number;
+
+    revenue: number;
 };
 export type Genre = {
     id: number;
@@ -61,4 +69,32 @@ export type TmdbPageResponse<T> = {
     totalResults: number;
 }
 
-  
+export type Moviecast ={
+    adult: boolean;
+
+    id: number;
+
+    profile_path: string;
+
+    name: string;
+
+    character: string;
+}
+
+export type MoviecastResponse<T> ={
+
+    id: number;
+
+    cast: T[];
+}
+
+export type MovieKeywords = {
+    id: number;
+
+    name: string;
+}
+
+export type MovieKeywordsResponse<T> = {
+    id: number;
+    keywords: T[];
+}
