@@ -19,13 +19,14 @@ export const MovieCard = (props: MovieCardProps) => {
     };
     
     return (
-        <div className="rounded-lg overflow-hidden cursor-pointer shrink-0" onClick={onClick}>
+        <div className="rounded-lg overflow-hidden cursor-pointer shrink-0 w-40" onClick={onClick}>
+
             <div className="w-40 relative h-[15rem]">
                 <img src={getResourceFromTmdb(movie.poster_path)} onLoad={onImageLoad} className={`${!loaded ? 'opacity-0' : ''}`}/>
                 {!loaded && <Skeleton className="top-0 absolute bottom-0 right-0 left-0 opacity-100" />}
             </div>
             <div className="mt-2 flex flex-col">
-                <span className="font-semibold">{movie.original_title}</span>
+                <span className="font-semibold text-ellipsis line-clamp-1">{movie.original_title}</span>
                 <span className="text-sm">{movie.release_date}</span>
             </div>
         </div>

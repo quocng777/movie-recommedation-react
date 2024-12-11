@@ -15,9 +15,11 @@ export const MainLayout = ({ children}: AuthLayoutProps) => {
         <>
             {
                 <div className="min-h-screen">
-                    <header className="w-full border-b py-4 px-6 sticky top-0 bg-opacity-80 z-50 bg-black">
+                    <header className="w-full border-b py-4 px-12 sticky top-0 bg-opacity-80 z-50 bg-black">
                         <div className="flex w-full justify-between">
-                            <p>TMDB</p>
+                            <Link to={'/'}>
+                                <p className="font-bold">TMDB</p>
+                            </Link>
                             <div>
                                 {isAuthenticated && 
                                 <UserPopover>
