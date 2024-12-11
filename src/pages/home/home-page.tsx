@@ -99,7 +99,6 @@ export const Homepage = () => {
                             return <MovieCard key={movie.id} movie={movie} onClick={() => onMovieCardClick(movie.id.toString())} />;
                         })}
                 </div>
-            </div>
           </div>
         </section>
       </div>

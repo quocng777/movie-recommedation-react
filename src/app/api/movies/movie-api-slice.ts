@@ -27,6 +27,8 @@ export const movieApiSlice = apiSlice.injectEndpoints({
                     totalResults: response.data.total_results
                 }
             })
+        }),
+
         movieDetail: builder.query<Response<Movie>, { id: string }>({
             query: ({ id }) => ({
                 url: `${apiEndpoints.MOVIE}/${id}`,
@@ -52,7 +54,7 @@ export const movieApiSlice = apiSlice.injectEndpoints({
 export const {
     useMovieTrendingQuery,
     useLazyMovieTrendingQuery,
-    useLazySearchMoviesQuery
+    useLazySearchMoviesQuery,
     useMovieDetailQuery,
     useLazyMovieDetailQuery,
     useMovieCastQuery,
