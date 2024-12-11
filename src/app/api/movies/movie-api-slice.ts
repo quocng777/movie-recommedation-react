@@ -13,6 +13,20 @@ export const movieApiSlice = apiSlice.injectEndpoints({
                 method: 'GET' ,
             })
         }),
+        searchMovies: builder.query<Response<TmdbPageResponse<Movie>>, { query: string, page: number }>({
+            query: ({ query, page }) => ({
+                url: `${apiEndpoints.MOVIE_SEARCH}`,
+                params: { query: query, page: page },
+                method: 'GET',
+            }),
+            transformResponse: (response: any) => ({
+                ...response,
+                data: {
+                    ...response.data,
+                    totalPages: response.data.total_pages,
+                    totalResults: response.data.total_results
+                }
+            })
         movieDetail: builder.query<Response<Movie>, { id: string }>({
             query: ({ id }) => ({
                 url: `${apiEndpoints.MOVIE}/${id}`,
@@ -38,11 +52,11 @@ export const movieApiSlice = apiSlice.injectEndpoints({
 export const {
     useMovieTrendingQuery,
     useLazyMovieTrendingQuery,
+    useLazySearchMoviesQuery
     useMovieDetailQuery,
     useLazyMovieDetailQuery,
     useMovieCastQuery,
     useLazyMovieCastQuery,
     useMovieKeywordsQuery,
     useLazyMovieKeywordsQuery
-
 } = movieApiSlice;

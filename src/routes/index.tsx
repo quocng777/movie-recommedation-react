@@ -3,6 +3,7 @@ import { getCurrentAuthentication } from "../app/api/auth/auth-slice";
 import { useSelector } from "react-redux";
 import { AuthLayout } from "@/layouts/auth-layout";
 import { Homepage } from "@/pages/home/home-page";
+import { SearchPage } from "@/pages/search/search-page";
 import { MainLayout } from "@/layouts/main-layout";
 import { Suspense } from "react";
 import { FallbackScreen } from "@/components/custom/fallback-screen";
@@ -22,20 +23,39 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 export const router = createBrowserRouter([
-  {
-    path: "/login",
-    lazy: async () => {
-      const { default: LoginPage } = await import("../pages/auth/login-page");
-      return {
+    {
+        path: "/search",
         element: (
-          <Suspense fallback={<FallbackScreen />}>
-            <AuthLayout>
-              {" "}
-              <LoginPage />
-            </AuthLayout>
-          </Suspense>
+        <Suspense fallback={<FallbackScreen />}>
+            <MainLayout>
+                <SearchPage />
+            </MainLayout>
+        </Suspense>
         ),
-      };
+    },
+    {
+        path: '/login',
+        lazy: async () => {
+            const { default: LoginPage } = await import('../pages/auth/login-page');
+            return {
+                element: (<Suspense fallback={<FallbackScreen/> }>
+                    <AuthLayout> <LoginPage /></AuthLayout>
+                </Suspense>)
+            };
+        }
+    },
+    {
+        path: '/register',
+        lazy: async () => {
+            const { default: RegisterPage } = await import('../pages/auth/register-page');
+            return {
+                element: (
+                    <Suspense fallback={<FallbackScreen />}>
+                        <AuthLayout> <RegisterPage /></AuthLayout>
+                    </Suspense>
+                )
+            };
+        }
     },
   },
   {
