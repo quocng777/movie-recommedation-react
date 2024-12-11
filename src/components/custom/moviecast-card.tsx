@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { Skeleton } from "../ui/skeleton";
-import { Moviecast } from "@/app/api/types/movie.type";
+import { MovieCast } from "@/app/api/types/movie.type";
 import { getResourceFromTmdb } from "@/lib/helpers/get-resource-tmbd";
 import DefaultImage from "./default-image";
 
-export type MoviecasrCardProps = {
-    cast: Moviecast;
+export type MovieCastCardProps = {
+    cast: MovieCast;
     onClick?: () => void;
 }
 
-export const MoviecastCard = (props: MoviecasrCardProps) => {
+export const MoviecastCard = (props: MovieCastCardProps) => {
    
     const { cast, onClick } = props;
 
