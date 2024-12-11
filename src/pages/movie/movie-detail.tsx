@@ -53,10 +53,15 @@ export const MovieDetail = () => {
       setIsLoading(false);
     }
     if (apiError) {
-      setError("Something went wrong. Please try again later.");
-      setIsLoading(false);
-    }
-  }, [isGetMovieDataSuccess, movieData]);
+        const statusCode = (apiError as any)?.status || 500;
+        if (statusCode === 500) {
+          setError("No movie found with the given ID. Please check the ID and try again.");
+        } else {
+          setError("Something went wrong. Please try again.");
+        }
+        setIsLoading(false)
+  }
+}, [isGetMovieDataSuccess, movieData, apiError]);
 
   useEffect(() => {
     if (isGetMovieCastSuccess) {
