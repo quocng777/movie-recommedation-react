@@ -1,7 +1,7 @@
 import { apiSlice } from "../base/api-slice";
 import { Response } from "../types/response";
 import { apiEndpoints } from "../constants";
-import { Movie, MovieMediaType, MovieTrendingDuration, MovieTrendingType, TmdbPageResponse } from "../types/movie.type";
+import { Movie, MovieCast, MovieCastResponse, MovieMediaType, MovieTrendingDuration, MovieTrendingType, TmdbPageResponse, MovieKeywords, MovieKeywordsResponse } from "../types/movie.type";
 
 export const movieApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
@@ -27,6 +27,24 @@ export const movieApiSlice = apiSlice.injectEndpoints({
                     totalResults: response.data.total_results
                 }
             })
+        movieDetail: builder.query<Response<Movie>, { id: string }>({
+            query: ({ id }) => ({
+                url: `${apiEndpoints.MOVIE}/${id}`,
+                method: 'GET',
+            }),
+        }),
+
+        movieCast: builder.query<Response<MovieCastResponse<MovieCast>>, { id: string }>({
+            query: ({ id }) => ({
+                url: `${apiEndpoints.MOVIE}/${id}/credits`,
+                method: 'GET',
+            }),
+        }),
+        movieKeywords: builder.query<Response<MovieKeywordsResponse<MovieKeywords>>, { id: string }>({
+            query: ({ id }) => ({
+                url: `${apiEndpoints.MOVIE}/${id}/keywords`,
+                method: 'GET',
+            }),
         }),
     })
 });
@@ -35,4 +53,10 @@ export const {
     useMovieTrendingQuery,
     useLazyMovieTrendingQuery,
     useLazySearchMoviesQuery
+    useMovieDetailQuery,
+    useLazyMovieDetailQuery,
+    useMovieCastQuery,
+    useLazyMovieCastQuery,
+    useMovieKeywordsQuery,
+    useLazyMovieKeywordsQuery
 } = movieApiSlice;

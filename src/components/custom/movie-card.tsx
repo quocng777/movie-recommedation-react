@@ -4,21 +4,22 @@ import { Movie } from "@/app/api/types/movie.type";
 import { getResourceFromTmdb } from "@/lib/helpers/get-resource-tmbd";
 
 export type MovieCardProps = {
-    movie: Movie
+    movie: Movie;
+    onClick?: () => void;
 }
 
 export const MovieCard = (props: MovieCardProps) => {
-
-    const { movie } = props;
+   
+    const { movie, onClick } = props;
 
     const [loaded, setLoaded] = useState(false);
 
     const onImageLoad = () => {
         setLoaded(true);
     };
-
+    
     return (
-        <div className="rounded-lg overflow-hidden cursor-pointer shrink-0 w-40">
+        <div className="rounded-lg overflow-hidden cursor-pointer shrink-0 w-40" onClick={onClick}>
             <div className="w-40 relative h-[15rem]">
                 <img src={getResourceFromTmdb(movie.poster_path)} onLoad={onImageLoad} className={`${!loaded ? 'opacity-0' : ''}`}/>
                 {!loaded && <Skeleton className="top-0 absolute bottom-0 right-0 left-0 opacity-100" />}

@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 
 export const Homepage = () => {
     const navigate = useNavigate();
-
+  
     const [trendingMovies, setTrendingMovies] = useState<Movie[]>([]);
     const [trendingDuration, setTrendingDuration] = useState<MovieTrendingDuration>(MovieTrendingDuration.DAY);
     const [isTrendingLoading, setIsTrendingLoading] = useState(true);
@@ -50,7 +50,10 @@ export const Homepage = () => {
             navigate(`/search?query=${encodeURIComponent(searchQuery.trim())}`);
         }
     }
-
+    const onMovieCardClick = (id: string)=>{
+        navigate('/movie/' + id);
+        return;
+    }
     return (
       <div className="w-full">
         <section className="px-8 flex justify-center w-full bg-discover-bg py-8 bg-black bg-center relative">
@@ -88,14 +91,14 @@ export const Homepage = () => {
               />
             </div>
 
-            <div className="flex gap-4 overflow-x-auto py-6">
-              {isTrendingLoading &&
-                new Array(10).fill(null).map((_, idx) => {
-                  return <MovieCardSkeleton key={idx} />;
-                })}
-              {trendingMovies.map((movie) => {
-                return <MovieCard key={movie.id} movie={movie} />;
-              })}
+                <div className="flex gap-4 overflow-x-auto py-6">
+                    {isTrendingLoading && new Array(10).fill(null).map((_, idx) => {
+                        return <MovieCardSkeleton key={idx} />
+                    })}
+                    {trendingMovies.map((movie) => {
+                            return <MovieCard key={movie.id} movie={movie} onClick={() => onMovieCardClick(movie.id.toString())} />;
+                        })}
+                </div>
             </div>
           </div>
         </section>
