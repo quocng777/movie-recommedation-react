@@ -1,8 +1,11 @@
 import { getResourceFromTmdb } from "@/lib/helpers/get-resource-tmbd";
 import React from "react";
 import DefaultImage from "./default-image";
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 type SearchResultItemProps = {
+  id: string,
   title: string;
   posterPath: string;
   releaseDate?: string;
@@ -11,6 +14,7 @@ type SearchResultItemProps = {
 };
 
 export const SearchResultItem: React.FC<SearchResultItemProps> = ({
+  id,
   title,
   posterPath,
   releaseDate,
@@ -31,15 +35,18 @@ export const SearchResultItem: React.FC<SearchResultItemProps> = ({
 
       <div className="flex flex-col justify-center">
         <div className="flex flex-col py-2 px-4 space-y-4">
-          <div className="flex flex-col">
-            <div className="flex items-center space-x-2">
-              <h4 className="text-lg font-semibold text-white">{title}</h4>
+          <div>
+            <Link
+              to={`/movie/${id}`}
+              className="inline-flex space-x-2 hover:shadow-lg transition duration-200"
+            >
+              <span className="text-lg font-semibold text-white">{title}</span>
               {originalTitle && originalTitle !== title && (
                 <span className="text-lg text-gray-400 italic">
                   ({originalTitle})
                 </span>
               )}
-            </div>
+            </Link>
             {releaseDate && (
               <p className="text-sm text-gray-500">
                 Release: {releaseDate.slice(0, 4)}
