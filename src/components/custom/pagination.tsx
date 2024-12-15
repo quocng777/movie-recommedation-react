@@ -1,4 +1,5 @@
 import React from "react";
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "../ui/pagination";
 
 type PaginationProps = {
   currentPage: number;
@@ -6,7 +7,7 @@ type PaginationProps = {
   onPageChange: (page: number) => void;
 };
 
-const Pagination: React.FC<PaginationProps> = ({
+const CustomPagination: React.FC<PaginationProps> = ({
   currentPage,
   totalPages,
   onPageChange,
@@ -68,54 +69,28 @@ const Pagination: React.FC<PaginationProps> = ({
   const pages = getPageNumbers();
 
   return (
-    <div className="flex items-center justify-center">
-      <button
-        onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
-        disabled={currentPage === 1}
-        className={`px-4 py-2 rounded-md mr-2 ${
-          currentPage === 1
-            ? "bg-gray-500 text-gray-300 cursor-not-allowed"
-            : "bg-gray-700 text-white"
-        }`}
-      >
-        Previous
-      </button>
-
-      <div className="flex space-x-2">
+    <Pagination>
+      <PaginationContent>
+        <PaginationItem onClick={() => onPageChange(Math.max(currentPage - 1, 1))} className={`${currentPage === 1  ? 'pointer-events-none hover:bg-inherit' : 'cursor-pointer'}`}>
+          <PaginationPrevious/>
+        </PaginationItem>
         {pages.map((page, index) =>
           typeof page === "number" ? (
-            <button
-              key={index}
-              onClick={() => onPageChange(page)}
-              className={`px-3 py-1 rounded-md ${
-                page === currentPage
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-700 text-white"
-              }`}
-            >
-              {page}
-            </button>
+            <PaginationItem key={index} onClick={() => onPageChange(page)} className="cursor-pointer">
+              <PaginationLink  isActive={ page === currentPage }>{page}</PaginationLink>
+            </PaginationItem>
           ) : (
-            <span key={index} className="px-3 py-1 text-lg text-white">
-              {page}
-            </span>
+            <PaginationItem key={index}>
+              <PaginationEllipsis />
+            </PaginationItem>
           )
         )}
-      </div>
-
-      <button
-        onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))}
-        disabled={currentPage === totalPages}
-        className={`px-4 py-2 rounded-md ml-2 cursor-pointer ${
-          currentPage === totalPages
-            ? "bg-gray-500 text-gray-300 cursor-not-allowed"
-            : "bg-gray-700 text-white"
-        }`}
-      >
-        Next
-      </button>
-    </div>
+        <PaginationItem onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))} className={`${currentPage === totalPages  ? 'pointer-events-none hover:bg-inherit' : 'cursor-pointer'}`}>
+          <PaginationNext />
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
   );
 };
 
-export default Pagination;
+export default CustomPagination;

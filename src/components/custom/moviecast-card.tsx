@@ -9,7 +9,7 @@ export type MovieCastCardProps = {
     onClick?: () => void;
 }
 
-export const MoviecastCard = (props: MovieCastCardProps) => {
+export const MovieCastCard = (props: MovieCastCardProps) => {
    
     const { cast, onClick } = props;
 
@@ -38,9 +38,9 @@ export const MoviecastCard = (props: MovieCastCardProps) => {
                     <DefaultImage alt={cast.name} className="h-full flex-shrink-0" />
                 )}
             </div>
-            <div className="mt-2 flex flex-col">
-                <span className="font-semibold">{cast.name}</span>
-                <span className="text-sm">{cast.character}</span>
+            <div className="mt-2 flex flex-col w-40">
+                <span className="font-semibold text-ellipsis line-clamp-1">{cast.name}</span>
+                <span className="text-sm text-ellipsis line-clamp-1">{cast.character}</span>
             </div>
         </div>
     )

@@ -1,7 +1,8 @@
 import { getResourceFromTmdb } from "@/lib/helpers/get-resource-tmbd";
-import React from "react";
+import React, { useState } from "react";
 import DefaultImage from "./default-image";
 import { Link } from "react-router-dom";
+import { Skeleton } from "../ui/skeleton";
 
 type SearchResultItemProps = {
   id: string,
@@ -20,14 +21,23 @@ export const SearchResultItem: React.FC<SearchResultItemProps> = ({
   overview,
   originalTitle,
 }) => {
+  const [loaded, setLoaded] = useState(false);
+  const onImageLoad = () => {
+    setLoaded(true);
+  };
+
   return (
     <li className="h-32 flex bg-gradient-to-r from-gray-800 to-gray-900 rounded-md overflow-hidden shadow-lg">
       {posterPath ? (
-        <img
-          src={getResourceFromTmdb(posterPath)}
-          alt={title}
-          className="w-24 object-cover h-full flex-shrink-0"
-        />
+        <div className="w-24 relative flex h-full flex-shrink-0">
+          <img
+            onLoad={onImageLoad}
+            src={getResourceFromTmdb(posterPath)}
+            alt={title}
+            className={`w-24 object-cover h-full flex-shrink-0 ${!loaded ? 'opacity-0' : ''}`}
+          />
+          {!loaded && <Skeleton className="top-0 absolute bottom-0 right-0 left-0 opacity-100" />}
+        </div>
       ) : (
         <DefaultImage alt={title} className="w-24 h-full flex-shrink-0" />
       )}

@@ -7,7 +7,8 @@ export const apiEndpoints = {
     MOVIE_TRENDING: '/tmdb/trending',
     MOVIE_SEARCH: '/tmdb/search/movie',
     TV_SEARCH: '/tmdb/search/tv',
-    MOVIE: "/tmdb/movie"
+    MOVIE: "/tmdb/movie",
+    SEARCH_KEYWORD: "/tmdb/search/keyword"
 };
 
 export const customApiCode = {
