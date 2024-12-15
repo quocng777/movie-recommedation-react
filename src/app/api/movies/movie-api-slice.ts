@@ -1,7 +1,7 @@
 import { apiSlice } from "../base/api-slice";
 import { Response } from "../types/response";
 import { apiEndpoints } from "../constants";
-import { Movie, MovieCast, MovieCastResponse, MovieMediaType, MovieTrendingDuration, MovieTrendingType, TmdbPageResponse, MovieKeywords, MovieKeywordsResponse } from "../types/movie.type";
+import { Movie, MovieCast, MovieCastResponse, MovieMediaType, MovieTrendingDuration, MovieTrendingType, TmdbPageResponse, MovieKeywords, MovieKeywordsResponse, SearchKeyword } from "../types/movie.type";
 
 export const movieApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
@@ -48,6 +48,13 @@ export const movieApiSlice = apiSlice.injectEndpoints({
                 method: 'GET',
             }),
         }),
+        getKeyword: builder.query<Response<TmdbPageResponse<SearchKeyword>>, {query: string}>({
+            query: ({ query }) => ({
+                url: apiEndpoints.SEARCH_KEYWORD,
+                params: { query },
+                method: 'GET',
+            })
+        })
     })
 });
 
@@ -60,5 +67,6 @@ export const {
     useMovieCastQuery,
     useLazyMovieCastQuery,
     useMovieKeywordsQuery,
-    useLazyMovieKeywordsQuery
+    useLazyMovieKeywordsQuery,
+    useLazyGetKeywordQuery
 } = movieApiSlice;

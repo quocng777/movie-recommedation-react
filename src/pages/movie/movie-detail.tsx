@@ -8,7 +8,7 @@ import {
 import { Movie, MovieCast, MovieKeywords } from "@/app/api/types/movie.type";
 import { FallbackScreen } from "@/components/custom/fallback-screen";
 import { getResourceFromTmdb } from "@/lib/helpers/get-resource-tmbd";
-import { MoviecastCard } from "@/components/custom/moviecast-card";
+import { MovieCastCard } from "@/components/custom/moviecast-card";
 import { MovieCardSkeleton } from "@/components/custom/movie-card-sekeleton";
 const languageMap: { [key: string]: string } = {
   en: "English",
@@ -54,7 +54,7 @@ export const MovieDetail = () => {
     }
     if (apiError) {
         const statusCode = (apiError as any)?.status || 500;
-        if (statusCode === 500) {
+        if (statusCode === 404) {
           setError("No movie found with the given ID. Please check the ID and try again.");
         } else {
           setError("Something went wrong. Please try again.");
@@ -82,7 +82,7 @@ export const MovieDetail = () => {
   if (!movie) return <div>Movie not found</div>;
   console.log(movieCast);
   return (
-    <div className="min-h-screen flex flex-col bg-gray-900 text-white">
+    <div className="min-h-screen flex flex-col text-white">
       {/* Header */}
       <div
         className="relative h-[600px] bg-cover bg-center flex items-center"
@@ -176,7 +176,7 @@ export const MovieDetail = () => {
               <p className="text-gray-500">No cast available</p>
             )}
             {movieCast.map((cast) => {
-              return <MoviecastCard key={cast.id} cast={cast} />;
+              return <MovieCastCard key={cast.id} cast={cast} />;
             })}
           </div>
         </div>

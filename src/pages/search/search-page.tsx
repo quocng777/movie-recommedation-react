@@ -45,7 +45,7 @@ export const SearchPage = () => {
           Search Results for "{query}"{" "}
           {isGetSearchResultSuccess && (
             <span className="ml-2 inline-flex items-center px-3 py-1 text-lg font-medium text-white bg-slate-600 rounded-full shadow-md">
-              {searchResultData.data?.totalResults}
+              {searchResultData.data?.total_results}
             </span>
           )}
         </h3>
@@ -72,7 +72,7 @@ export const SearchPage = () => {
       {isGetSearchResultSuccess && searchResultData?.data && (
         <Pagination
           currentPage={currentPage}
-          totalPages={searchResultData.data?.totalPages!}
+          totalPages={searchResultData.data?.total_pages!}
           onPageChange={handlePageChange}
         />
       )}

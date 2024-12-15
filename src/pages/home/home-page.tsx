@@ -1,12 +1,12 @@
-import { useLazyMovieTrendingQuery } from "@/app/api/movies/movie-api-slice";
-import { Movie, MovieMediaType, MovieTrendingDuration } from "@/app/api/types/movie.type";
+import { useLazyGetKeywordQuery, useLazyMovieTrendingQuery } from "@/app/api/movies/movie-api-slice";
+import { Movie, MovieMediaType, MovieTrendingDuration, SearchKeyword } from "@/app/api/types/movie.type";
 import { MovieCard } from "@/components/custom/movie-card";
 import { MovieCardSkeleton } from "@/components/custom/movie-card-sekeleton";
 import { SliderButton } from "@/components/custom/slider-button";
 import { Input } from "@/components/ui/input";
 import { useTopBarLoader } from "@/hooks/use-top-loader";
 import { Search } from "lucide-react";
-import {  useEffect, useState } from "react";
+import {  ChangeEvent, ChangeEventHandler, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export const Homepage = () => {
@@ -17,8 +17,11 @@ export const Homepage = () => {
     const [isTrendingLoading, setIsTrendingLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
     const { staticStart: startTopBar, complete: completeTopBar } = useTopBarLoader();
+    const [showSearchSuggestions, setShowSearchSuggestions] = useState(true);
+    const [searchKeywords, setSearchKeywords] = useState<SearchKeyword[]>([]);
 
     const [ getTrendingMovies, {isSuccess: isGetTrendingMoviesSuccess, data: trendingMoviesData} ] = useLazyMovieTrendingQuery();
+    const [getSearchKeywords, {isSuccess: isGetSearchKeywordsSuccess, data: searchKeywordsData}] = useLazyGetKeywordQuery();
 
     useEffect(() => {
         if(!isTrendingLoading) {
@@ -35,6 +38,13 @@ export const Homepage = () => {
         completeTopBar();
     }, [isGetTrendingMoviesSuccess, trendingMoviesData]);
 
+    useEffect(() => {
+      if(isGetSearchKeywordsSuccess) {
+        const searchKeywords = searchKeywordsData.data?.results;
+        setSearchKeywords(searchKeywords!.slice(0, 9));
+      }
+    }, [isGetSearchKeywordsSuccess, searchKeywordsData]);
+
     const onLeftDurationClick = () => {
         startTopBar();
         setTrendingDuration(MovieTrendingDuration.DAY);
@@ -50,10 +60,37 @@ export const Homepage = () => {
             navigate(`/search?query=${encodeURIComponent(searchQuery.trim())}`);
         }
     }
+
     const onMovieCardClick = (id: string)=>{
         navigate('/movie/' + id);
         return;
     }
+
+    const onSearchInputChange: ChangeEventHandler = (event : ChangeEvent<HTMLInputElement>) => {
+      const query = event.target.value;
+      setSearchQuery(query);
+      if(query.trim().length > 0) {
+        getSearchKeywords({query});
+      } else {
+        setSearchKeywords([]);
+      }
+    };
+
+    const onSearchInputFocus = () => {
+      setShowSearchSuggestions(true);
+    };
+
+    const onSearchInputBlur = () => {
+      setTimeout(() => {
+        setShowSearchSuggestions(false);
+      }, 200);
+    };
+
+    const onSearchSuggestionClick = (keyword: string) => {
+      setSearchQuery(keyword);
+      navigate(`/search?query=${encodeURIComponent(keyword.trim())}`)
+    }
+
     return (
       <div className="w-full">
         <section className="px-8 flex justify-center w-full bg-discover-bg py-8 bg-black bg-center relative">
@@ -66,15 +103,34 @@ export const Homepage = () => {
 
             <div className="relative">
               <Input
-                className="rounded-full py-6 px-6 mt-8"
+                className={`rounded-full py-6 px-6 mt-8`}
                 placeholder="Search for a movie, tv show, person"
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={onSearchInputChange}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                onFocus={onSearchInputFocus}
+                onBlur={onSearchInputBlur}
               />
-
               <Search 
                     className="text-white cursor-pointer absolute top-3 end-5" 
                     onClick={handleSearch}/>
+
+              {
+                searchKeywords.length > 0 &&
+                <div className={`absolute bg-background w-full top-[110%] px-4 py-4 rounded-2xl border ${!showSearchSuggestions ? 'hidden' : ''}`}>
+                <ul>
+                  {
+                    searchKeywords.map((keyword) => (
+                      <li key={keyword.id} className="w-full px-6 py-2 cursor-pointer hover:bg-accent rounded-xl" onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        onSearchSuggestionClick(keyword.name)}}>
+                        {keyword.name}
+                      </li>
+                    ))
+                  }
+                </ul>
+              </div>
+              }
             </div>
           </div>
         </section>

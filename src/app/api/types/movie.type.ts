@@ -65,8 +65,8 @@ export type MovieTrendingType = {
 export type TmdbPageResponse<T> = {
     page: number;
     results: T[];
-    totalPages: number;
-    totalResults: number;
+    total_pages: number;
+    total_results: number;
 }
 
 export type MovieCast ={
@@ -97,4 +97,9 @@ export type MovieKeywords = {
 export type MovieKeywordsResponse<T> = {
     id: number;
     keywords: T[];
+}
+
+export type  SearchKeyword = {
+    id: number,
+    name: string,
 }
