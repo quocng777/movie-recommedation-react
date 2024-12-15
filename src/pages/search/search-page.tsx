@@ -4,11 +4,13 @@ import { Movie } from "@/app/api/types/movie.type";
 import { useEffect, useState } from "react";
 import { SearchResultItem } from "@/components/custom/search-result-item";
 import Pagination from "@/components/custom/pagination";
+import { useTopBarLoader } from "@/hooks/use-top-loader";
 
 export const SearchPage = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("query") || "";
   const page = searchParams.get("page") ? parseInt(searchParams.get("page")!) : 1;
+  const {staticStart: startTopBarLoader, complete: completeTopBarLoader } = useTopBarLoader();
 
   const [currentPage, setCurrentPage] = useState(page);
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -18,6 +20,7 @@ export const SearchPage = () => {
 
   useEffect(() => {
     if (!isLoading) {
+      startTopBarLoader();
       setIsLoading(true);
     }
     searchMovies({ query: query, page: currentPage });
@@ -27,6 +30,7 @@ export const SearchPage = () => {
     if (isGetSearchResultSuccess) {
       setMovies(searchResultData.data?.results!);
       setIsLoading(false);
+      completeTopBarLoader();
     }
   }, [isGetSearchResultSuccess, searchResultData]);
 
