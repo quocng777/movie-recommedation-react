@@ -54,6 +54,26 @@ export const movieApiSlice = apiSlice.injectEndpoints({
                 params: { query },
                 method: 'GET',
             })
+        }),
+        getLikedMovies: builder.query<Response<number[]>, undefined>({
+            query: () => ({
+                url: apiEndpoints.LIKED_MOVIE,
+                method: 'GET'
+            })
+        }),
+        likeMovie: builder.mutation<Response<number>, {movieId: number}>({
+            query: (body) => ({
+                url: apiEndpoints.LIKED_MOVIE,
+                method: 'POST',
+                body
+            })
+        }),
+        removeLikedMovie: builder.mutation<Response<number>, {movieId: number}>({
+            query: body => ({
+                url: apiEndpoints.LIKED_MOVIE,
+                method: 'DELETE',
+                body
+            }),
         })
     })
 });
@@ -68,5 +88,8 @@ export const {
     useLazyMovieCastQuery,
     useMovieKeywordsQuery,
     useLazyMovieKeywordsQuery,
-    useLazyGetKeywordQuery
+    useLazyGetKeywordQuery,
+    useGetLikedMoviesQuery,
+    useLikeMovieMutation,
+    useRemoveLikedMovieMutation,
 } = movieApiSlice;

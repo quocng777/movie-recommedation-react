@@ -8,7 +8,8 @@ export const apiEndpoints = {
     MOVIE_SEARCH: '/tmdb/search/movie',
     TV_SEARCH: '/tmdb/search/tv',
     MOVIE: "/tmdb/movie",
-    SEARCH_KEYWORD: "/tmdb/search/keyword"
+    SEARCH_KEYWORD: "/tmdb/search/keyword",
+    LIKED_MOVIE: '/movies/liked'
 };
 
 export const customApiCode = {

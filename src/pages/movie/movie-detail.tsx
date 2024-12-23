@@ -10,6 +10,8 @@ import { FallbackScreen } from "@/components/custom/fallback-screen";
 import { getResourceFromTmdb } from "@/lib/helpers/get-resource-tmbd";
 import { MovieCastCard } from "@/components/custom/moviecast-card";
 import { MovieCardSkeleton } from "@/components/custom/movie-card-sekeleton";
+import { Button } from "@/components/ui/button";
+import { Bookmark, Eye, EyeFill, Heart, HeartFill, Play } from "react-bootstrap-icons";
 const languageMap: { [key: string]: string } = {
   en: "English",
   vn: "Vietnamese",
@@ -21,6 +23,8 @@ export const MovieDetail = () => {
   const [movieKeywords, setMovieKeywords] = useState<MovieKeywords[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isMovieCastLoading, setIsMovieCastLoading] = useState(true);
+
+  const isLiked = false;
 
   const [error, setError] = useState<string | null>(null);
 
@@ -137,20 +141,27 @@ export const MovieDetail = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-6 mt-6">
-              <button className="bg-gray-800 text-white w-12 h-12 rounded-full flex justify-center items-center">
-                <i className="fas fa-plus"></i> {/* Icon for Add to list */}
-              </button>
-              <button className="bg-gray-800 text-white w-12 h-12 rounded-full flex justify-center items-center">
-                <i className="fas fa-heart"></i>{" "}
-                {/* Icon for Mark as favourite */}
-              </button>
-              <button className="bg-gray-800 text-white w-12 h-12 rounded-full flex justify-center items-center">
-                <i className="fas fa-eye"></i> {/* Icon for Add to watchlist */}
-              </button>
-              <button className="bg-blue-500 text-white w-12 h-12 rounded-full flex justify-center items-center">
-                <i className="fas fa-play"></i> {/* Icon for Play trailer */}
-              </button>
+            <div className="flex gap-4 mt-6 text-white">
+              <Button size="icon" className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-sky-500">
+                <Bookmark />
+              </Button>
+              <Button size="icon" className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-pink-500">
+                {
+                  isLiked 
+                  ? <HeartFill className="text-pink-500" />
+                  : <Heart />
+                }
+              </Button>
+              <Button size="icon" className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-green-500">
+                {
+                  !isLiked 
+                  ? <Eye />
+                  : <EyeFill />
+                }
+              </Button>
+              <Button size="icon" className="bg-blue-500 rounded-full text-white hover:bg-blue-500 hover:bg-opacity-80">
+                <Play />
+              </Button>
             </div>
 
             {/* Tagline */}
