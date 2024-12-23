@@ -4,8 +4,8 @@ import { getCurrentAuthentication, setAuthenticatedUser } from "../api/auth/auth
 import { useGetAuthenticationQuery } from "../api/user/user.api.slice"
 import { UserRes } from "../api/types/user.type"
 import { FallbackScreen } from "@/components/custom/fallback-screen"
-import { setLikedMovies } from "../api/movies/movie-list-slice"
-import { useLazyGetLikedMoviesQuery } from "../api/movies/movie-api-slice"
+import { setLikedMovies, setWatchLater } from "../api/movies/movie-list-slice"
+import { useLazyGetLikedMoviesQuery, useLazyGetWatchLaterListQuery } from "../api/movies/movie-api-slice"
 
 type AuthLoaderProps = {
     children: ReactNode
@@ -21,6 +21,7 @@ export const AuthLoader = ({ children}: AuthLoaderProps) => {
     });
 
     const [getLikedMovies, { isSuccess: isGetLikedMovieSuccess, data: likedMovies }] = useLazyGetLikedMoviesQuery();
+    const [getWatchLaterList, { isSuccess: isGetWatchLaterSuccess, data: watchLaterData }] = useLazyGetWatchLaterListQuery();
     
 
     useEffect(() => {
@@ -33,7 +34,13 @@ export const AuthLoader = ({ children}: AuthLoaderProps) => {
         if(!isGetLikedMovieSuccess)
             return;
         dispatch(setLikedMovies(likedMovies.data!))
-    }, [isGetLikedMovieSuccess, likedMovies])
+    }, [isGetLikedMovieSuccess, likedMovies]);
+
+    useEffect(() => {
+        if(!isGetWatchLaterSuccess)
+            return;
+        dispatch(setWatchLater(watchLaterData.data!))
+    }, [isGetWatchLaterSuccess, watchLaterData])
 
     useEffect(() => {
         if(data) {

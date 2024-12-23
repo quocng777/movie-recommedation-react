@@ -2,6 +2,7 @@ import { apiSlice } from "../base/api-slice";
 import { Response } from "../types/response";
 import { apiEndpoints } from "../constants";
 import { Movie, MovieCast, MovieCastResponse, MovieMediaType, MovieTrendingDuration, MovieTrendingType, TmdbPageResponse, MovieKeywords, MovieKeywordsResponse, SearchKeyword } from "../types/movie.type";
+import { removeFromWatchLater } from "./movie-list-slice";
 
 export const movieApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
@@ -74,6 +75,26 @@ export const movieApiSlice = apiSlice.injectEndpoints({
                 method: 'DELETE',
                 body
             }),
+        }),
+        getWatchLaterList: builder.query<Response<number[]>, void>({
+            query: () => ({
+                url: apiEndpoints.WATCH_LATER,
+                method: 'GET'
+            })
+        }),
+        addToWatchLater: builder.mutation<Response<number>, {movieId: number}>({
+            query: (body) => ({
+                url: apiEndpoints.WATCH_LATER,
+                method: 'POST',
+                body
+            })
+        }),
+        removeFromWatchLater: builder.mutation<Response<number>, {movieId: number}>({
+            query: body => ({
+                url: apiEndpoints.WATCH_LATER,
+                method: 'DELETE',
+                body
+            }),
         })
     })
 });
@@ -92,4 +113,7 @@ export const {
     useLazyGetLikedMoviesQuery,
     useLikeMovieMutation,
     useRemoveLikedMovieMutation,
+    useLazyGetWatchLaterListQuery,
+    useAddToWatchLaterMutation,
+    useRemoveFromWatchLaterMutation,
 } = movieApiSlice;

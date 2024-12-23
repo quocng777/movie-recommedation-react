@@ -5,10 +5,12 @@ export type User = UserRes;
 
 type MovieListState = {
     likedMovies: number[],
+    watchLater: number[],
 }
 
 const initialState: MovieListState = {
-    likedMovies: []
+    likedMovies: [],
+    watchLater: [],
 }
 
 const movieListSlice = createSlice({
@@ -26,14 +28,29 @@ const movieListSlice = createSlice({
         },
         removeLikedMovie: (state, action) => {
             state.likedMovies = state.likedMovies.filter(id => id !== action.payload)
-        }
+        },
+        setWatchLater: (state, action: PayloadAction<number[]>) => {
+            state.watchLater = action.payload;
+        },
+        addMovieToWatchLater: (state, action) => {
+            state.watchLater = [
+                action.payload,
+                ...state.watchLater
+            ]
+        },
+        removeFromWatchLater: (state, action) => {
+            state.watchLater = state.watchLater.filter(id => id !== action.payload)
+        },
     }
 });
 
 export const { 
     setLikedMovies,
     addLikedMovie,
-    removeLikedMovie
+    removeLikedMovie,
+    setWatchLater,
+    addMovieToWatchLater,
+    removeFromWatchLater,
 
 } = movieListSlice.actions;
 

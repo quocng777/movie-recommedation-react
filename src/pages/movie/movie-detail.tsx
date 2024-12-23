@@ -24,7 +24,7 @@ export const MovieDetail = () => {
   const [movieKeywords, setMovieKeywords] = useState<MovieKeywords[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isMovieCastLoading, setIsMovieCastLoading] = useState(true);
-  const {isLiked, likeMovie} = useMovieActions(Number(id));
+  const {isLiked, likeMovie, isInWatchLaterList, watchLater} = useMovieActions(Number(id));
 
   const [error, setError] = useState<string | null>(null);
 
@@ -152,11 +152,11 @@ export const MovieDetail = () => {
                   : <Heart />
                 }
               </Button>
-              <Button size="icon" className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-green-500">
+              <Button size="icon" className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-green-500" onClick={watchLater}>
                 {
-                  !isLiked 
+                  !isInWatchLaterList 
                   ? <Eye />
-                  : <EyeFill />
+                  : <EyeFill className="text-green-500" />
                 }
               </Button>
               <Button size="icon" className="bg-blue-500 rounded-full text-white hover:bg-blue-500 hover:bg-opacity-80">
