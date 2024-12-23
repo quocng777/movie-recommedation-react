@@ -55,7 +55,7 @@ export const movieApiSlice = apiSlice.injectEndpoints({
                 method: 'GET',
             })
         }),
-        getLikedMovies: builder.query<Response<number[]>, undefined>({
+        getLikedMovies: builder.query<Response<number[]>, void>({
             query: () => ({
                 url: apiEndpoints.LIKED_MOVIE,
                 method: 'GET'
@@ -89,7 +89,7 @@ export const {
     useMovieKeywordsQuery,
     useLazyMovieKeywordsQuery,
     useLazyGetKeywordQuery,
-    useGetLikedMoviesQuery,
+    useLazyGetLikedMoviesQuery,
     useLikeMovieMutation,
     useRemoveLikedMovieMutation,
 } = movieApiSlice;

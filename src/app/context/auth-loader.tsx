@@ -1,9 +1,11 @@
-import { ReactNode } from "react"
-import { useDispatch } from "react-redux"
-import { setAuthenticatedUser } from "../api/auth/auth-slice"
+import { ReactNode, useEffect } from "react"
+import { useDispatch, useSelector } from "react-redux"
+import { getCurrentAuthentication, setAuthenticatedUser } from "../api/auth/auth-slice"
 import { useGetAuthenticationQuery } from "../api/user/user.api.slice"
 import { UserRes } from "../api/types/user.type"
 import { FallbackScreen } from "@/components/custom/fallback-screen"
+import { setLikedMovies } from "../api/movies/movie-list-slice"
+import { useLazyGetLikedMoviesQuery } from "../api/movies/movie-api-slice"
 
 type AuthLoaderProps = {
     children: ReactNode
@@ -11,15 +13,33 @@ type AuthLoaderProps = {
 
 export const AuthLoader = ({ children}: AuthLoaderProps) => {
     const dispatch = useDispatch();
+    const authData = useSelector(getCurrentAuthentication);
 
     const accessToken = localStorage.getItem("access_token");
     const {data, isSuccess, isLoading, isError} = useGetAuthenticationQuery(undefined, {
         skip: !accessToken
     });
+
+    const [getLikedMovies, { isSuccess: isGetLikedMovieSuccess, data: likedMovies }] = useLazyGetLikedMoviesQuery();
     
-    if(data) {
-        dispatch(setAuthenticatedUser(data?.data as UserRes))
-    }
+
+    useEffect(() => {
+        if(!authData)
+            return;
+        getLikedMovies();
+    }, [authData]);
+
+    useEffect(() => {
+        if(!isGetLikedMovieSuccess)
+            return;
+        dispatch(setLikedMovies(likedMovies.data!))
+    }, [isGetLikedMovieSuccess, likedMovies])
+
+    useEffect(() => {
+        if(data) {
+            dispatch(setAuthenticatedUser(data?.data as UserRes))
+        }
+    }, [data]);
 
     return (
         <>

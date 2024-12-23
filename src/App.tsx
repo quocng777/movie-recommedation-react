@@ -12,6 +12,7 @@ import ErrorBoundary from './components/error-boundary'
 function App() {
   const loaderRef = useRef<LoadingBarRef>(null);
 
+
   const staticStart = () => {
     loaderRef.current?.staticStart();
   };
@@ -32,10 +33,10 @@ function App() {
             values={{ staticStart, complete, continuousStart }}
             >
             <AuthLoader>
-            <ErrorBoundary>
-              <RouterProvider router={router}></RouterProvider>
-              <Toaster />
-            </ErrorBoundary>
+              <ErrorBoundary>
+                <RouterProvider router={router}></RouterProvider>
+                <Toaster />
+              </ErrorBoundary>
             </AuthLoader>
           </TopLoaderContextProvider>
       </Provider>

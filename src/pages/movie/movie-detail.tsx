@@ -12,6 +12,7 @@ import { MovieCastCard } from "@/components/custom/moviecast-card";
 import { MovieCardSkeleton } from "@/components/custom/movie-card-sekeleton";
 import { Button } from "@/components/ui/button";
 import { Bookmark, Eye, EyeFill, Heart, HeartFill, Play } from "react-bootstrap-icons";
+import { useMovieActions } from "@/hooks/use-movie-actions";
 const languageMap: { [key: string]: string } = {
   en: "English",
   vn: "Vietnamese",
@@ -23,8 +24,7 @@ export const MovieDetail = () => {
   const [movieKeywords, setMovieKeywords] = useState<MovieKeywords[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isMovieCastLoading, setIsMovieCastLoading] = useState(true);
-
-  const isLiked = false;
+  const {isLiked, likeMovie} = useMovieActions(Number(id));
 
   const [error, setError] = useState<string | null>(null);
 
@@ -145,7 +145,7 @@ export const MovieDetail = () => {
               <Button size="icon" className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-sky-500">
                 <Bookmark />
               </Button>
-              <Button size="icon" className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-pink-500">
+              <Button size="icon" className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-pink-500" onClick={likeMovie}>
                 {
                   isLiked 
                   ? <HeartFill className="text-pink-500" />
