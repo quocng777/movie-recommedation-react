@@ -54,6 +54,46 @@ export const movieApiSlice = apiSlice.injectEndpoints({
                 params: { query },
                 method: 'GET',
             })
+        }),
+        getLikedMovies: builder.query<Response<number[]>, void>({
+            query: () => ({
+                url: apiEndpoints.LIKED_MOVIE,
+                method: 'GET'
+            })
+        }),
+        likeMovie: builder.mutation<Response<number>, {movieId: number}>({
+            query: (body) => ({
+                url: apiEndpoints.LIKED_MOVIE,
+                method: 'POST',
+                body
+            })
+        }),
+        removeLikedMovie: builder.mutation<Response<number>, {movieId: number}>({
+            query: body => ({
+                url: apiEndpoints.LIKED_MOVIE,
+                method: 'DELETE',
+                body
+            }),
+        }),
+        getWatchLaterList: builder.query<Response<number[]>, void>({
+            query: () => ({
+                url: apiEndpoints.WATCH_LATER,
+                method: 'GET'
+            })
+        }),
+        addToWatchLater: builder.mutation<Response<number>, {movieId: number}>({
+            query: (body) => ({
+                url: apiEndpoints.WATCH_LATER,
+                method: 'POST',
+                body
+            })
+        }),
+        removeFromWatchLater: builder.mutation<Response<number>, {movieId: number}>({
+            query: body => ({
+                url: apiEndpoints.WATCH_LATER,
+                method: 'DELETE',
+                body
+            }),
         })
     })
 });
@@ -68,5 +108,11 @@ export const {
     useLazyMovieCastQuery,
     useMovieKeywordsQuery,
     useLazyMovieKeywordsQuery,
-    useLazyGetKeywordQuery
+    useLazyGetKeywordQuery,
+    useLazyGetLikedMoviesQuery,
+    useLikeMovieMutation,
+    useRemoveLikedMovieMutation,
+    useLazyGetWatchLaterListQuery,
+    useAddToWatchLaterMutation,
+    useRemoveFromWatchLaterMutation,
 } = movieApiSlice;

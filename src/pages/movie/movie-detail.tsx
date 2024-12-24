@@ -10,6 +10,13 @@ import { FallbackScreen } from "@/components/custom/fallback-screen";
 import { getResourceFromTmdb } from "@/lib/helpers/get-resource-tmbd";
 import { MovieCastCard } from "@/components/custom/moviecast-card";
 import { MovieCardSkeleton } from "@/components/custom/movie-card-sekeleton";
+import { Button } from "@/components/ui/button";
+import { Bookmark, Eye, EyeFill, Heart, HeartFill, Play } from "react-bootstrap-icons";
+import { useMovieActions } from "@/hooks/use-movie-actions";
+import { useSelector } from "react-redux";
+import { RootState } from "@/app/api/store";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { AddMovieToPlaylistDialog } from "@/components/custom/add-movie-to-playlist-dialog";
 const languageMap: { [key: string]: string } = {
   en: "English",
   vn: "Vietnamese",
@@ -21,6 +28,8 @@ export const MovieDetail = () => {
   const [movieKeywords, setMovieKeywords] = useState<MovieKeywords[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isMovieCastLoading, setIsMovieCastLoading] = useState(true);
+  const {isLiked, likeMovie, isInWatchLaterList, watchLater} = useMovieActions(Number(id));
+  const isAuthenticated = useSelector((state: RootState) => !!state.auth.user);
 
   const [error, setError] = useState<string | null>(null);
 
@@ -65,7 +74,6 @@ export const MovieDetail = () => {
 
   useEffect(() => {
     if (isGetMovieCastSuccess) {
-      console.log(movieCastData);
       setMovieCast(movieCastData.data?.cast!);
       setIsMovieCastLoading(false);
     }
@@ -80,7 +88,6 @@ export const MovieDetail = () => {
   if (isLoading) return <FallbackScreen />;
   if (error) return <div>{error}</div>;
   if (!movie) return <div>Movie not found</div>;
-  console.log(movieCast);
   return (
     <div className="min-h-screen flex flex-col text-white">
       {/* Header */}
@@ -137,20 +144,63 @@ export const MovieDetail = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-6 mt-6">
-              <button className="bg-gray-800 text-white w-12 h-12 rounded-full flex justify-center items-center">
-                <i className="fas fa-plus"></i> {/* Icon for Add to list */}
-              </button>
-              <button className="bg-gray-800 text-white w-12 h-12 rounded-full flex justify-center items-center">
-                <i className="fas fa-heart"></i>{" "}
-                {/* Icon for Mark as favourite */}
-              </button>
-              <button className="bg-gray-800 text-white w-12 h-12 rounded-full flex justify-center items-center">
-                <i className="fas fa-eye"></i> {/* Icon for Add to watchlist */}
-              </button>
-              <button className="bg-blue-500 text-white w-12 h-12 rounded-full flex justify-center items-center">
-                <i className="fas fa-play"></i> {/* Icon for Play trailer */}
-              </button>
+            <div className="flex gap-4 mt-6 text-white">
+              <AddMovieToPlaylistDialog movieId={movie.id}>
+                <Button size="icon" className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-sky-500">
+                  <Bookmark />
+                </Button>
+              </AddMovieToPlaylistDialog>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button size="icon" className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-pink-500" onClick={likeMovie}>
+                  {
+                    isLiked 
+                    ? <HeartFill className="text-pink-500" />
+                    : <Heart />
+                  }
+                </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>
+                    {
+                      !isAuthenticated 
+                      ? 'Login to like this movie'
+                      : (
+                        isLiked 
+                        ? 'Remove out of like list'
+                        : 'Like this movie'
+                      )
+                    }
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button size="icon" className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-green-500" onClick={watchLater}>
+                    {
+                      !isInWatchLaterList 
+                      ? <Eye />
+                      : <EyeFill className="text-green-500" />
+                    }
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>
+                    {
+                      !isAuthenticated 
+                      ? 'Login to add to your watch list'
+                      : (
+                        isInWatchLaterList 
+                        ? 'Remove from watch list'
+                        : 'Add to watch list'
+                      )
+                    }
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+              <Button size="icon" className="bg-blue-500 rounded-full text-white hover:bg-blue-500 hover:bg-opacity-80">
+                <Play />
+              </Button>
             </div>
 
             {/* Tagline */}
