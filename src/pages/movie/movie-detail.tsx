@@ -13,6 +13,9 @@ import { MovieCardSkeleton } from "@/components/custom/movie-card-sekeleton";
 import { Button } from "@/components/ui/button";
 import { Bookmark, Eye, EyeFill, Heart, HeartFill, Play } from "react-bootstrap-icons";
 import { useMovieActions } from "@/hooks/use-movie-actions";
+import { useSelector } from "react-redux";
+import { RootState } from "@/app/api/store";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 const languageMap: { [key: string]: string } = {
   en: "English",
   vn: "Vietnamese",
@@ -25,6 +28,7 @@ export const MovieDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isMovieCastLoading, setIsMovieCastLoading] = useState(true);
   const {isLiked, likeMovie, isInWatchLaterList, watchLater} = useMovieActions(Number(id));
+  const isAuthenticated = useSelector((state: RootState) => !!state.auth.user);
 
   const [error, setError] = useState<string | null>(null);
 
@@ -145,20 +149,55 @@ export const MovieDetail = () => {
               <Button size="icon" className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-sky-500">
                 <Bookmark />
               </Button>
-              <Button size="icon" className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-pink-500" onClick={likeMovie}>
-                {
-                  isLiked 
-                  ? <HeartFill className="text-pink-500" />
-                  : <Heart />
-                }
-              </Button>
-              <Button size="icon" className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-green-500" onClick={watchLater}>
-                {
-                  !isInWatchLaterList 
-                  ? <Eye />
-                  : <EyeFill className="text-green-500" />
-                }
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button size="icon" className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-pink-500" onClick={likeMovie}>
+                  {
+                    isLiked 
+                    ? <HeartFill className="text-pink-500" />
+                    : <Heart />
+                  }
+                </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>
+                    {
+                      !isAuthenticated 
+                      ? 'Login to like this movie'
+                      : (
+                        isLiked 
+                        ? 'Remove out of like list'
+                        : 'Like this movie'
+                      )
+                    }
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button size="icon" className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-green-500" onClick={watchLater}>
+                    {
+                      !isInWatchLaterList 
+                      ? <Eye />
+                      : <EyeFill className="text-green-500" />
+                    }
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>
+                    {
+                      !isAuthenticated 
+                      ? 'Login to add to your watch list'
+                      : (
+                        isInWatchLaterList 
+                        ? 'Remove from watch list'
+                        : 'Add to watch list'
+                      )
+                    }
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+              
               <Button size="icon" className="bg-blue-500 rounded-full text-white hover:bg-blue-500 hover:bg-opacity-80">
                 <Play />
               </Button>

@@ -28,6 +28,7 @@ export const AuthLoader = ({ children}: AuthLoaderProps) => {
         if(!authData)
             return;
         getLikedMovies();
+        getWatchLaterList();
     }, [authData]);
 
     useEffect(() => {
