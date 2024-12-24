@@ -1,7 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { UserRes } from "../types/user.type";
-
-export type User = UserRes;
 
 type MovieListState = {
     likedMovies: number[],
@@ -14,7 +11,7 @@ const initialState: MovieListState = {
 }
 
 const movieListSlice = createSlice({
-    name: 'auth',
+    name: 'movieList',
     initialState,
     reducers: {
         setLikedMovies: (state, action: PayloadAction<number[]>) => {

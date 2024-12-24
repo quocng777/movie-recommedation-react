@@ -2,7 +2,6 @@ import { apiSlice } from "../base/api-slice";
 import { Response } from "../types/response";
 import { apiEndpoints } from "../constants";
 import { Movie, MovieCast, MovieCastResponse, MovieMediaType, MovieTrendingDuration, MovieTrendingType, TmdbPageResponse, MovieKeywords, MovieKeywordsResponse, SearchKeyword } from "../types/movie.type";
-import { removeFromWatchLater } from "./movie-list-slice";
 
 export const movieApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({

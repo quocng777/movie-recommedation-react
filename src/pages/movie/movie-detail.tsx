@@ -16,6 +16,7 @@ import { useMovieActions } from "@/hooks/use-movie-actions";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/api/store";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { AddMovieToPlaylistDialog } from "@/components/custom/add-movie-to-playlist-dialog";
 const languageMap: { [key: string]: string } = {
   en: "English",
   vn: "Vietnamese",
@@ -73,7 +74,6 @@ export const MovieDetail = () => {
 
   useEffect(() => {
     if (isGetMovieCastSuccess) {
-      console.log(movieCastData);
       setMovieCast(movieCastData.data?.cast!);
       setIsMovieCastLoading(false);
     }
@@ -88,7 +88,6 @@ export const MovieDetail = () => {
   if (isLoading) return <FallbackScreen />;
   if (error) return <div>{error}</div>;
   if (!movie) return <div>Movie not found</div>;
-  console.log(movieCast);
   return (
     <div className="min-h-screen flex flex-col text-white">
       {/* Header */}
@@ -146,9 +145,11 @@ export const MovieDetail = () => {
 
             {/* Action Buttons */}
             <div className="flex gap-4 mt-6 text-white">
-              <Button size="icon" className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-sky-500">
-                <Bookmark />
-              </Button>
+              <AddMovieToPlaylistDialog movieId={movie.id}>
+                <Button size="icon" className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-sky-500">
+                  <Bookmark />
+                </Button>
+              </AddMovieToPlaylistDialog>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button size="icon" className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-pink-500" onClick={likeMovie}>
@@ -197,7 +198,6 @@ export const MovieDetail = () => {
                   </p>
                 </TooltipContent>
               </Tooltip>
-              
               <Button size="icon" className="bg-blue-500 rounded-full text-white hover:bg-blue-500 hover:bg-opacity-80">
                 <Play />
               </Button>
