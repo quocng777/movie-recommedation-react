@@ -1,3 +1,4 @@
+import { url } from "inspector";
 import { apiSlice } from "../base/api-slice";
 import { CreatePlaylistDto, Playlist } from "../types/playlist.type";
 import { Response } from "../types/response";
@@ -12,6 +13,10 @@ export type MovieQueryOptions = {
     sortBy?: string;
     sortDir?: string;
 } | undefined;
+
+export type UpdatePlaylistQueryArg = {
+    playlistId: number;
+} & CreatePlaylistDto;
 
 export type GetMovieFromPlaylistQuery = MovieQueryOptions & {
     playlistId: number;
@@ -65,6 +70,13 @@ export const playlistApiSlice = apiSlice.injectEndpoints({
                 method: 'DELETE',
             })
         }),
+        updatePlaylist: builder.mutation<Response<Playlist>, UpdatePlaylistQueryArg>({
+            query: (queryArg) => ({
+                url: `/playlist/${queryArg.playlistId}`,
+                method: 'PUT',
+                body: queryArg,
+            }),
+        }) 
     }),
 });
 
@@ -76,4 +88,5 @@ export const {
     useRemoveMovieFromPlaylistMutation,
     useGetMovieFromPlaylistQuery,
     useDeletePlaylistMutation,
+    useUpdatePlaylistMutation,
 } = playlistApiSlice;

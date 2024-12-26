@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { useDispatch } from "react-redux";
 import { deletePlaylist } from "@/app/api/playlist/playlist-slice";
 import { toast } from "@/hooks/use-toast";
+import { EditPlaylistDialog } from "./edit-playlist-dialog";
 
 export type PlaylistCardProps = {
     playlist: Playlist;
@@ -116,10 +117,12 @@ export const PlaylistCard = (props: PlaylistCardProps) => {
                                     <Trash />
                                     <p>Delete playlist</p>
                                 </li>
-                                <li className={`flex gap-4 items-center px-4 py-2 hover:bg-primary-foreground rounded-lg cursor-pointer`}>
-                                    <Pen />
-                                    <p>Edit</p>
-                                </li>
+                                <EditPlaylistDialog playlist={playlist}>
+                                    <li className={`flex gap-4 items-center px-4 py-2 hover:bg-primary-foreground rounded-lg cursor-pointer`}>
+                                        <Pen />
+                                        <p>Edit</p>
+                                    </li>
+                                </EditPlaylistDialog>
                                 {
                                     playlist.accessibility == PlaylistAccessibility.PUBLIC
                                     ? (
