@@ -1,5 +1,5 @@
 import { useLazyMovieDetailQuery } from "@/app/api/movies/movie-api-slice";
-import { useGetMovieFromPlaylistQuery } from "@/app/api/playlist/playlist-api-slice";
+import { useDeletePlaylistMutation, useGetMovieFromPlaylistQuery } from "@/app/api/playlist/playlist-api-slice";
 import { Playlist, PlaylistAccessibility } from "@/app/api/types/playlist.type";
 import { getResourceFromTmdb } from "@/lib/helpers/get-resource-tmbd";
 import { Earth, Film, Lock } from "lucide-react";
@@ -7,6 +7,9 @@ import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Pen, Share, ThreeDotsVertical, Trash } from "react-bootstrap-icons";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { useDispatch } from "react-redux";
+import { deletePlaylist } from "@/app/api/playlist/playlist-slice";
+import { toast } from "@/hooks/use-toast";
 
 export type PlaylistCardProps = {
     playlist: Playlist;
@@ -21,6 +24,8 @@ export const PlaylistCard = (props: PlaylistCardProps) => {
     const {playlist} = props;
     const [playlistInfo, setPlaylistInfo] = useState<PlaylistInfo | undefined>();
     const [getMovieDetails, {isSuccess: isMovieDetailsSuccess, data: movieDetailsData}] = useLazyMovieDetailQuery();
+    const [deletePlaylistMutation, {isSuccess: isDeletedSuccess, isError: isDeletedError}] = useDeletePlaylistMutation();
+    const dispatch = useDispatch();
 
     const {data, isSuccess} = useGetMovieFromPlaylistQuery({
         playlistId: playlist.id,
@@ -52,7 +57,34 @@ export const PlaylistCard = (props: PlaylistCardProps) => {
             picture: movieDetailsData.data?.backdrop_path,
         };
         setPlaylistInfo(info as PlaylistInfo);
-    }, [isMovieDetailsSuccess, movieDetailsData])
+    }, [isMovieDetailsSuccess, movieDetailsData]);
+
+    useEffect(() => {
+        if(!isDeletedSuccess) {
+            return;
+        }
+        dispatch(deletePlaylist(playlist.id));
+        toast({
+            title: 'Success',
+            description: `Deleted ${playlist.name} 📺`,
+        });
+    }, [isDeletedSuccess]);
+
+    useEffect(() => {
+        if(!isDeletedError) {
+            return;
+        }
+        toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: `Error when deleting ${playlist.name} 📺`,
+        });
+    }, [isDeletedError])
+
+
+    const onDeleteClick = () => {
+        deletePlaylistMutation(playlist.id);
+    };
 
 
     return (
@@ -80,7 +112,7 @@ export const PlaylistCard = (props: PlaylistCardProps) => {
                     <PopoverContent className="bg-background z-[90] rounded-lg max-w-[240px]" sideOffset={2}>
                         <div>
                             <ul className="grid">
-                                <li className={`flex gap-4 items-center px-4 py-2 hover:bg-primary-foreground rounded-lg cursor-pointer hover:text-red-500`}>
+                                <li className={`flex gap-4 items-center px-4 py-2 hover:bg-primary-foreground rounded-lg cursor-pointer hover:text-red-500`} onClick={onDeleteClick}>
                                     <Trash />
                                     <p>Delete playlist</p>
                                 </li>

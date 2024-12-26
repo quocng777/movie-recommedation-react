@@ -58,7 +58,13 @@ export const playlistApiSlice = apiSlice.injectEndpoints({
                 method: 'GET',
                 params: query,
             })
-        }), 
+        }),
+        deletePlaylist: builder.mutation<Response<number>, number>({
+            query: (playlistId) => ({
+                url: `/playlist/${playlistId}`,
+                method: 'DELETE',
+            })
+        }),
     }),
 });
 
@@ -69,4 +75,5 @@ export const {
     useAddMovieToPlayMutation,
     useRemoveMovieFromPlaylistMutation,
     useGetMovieFromPlaylistQuery,
+    useDeletePlaylistMutation,
 } = playlistApiSlice;
