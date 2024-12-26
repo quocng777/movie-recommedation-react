@@ -16,7 +16,7 @@ import { AddPlaylistDialog } from "./add-playlist-dialog";
 import { Checkbox } from "@/components/ui/checkbox"
 import { PlaylistAccessibility } from "@/app/api/types/playlist.type";
 import { Earth, Lock } from "lucide-react";
-import { useAddMovieToPlayMutation, useGetPlaylistQuery, useRemoveMovieFromPlaylistMutation } from "@/app/api/playlist/playlist-api-slice";
+import { useAddMovieToPlayMutation, useGetPlaylistsQuery, useRemoveMovieFromPlaylistMutation } from "@/app/api/playlist/playlist-api-slice";
 import { toast } from "@/hooks/use-toast";
  
 export type AddMovieToPlaylistDialogProps = {
@@ -27,7 +27,7 @@ export type AddMovieToPlaylistDialogProps = {
 export function AddMovieToPlaylistDialog(props: AddMovieToPlaylistDialogProps) {
     const {children, movieId} = props;
     const playlists = useSelector((state: RootState) => state.playlist);
-    const {data: moviePlaylistsData, refetch} = useGetPlaylistQuery({movieId});
+    const {data: moviePlaylistsData, refetch} = useGetPlaylistsQuery({movieId});
     const [addMovieToPlaylistMutation, {isSuccess: isAddedMovieSuccess, isError: isAddedMovieError}] = useAddMovieToPlayMutation();
     const [removedMovieFromPlaylistMutation, {isSuccess: isRemovedMovieSuccess, isError: isRemovedMovieError}] = useRemoveMovieFromPlaylistMutation();
 

@@ -1,6 +1,5 @@
-import { url } from "inspector";
 import { apiSlice } from "../base/api-slice";
-import { CreatePlaylistDto, Playlist } from "../types/playlist.type";
+import { CreatePlaylistDto, Playlist, PlaylistUser } from "../types/playlist.type";
 import { Response } from "../types/response";
 
 export type PlaylistQueryOptions = {
@@ -25,7 +24,7 @@ export type GetMovieFromPlaylistQuery = MovieQueryOptions & {
 
 export const playlistApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
-        getPlaylist: builder.query<Response<Playlist[]>, PlaylistQueryOptions | void>({
+        getPlaylists: builder.query<Response<Playlist[]>, PlaylistQueryOptions | void>({
             query: (query = {}) => ({
                 url: '/playlist',
                 method: 'GET',
@@ -76,17 +75,24 @@ export const playlistApiSlice = apiSlice.injectEndpoints({
                 method: 'PUT',
                 body: queryArg,
             }),
+        }),
+        getPlaylist: builder.query<Response<PlaylistUser>, number>({
+            query: (playlistId) => ({
+                url: `/playlist/${playlistId}`,
+                method: 'GET',
+            })
         }) 
     }),
 });
 
 export const {
-    useGetPlaylistQuery,
-    useLazyGetPlaylistQuery,
+    useGetPlaylistsQuery,
+    useLazyGetPlaylistsQuery,
     useAddPlaylistMutation,
     useAddMovieToPlayMutation,
     useRemoveMovieFromPlaylistMutation,
     useGetMovieFromPlaylistQuery,
     useDeletePlaylistMutation,
     useUpdatePlaylistMutation,
+    useGetPlaylistQuery,
 } = playlistApiSlice;

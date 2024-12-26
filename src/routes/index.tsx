@@ -2,7 +2,6 @@ import { createBrowserRouter, Navigate, useLocation } from "react-router-dom";
 import { getCurrentAuthentication } from "../app/api/auth/auth-slice";
 import { useSelector } from "react-redux";
 import { AuthLayout } from "@/layouts/auth-layout";
-import { Homepage } from "@/pages/home/home-page";
 import { SearchPage } from "@/pages/search/search-page";
 import { MainLayout } from "@/layouts/main-layout";
 import { Suspense } from "react";
@@ -10,6 +9,7 @@ import { FallbackScreen } from "@/components/custom/fallback-screen";
 import InterruptsPage from "@/pages/error/interrupts";
 import NotFoundPage from "@/pages/error/not-found-page";
 import { PlaylistPage } from "@/pages/playlist/playlist-page";
+import { PlaylistDetailsPage } from "@/pages/playlist/playlist-details-page";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const user = useSelector(getCurrentAuthentication);
@@ -110,12 +110,27 @@ export const router = createBrowserRouter([
   },
   {
     path: "/playlists",
+    lazy: async () => {
+      const { PlaylistPage  } = await import("@/pages/playlist/playlist-page");
+      return {
+        element: (
+          <Suspense fallback={<FallbackScreen />}>
+            <ProtectedRoute>
+              <MainLayout>
+                <PlaylistPage key={window.location.pathname + window.location.search}/>
+              </MainLayout>
+            </ProtectedRoute>
+          </Suspense>
+        ),
+      };
+    }
+  },
+  {
+    path: "/playlists/:playlistId",
     element: (
-      <ProtectedRoute>
-        <MainLayout>
-          <PlaylistPage />
-        </MainLayout>
-      </ProtectedRoute>
+      <MainLayout>
+          <PlaylistDetailsPage />
+      </MainLayout>
     ),
   },
   {

@@ -17,7 +17,7 @@ import {
   import { Earth, Lock } from "lucide-react";
   import { Playlist, PlaylistAccessibility } from "@/app/api/types/playlist.type";
   import { useUpdatePlaylistMutation } from "@/app/api/playlist/playlist-api-slice";
-  import { addPlayList, updatePlaylist } from "@/app/api/playlist/playlist-slice";
+  import { updatePlaylist } from "@/app/api/playlist/playlist-slice";
   import { toast } from "@/hooks/use-toast";
   import { useDispatch } from "react-redux";
    

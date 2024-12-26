@@ -8,4 +8,11 @@ export type UserRes = {
     createdAt: Date;
     updatedAt: Date;
     picture: string,
-}
+};
+
+export type UserMiniDto = {
+    id: number;
+    fullname: string;
+    username: string;
+    picture: string;
+};

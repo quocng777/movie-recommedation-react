@@ -3,7 +3,7 @@ import { useDeletePlaylistMutation, useGetMovieFromPlaylistQuery } from "@/app/a
 import { Playlist, PlaylistAccessibility } from "@/app/api/types/playlist.type";
 import { getResourceFromTmdb } from "@/lib/helpers/get-resource-tmbd";
 import { Earth, Film, Lock } from "lucide-react";
-import { useEffect, useState } from "react";
+import { MouseEventHandler, useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Pen, Share, ThreeDotsVertical, Trash } from "react-bootstrap-icons";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
@@ -11,6 +11,7 @@ import { useDispatch } from "react-redux";
 import { deletePlaylist } from "@/app/api/playlist/playlist-slice";
 import { toast } from "@/hooks/use-toast";
 import { EditPlaylistDialog } from "./edit-playlist-dialog";
+import { useNavigate } from "react-router-dom";
 
 export type PlaylistCardProps = {
     playlist: Playlist;
@@ -27,6 +28,7 @@ export const PlaylistCard = (props: PlaylistCardProps) => {
     const [getMovieDetails, {isSuccess: isMovieDetailsSuccess, data: movieDetailsData}] = useLazyMovieDetailQuery();
     const [deletePlaylistMutation, {isSuccess: isDeletedSuccess, isError: isDeletedError}] = useDeletePlaylistMutation();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const {data, isSuccess} = useGetMovieFromPlaylistQuery({
         playlistId: playlist.id,
@@ -34,7 +36,7 @@ export const PlaylistCard = (props: PlaylistCardProps) => {
         limit: 1,
         sortBy: 'updatedAt',
         sortDir: 'desc',
-    });
+    }, {refetchOnMountOrArgChange: true});
 
     useEffect(() => {
         if(!isSuccess)
@@ -83,18 +85,22 @@ export const PlaylistCard = (props: PlaylistCardProps) => {
     }, [isDeletedError])
 
 
-    const onDeleteClick = () => {
+    const onDeleteClick: MouseEventHandler = (event) => {
+        event.stopPropagation();
         deletePlaylistMutation(playlist.id);
     };
 
+    const onCardClick = () => {
+        navigate(`/playlists/${playlist.id}-${playlist.name.split(' ').join('-')}`);
+    };
 
     return (
         <div className="w-[320px] max-lg:w-[240px] relative cursor-pointer group">
             <div className="bg-gray-800 absolute -top-2 inset-x-4 h-4 z-[1] rounded-md" />
-            <div className="bg-gray-800 absolute -top-1 inset-x-2 h-4 z-[1] rounded-md border-t border-background" />
+            <div className="bg-gray-800 absolute -top-1 inset-x-2 h-4 z-[1] rounded-md border-t border-background"/>
             {
                 playlistInfo && (
-                    <div className="relative z-[4] bg-white rounded-md border-t border-background  max-lg:w-[240px] max-lg:h-[135px] w-[320px] h-[180px] overflow-hidden">
+                    <div className="relative z-[4] bg-white rounded-md border-t border-background  max-lg:w-[240px] max-lg:h-[135px] w-[320px] h-[180px] overflow-hidden" onClick={onCardClick}>
                     <img src={getResourceFromTmdb(playlistInfo?.picture || '')} className="group-hover:blur-[1px]"/>
                         <div className="bg-background/80 py-1 px-2 absolute bottom-2 flex items-center rounded-md right-2 gap-2">
                             <Film className="size-4" />
@@ -106,7 +112,7 @@ export const PlaylistCard = (props: PlaylistCardProps) => {
             <div className="z-[4] grid relative">
                 <Popover>
                     <PopoverTrigger asChild>
-                        <Button variant="ghost" size="icon" className="absolute right-1 size-8 rounded-full">
+                        <Button variant="ghost" size="icon" className="absolute right-1 size-8 rounded-full" onClick={(e) => {e.stopPropagation()}}>
                             <ThreeDotsVertical />
                         </Button>
                     </PopoverTrigger>
@@ -118,7 +124,7 @@ export const PlaylistCard = (props: PlaylistCardProps) => {
                                     <p>Delete playlist</p>
                                 </li>
                                 <EditPlaylistDialog playlist={playlist}>
-                                    <li className={`flex gap-4 items-center px-4 py-2 hover:bg-primary-foreground rounded-lg cursor-pointer`}>
+                                    <li className={`flex gap-4 items-center px-4 py-2 hover:bg-primary-foreground rounded-lg cursor-pointer`} onClick={(event) => {event.stopPropagation();}}>
                                         <Pen />
                                         <p>Edit</p>
                                     </li>
