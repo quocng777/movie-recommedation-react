@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, MouseEventHandler } from "react";
 import {
   useLazyMovieCastQuery,
   useLazyMovieDetailQuery,
@@ -30,9 +30,7 @@ export const MovieDetail = () => {
   const [isMovieCastLoading, setIsMovieCastLoading] = useState(true);
   const {isLiked, likeMovie, isInWatchLaterList, watchLater} = useMovieActions(Number(id));
   const isAuthenticated = useSelector((state: RootState) => !!state.auth.user);
-
   const [error, setError] = useState<string | null>(null);
-
   const [
     getMovieDetail,
     { data: movieData, isSuccess: isGetMovieDataSuccess, error: apiError },
@@ -45,6 +43,21 @@ export const MovieDetail = () => {
     getMovieKeywords,
     { data: movieKeywordData, isSuccess: isGetMovieKeywordsSuccess },
   ] = useLazyMovieKeywordsQuery();
+
+  const onLikeMovieClick: MouseEventHandler = () => {
+      if(!isAuthenticated) {
+        return;
+      }
+      likeMovie();
+  };
+
+  const onAddWatchListClick: MouseEventHandler = () => {
+    if(!isAuthenticated) {
+      return;
+    }
+    watchLater();
+  };
+
   useEffect(() => {
     if (id) {
       setIsLoading(true);
@@ -101,7 +114,6 @@ export const MovieDetail = () => {
       >
         <div className="absolute inset-0 bg-black bg-opacity-60"></div>
         <div className="relative z-10 max-w-5xl mx-auto px-6 py-12 flex gap-8 text-white">
-          {/* Image on the left */}
           <div className="w-1/3">
             <img
               src={getResourceFromTmdb(movie.poster_path)}
@@ -110,16 +122,13 @@ export const MovieDetail = () => {
             />
           </div>
 
-          {/* Information on the right */}
           <div className="w-2/3">
-            {/* Title and Time */}
             <div className="flex justify-between items-center">
               <h1 className="text-5xl font-bold">{movie.title}</h1>
             </div>
             <span className="text-lg">
               {new Date(movie.release_date).toLocaleDateString()}
             </span>
-            {/* Genres */}
             <div className="flex gap-4 flex-wrap mt-4">
               {movie.genres?.map((genre) => (
                 <span
@@ -145,14 +154,27 @@ export const MovieDetail = () => {
 
             {/* Action Buttons */}
             <div className="flex gap-4 mt-6 text-white">
-              <AddMovieToPlaylistDialog movieId={movie.id}>
-                <Button size="icon" className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-sky-500">
-                  <Bookmark />
-                </Button>
-              </AddMovieToPlaylistDialog>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button size="icon" className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-pink-500" onClick={likeMovie}>
+                  <AddMovieToPlaylistDialog movieId={movie.id}>
+                    <Button size="icon" className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-sky-500">
+                      <Bookmark />
+                    </Button>
+                  </AddMovieToPlaylistDialog>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>
+                    {
+                      !isAuthenticated 
+                      ? 'Login to add to your playlist'
+                      : 'Add to playlist'
+                    }
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button size="icon" className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-pink-500" onClick={onLikeMovieClick}>
                   {
                     isLiked 
                     ? <HeartFill className="text-pink-500" />
@@ -176,7 +198,7 @@ export const MovieDetail = () => {
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button size="icon" className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-green-500" onClick={watchLater}>
+                  <Button size="icon" className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-green-500" onClick={onAddWatchListClick}>
                     {
                       !isInWatchLaterList 
                       ? <Eye />

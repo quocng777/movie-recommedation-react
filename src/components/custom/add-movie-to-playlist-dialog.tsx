@@ -16,7 +16,7 @@ import { AddPlaylistDialog } from "./add-playlist-dialog";
 import { Checkbox } from "@/components/ui/checkbox"
 import { PlaylistAccessibility } from "@/app/api/types/playlist.type";
 import { Earth, Lock } from "lucide-react";
-import { useAddMovieToPlayMutation, useGetPlaylistQuery } from "@/app/api/playlist/playlist-api-slice";
+import { useAddMovieToPlayMutation, useGetPlaylistQuery, useRemoveMovieFromPlaylistMutation } from "@/app/api/playlist/playlist-api-slice";
 import { toast } from "@/hooks/use-toast";
  
 export type AddMovieToPlaylistDialogProps = {
@@ -29,6 +29,7 @@ export function AddMovieToPlaylistDialog(props: AddMovieToPlaylistDialogProps) {
     const playlists = useSelector((state: RootState) => state.playlist);
     const {data: moviePlaylistsData, refetch} = useGetPlaylistQuery({movieId});
     const [addMovieToPlaylistMutation, {isSuccess: isAddedMovieSuccess, isError: isAddedMovieError}] = useAddMovieToPlayMutation();
+    const [removedMovieFromPlaylistMutation, {isSuccess: isRemovedMovieSuccess, isError: isRemovedMovieError}] = useRemoveMovieFromPlaylistMutation();
 
     const moviePlaylist = useMemo(() => {
         if(!moviePlaylistsData?.data) {
@@ -39,7 +40,10 @@ export function AddMovieToPlaylistDialog(props: AddMovieToPlaylistDialogProps) {
 
     const onChangeCheckBox = (playlistId: number) => {
         if(moviePlaylist.some((item) => item === playlistId)) {
-            // handle remove
+            removedMovieFromPlaylistMutation({
+                playlistId,
+                movieId
+            })
         } else {
             addMovieToPlaylistMutation({
                 playlistId,
@@ -68,6 +72,27 @@ export function AddMovieToPlaylistDialog(props: AddMovieToPlaylistDialogProps) {
             description: `Error when adding ${movieId} to a playlist 😟`
         });
     }, [isAddedMovieError]);
+
+    useEffect(() => {
+        if(!isRemovedMovieSuccess) {
+            return;
+        }
+        toast({
+            title: 'Success',
+            description: `Removed ${movieId} to a playlist 🎉`
+        });
+        refetch();
+    }, [isRemovedMovieSuccess]);
+
+    useEffect(() => {
+        if(!isRemovedMovieError) {
+            return;
+        }
+        toast({
+            title: 'Error',
+            description: `Error when removing ${movieId} to a playlist 😟`
+        });
+    }, [isRemovedMovieError]);
 
   return (
     <Dialog>
@@ -110,9 +135,9 @@ export function AddMovieToPlaylistDialog(props: AddMovieToPlaylistDialogProps) {
                 
             }
         </div>
-        <DialogFooter className="sm:justify-start">
+        <DialogFooter className="w-full">
             <AddPlaylistDialog>
-                <Button type="button" variant="secondary">
+                <Button type="button" variant="secondary" className="w-full">
                         Create new playlist
                 </Button>
             </AddPlaylistDialog>
