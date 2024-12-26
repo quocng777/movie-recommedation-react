@@ -4,7 +4,6 @@ import { MovieCard } from "@/components/custom/movie-card";
 import { MovieCardSkeleton } from "@/components/custom/movie-card-sekeleton";
 import { SliderButton } from "@/components/custom/slider-button";
 import { Input } from "@/components/ui/input";
-import { MovieAction } from "@/constants/movies";
 import { useTopBarLoader } from "@/hooks/use-top-loader";
 import { Search } from "lucide-react";
 import {  ChangeEvent, ChangeEventHandler, useEffect, useState } from "react";
@@ -91,25 +90,6 @@ export const Homepage = () => {
       setSearchQuery(keyword);
       navigate(`/search?query=${encodeURIComponent(keyword.trim())}`)
     };
-
-    const onMovieActionClick = (movie: Movie) => {
-      const handleMovieAction = (action: MovieAction) => {
-        switch (action) {
-          case MovieAction.WATCH_LIST: {
-            
-            return;
-          }
-          case MovieAction.MY_LIST: {
-            return;
-          }
-          case MovieAction.LIKE_LIST: {
-            return;
-          };
-        }
-      };
-
-      return handleMovieAction;
-    }
 
     return (
       <div className="w-full">

@@ -22,16 +22,17 @@ import {
   import { useDispatch } from "react-redux";
    
   export type EditPlaylistDialogProps = {
-      children: ReactNode,
-      playlist: Playlist,
+      children?: ReactNode;
+      playlist: Playlist;
+      isOpening: boolean;
+      setIsOpening: (value: boolean) => void;
   };
   
   export function EditPlaylistDialog(props: EditPlaylistDialogProps) {
-      const {children, playlist} = props;
+      const {children, playlist, isOpening, setIsOpening} = props;
       const [name, setName] = useState(playlist.name);
       const [description, setDescription] = useState(playlist.description);
       const [accessibility, setAccessibility] = useState<PlaylistAccessibility>(playlist.accessibility);
-      const [isOpening, setIsOpening] = useState(false);
       const [nameErrorMsg, setNameErrorMsg] = useState('');
       const [updatePlaylistMutation, {isSuccess, isLoading, data}] = useUpdatePlaylistMutation();
       const dispatch = useDispatch();

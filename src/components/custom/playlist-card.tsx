@@ -12,6 +12,7 @@ import { deletePlaylist } from "@/app/api/playlist/playlist-slice";
 import { toast } from "@/hooks/use-toast";
 import { EditPlaylistDialog } from "./edit-playlist-dialog";
 import { useNavigate } from "react-router-dom";
+import { ShareDialog } from "./share-dialog";
 
 export type PlaylistCardProps = {
     playlist: Playlist;
@@ -29,6 +30,9 @@ export const PlaylistCard = (props: PlaylistCardProps) => {
     const [deletePlaylistMutation, {isSuccess: isDeletedSuccess, isError: isDeletedError}] = useDeletePlaylistMutation();
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [openMenu, setOpenMenu] = useState(false);
+    const [openEditDialog, setOpenEditDialog] = useState(false);
+    const [openShareDialog, setOpenShareDialog] = useState(false);
 
     const {data, isSuccess} = useGetMovieFromPlaylistQuery({
         playlistId: playlist.id,
@@ -88,6 +92,7 @@ export const PlaylistCard = (props: PlaylistCardProps) => {
     const onDeleteClick: MouseEventHandler = (event) => {
         event.stopPropagation();
         deletePlaylistMutation(playlist.id);
+        setOpenMenu(false);
     };
 
     const onCardClick = () => {
@@ -110,7 +115,7 @@ export const PlaylistCard = (props: PlaylistCardProps) => {
                 )
             }
             <div className="z-[4] grid relative">
-                <Popover>
+                <Popover open={openMenu} onOpenChange={setOpenMenu}>
                     <PopoverTrigger asChild>
                         <Button variant="ghost" size="icon" className="absolute right-1 size-8 rounded-full" onClick={(e) => {e.stopPropagation()}}>
                             <ThreeDotsVertical />
@@ -123,16 +128,25 @@ export const PlaylistCard = (props: PlaylistCardProps) => {
                                     <Trash />
                                     <p>Delete playlist</p>
                                 </li>
-                                <EditPlaylistDialog playlist={playlist}>
-                                    <li className={`flex gap-4 items-center px-4 py-2 hover:bg-primary-foreground rounded-lg cursor-pointer`} onClick={(event) => {event.stopPropagation();}}>
+                                <li className={`flex gap-4 items-center px-4 py-2 hover:bg-primary-foreground rounded-lg cursor-pointer`} onClick={(event) => {
+                                        event.stopPropagation();
+                                        setOpenMenu(false);
+                                        setOpenEditDialog(true);
+                                    }}
+                                        >
                                         <Pen />
                                         <p>Edit</p>
-                                    </li>
-                                </EditPlaylistDialog>
+                                </li>
                                 {
                                     playlist.accessibility == PlaylistAccessibility.PUBLIC
                                     ? (
-                                        <li className={`flex gap-4 items-center px-4 py-2 hover:bg-primary-foreground rounded-lg cursor-pointer`}>
+                                        <li 
+                                            className={`flex gap-4 items-center px-4 py-2 hover:bg-primary-foreground rounded-lg cursor-pointer`}
+                                            onClick={() => {
+                                                setOpenMenu(false);
+                                                setOpenShareDialog(true);
+                                            }}
+                                        >
                                             <Share />
                                             <p>Share</p>
                                         </li>
@@ -156,6 +170,12 @@ export const PlaylistCard = (props: PlaylistCardProps) => {
                     </div>)
                 }
             </div>
+            <EditPlaylistDialog 
+                isOpening={openEditDialog}
+                setIsOpening={setOpenEditDialog}
+                playlist={playlist} />
+
+            <ShareDialog value={`${window.location.origin}/playlists/${playlist.id}-${playlist.name.split(' ').join('-')}`} open={openShareDialog} setOpen={setOpenShareDialog}/>
         </div>
     );
 };

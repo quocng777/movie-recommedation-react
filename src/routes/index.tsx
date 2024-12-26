@@ -8,7 +8,6 @@ import { Suspense } from "react";
 import { FallbackScreen } from "@/components/custom/fallback-screen";
 import InterruptsPage from "@/pages/error/interrupts";
 import NotFoundPage from "@/pages/error/not-found-page";
-import { PlaylistPage } from "@/pages/playlist/playlist-page";
 import { PlaylistDetailsPage } from "@/pages/playlist/playlist-details-page";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
