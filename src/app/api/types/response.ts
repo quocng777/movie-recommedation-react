@@ -3,6 +3,7 @@ export type Response<T> = {
     message: string,
     data?: T,
     timestamp: Date,
+    pagination?: Pagination,
 };
 
 export type Pagination = {

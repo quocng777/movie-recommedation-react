@@ -9,6 +9,7 @@ import { Suspense } from "react";
 import { FallbackScreen } from "@/components/custom/fallback-screen";
 import InterruptsPage from "@/pages/error/interrupts";
 import NotFoundPage from "@/pages/error/not-found-page";
+import { PlaylistPage } from "@/pages/playlist/playlist-page";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const user = useSelector(getCurrentAuthentication);
@@ -108,11 +109,11 @@ export const router = createBrowserRouter([
     element: <InterruptsPage />,
   },
   {
-    path: "/protected",
+    path: "/playlists",
     element: (
       <ProtectedRoute>
         <MainLayout>
-          <Homepage />
+          <PlaylistPage />
         </MainLayout>
       </ProtectedRoute>
     ),

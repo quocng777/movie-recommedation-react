@@ -6,6 +6,17 @@ export type PlaylistQueryOptions = {
     movieId?: number
 } | undefined;
 
+export type MovieQueryOptions = {
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortDir?: string;
+} | undefined;
+
+export type GetMovieFromPlaylistQuery = MovieQueryOptions & {
+    playlistId: number;
+}
+
 
 export const playlistApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
@@ -40,7 +51,14 @@ export const playlistApiSlice = apiSlice.injectEndpoints({
                     movieId: param.movieId,
                 }
             })
-        })
+        }),
+        getMovieFromPlaylist: builder.query<Response<number[]>, GetMovieFromPlaylistQuery>({
+            query: (query) => ({
+                url: `/playlist/${query.playlistId}/movies`,
+                method: 'GET',
+                params: query,
+            })
+        }), 
     }),
 });
 
@@ -50,4 +68,5 @@ export const {
     useAddPlaylistMutation,
     useAddMovieToPlayMutation,
     useRemoveMovieFromPlaylistMutation,
+    useGetMovieFromPlaylistQuery,
 } = playlistApiSlice;

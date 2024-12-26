@@ -220,9 +220,16 @@ export const MovieDetail = () => {
                   </p>
                 </TooltipContent>
               </Tooltip>
-              <Button size="icon" className="bg-blue-500 rounded-full text-white hover:bg-blue-500 hover:bg-opacity-80">
-                <Play />
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button size="icon" className="bg-blue-500 rounded-full text-white hover:bg-blue-500 hover:bg-opacity-80">
+                    <Play />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>View trailer</p>
+                </TooltipContent>
+              </Tooltip>
             </div>
 
             {/* Tagline */}
