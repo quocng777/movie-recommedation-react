@@ -8,7 +8,9 @@ import { useAuthentication } from "@/hooks/use-authentication";
 import { useTopBarLoader } from "@/hooks/use-top-loader";
 import { LogOut } from "lucide-react";
 import { ReactNode } from "react";
+import { Bookmark } from "react-bootstrap-icons";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 export type UserPopoverProps = {
     children: ReactNode;
@@ -32,12 +34,17 @@ export const UserPopover = (props: UserPopoverProps) => {
     const { children } = props;
     const user = useAuthentication();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const { complete: completeSideBarLoader } = useTopBarLoader();
 
     const onLogoutClick = () => {
         dispatch(logOut());
         completeSideBarLoader();
+    };
+
+    const onPlaylistClick = () => {
+        navigate('/playlists');
     };
 
   return (
@@ -50,6 +57,12 @@ export const UserPopover = (props: UserPopoverProps) => {
             <PopoverItem>
                 <p className="font-semibold mb-2">{user.authentication.username}</p>
                 <p className="text-xs">View your detail profile</p>
+            </PopoverItem>
+            <PopoverItem onClick={onPlaylistClick}>
+                <div className="flex gap-6 items-center">
+                    <Bookmark className="size-5" />
+                    <span className="font-semibold">Playlists</span>
+                </div>
             </PopoverItem>
             <PopoverItem onClick={onLogoutClick}>
                 <div className="flex gap-6 items-center">

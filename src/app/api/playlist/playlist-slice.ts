@@ -1,6 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { Playlist } from "../types/playlist.type";
-import { stat } from "fs";
 
 type PlaylistState = Playlist[];
 
@@ -26,12 +25,28 @@ const playlistSlice = createSlice({
 
             return state;
 
-        }
+        },
+        deletePlaylist: (state, action) => {
+            const playlistId = action.payload;
+            return state.filter(playlist => playlist.id !== playlistId);
+        },
+        updatePlaylist: (state, action) => {
+            const playlist = action.payload;
+            const idx = state.findIndex(item => item.id === playlist.id);
+
+            if(idx === -1) {
+                return;
+            }
+
+            state[idx] = playlist;
+        },
     }
 });
 
 export const { 
     addPlayList,
+    deletePlaylist,
+    updatePlaylist,
 } = playlistSlice.actions;
 
 export default playlistSlice.reducer;
