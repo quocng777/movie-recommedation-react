@@ -9,18 +9,19 @@ import { FallbackScreen } from "@/components/custom/fallback-screen";
 import InterruptsPage from "@/pages/error/interrupts";
 import NotFoundPage from "@/pages/error/not-found-page";
 import { PlaylistDetailsPage } from "@/pages/playlist/playlist-details-page";
+import { ActivateAccountPage } from "@/pages/auth/activate-account-page";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const user = useSelector(getCurrentAuthentication);
   const location = useLocation();
 
-  return user ? (
-    children
-  ) : (
+  return user 
+    ? ( children) 
+    : (
     <Navigate
       to={`/login?redirectTo=${encodeURIComponent(location.pathname)}`}
       replace
-    ></Navigate>
+    />
   );
 };
 
@@ -130,6 +131,12 @@ export const router = createBrowserRouter([
       <MainLayout>
           <PlaylistDetailsPage />
       </MainLayout>
+    ),
+  },
+  {
+    path: "/activate-account",
+    element: (
+      <ActivateAccountPage />
     ),
   },
   {
