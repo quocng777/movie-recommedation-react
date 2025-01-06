@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import messageSentImage from "@/assets/message-sent.svg";
 import { useLazyActivateAccountQuery } from "@/app/api/auth/auth-api-slice";
 import { useEffect } from "react";
@@ -9,7 +9,6 @@ export const ActivateAccountPage = () => {
     const [ searchParams ] = useSearchParams();
     const token = searchParams.get('token');
     const [ activateAccount, {isSuccess, isError} ] = useLazyActivateAccountQuery();
-    const navigate = useNavigate();
 
     const onConfirmClick = () => {
       activateAccount({token: token || ''});

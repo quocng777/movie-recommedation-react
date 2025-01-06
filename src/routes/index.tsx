@@ -63,7 +63,6 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<FallbackScreen />}>
             <AuthLayout>
-              {" "}
               <LoginPage />
             </AuthLayout>
           </Suspense>
@@ -81,8 +80,22 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<FallbackScreen />}>
             <AuthLayout>
-              {" "}
               <RegisterPage />
+            </AuthLayout>
+          </Suspense>
+        ),
+      };
+    },
+  },
+  {
+    path: "/reset-password",
+    lazy: async () => {
+      const { default: ResetPasswordPage } = await import("../pages/auth/reset-password-page.tsx");
+      return {
+        element: (
+          <Suspense fallback={<FallbackScreen />}>
+            <AuthLayout>
+              <ResetPasswordPage />
             </AuthLayout>
           </Suspense>
         ),

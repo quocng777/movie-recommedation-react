@@ -8,15 +8,17 @@ import { GoogleOAuthProvider } from "@react-oauth/google"
 import { CustomGoogleLogin, CustomGoogleLoginProps } from "@/components/custom/google-login-button"
 import loginFormSchema from "@/lib/validation/login-form-schema"
 import { Link } from "react-router-dom"
+import { MouseEventHandler } from "react"
 
 export type  RegisterFormProps = {
     form: UseFormReturn<z.infer<typeof loginFormSchema>, any, undefined >,
     onSubmit: (values: z.infer<typeof loginFormSchema>) => void,
     isLoading: boolean,
+    onForgotPasswordClick: MouseEventHandler;
 } & CustomGoogleLoginProps;
 
 const LoginForm = (props: RegisterFormProps) => {
-    const { form, onSubmit, isLoading, onGoogleAuthSuccess, onGoogleAuthError } = props;
+    const { form, onSubmit, isLoading, onGoogleAuthSuccess, onGoogleAuthError, onForgotPasswordClick } = props;
 
     return (
         <Form {...form}>
@@ -63,7 +65,10 @@ const LoginForm = (props: RegisterFormProps) => {
                     </FormItem>
                     )}
                 />
-                <Link className=" text-blue-500 hover:underline mt-8" to={'/register'}>Register an account?</Link>
+                <div className="flex items-center justify-between">
+                  <Link className=" text-blue-500 hover:underline" to={'/register'}>Register an account?</Link>
+                  <Button onClick={onForgotPasswordClick} variant='link' type="submit" className="p-0 m-0 text-blue-500">Forgot your password?</Button>
+                </div>
                 <Button type="submit" className="mt-6 w-full" disabled={Object.keys(form.formState.errors).length > 0}>Login</Button>
             </div>
             </form>

@@ -32,7 +32,24 @@ export const authApiSlice = apiSlice.injectEndpoints({
               method: 'GET',
               params: queryArg,
             })
-        })
+        }),
+        sendResetPassword: builder.query<void, {email: string}>({
+          query: queryArg => ({
+            url: `/auth/reset-password`,
+            method: 'GET',
+            params: queryArg,
+          })
+        }),
+        resetPassword: builder.mutation<void, {
+          token: string,
+          password: string,
+        }>({
+          query: queryArg => ({
+            url: `/auth/reset-password`,
+            method: 'POST',
+            body: queryArg,
+          })
+        }),
     })
 });
 
@@ -41,4 +58,6 @@ export const {
     useGoogleLoginMutation,
     useLoginMutation,
     useLazyActivateAccountQuery,
+    useLazySendResetPasswordQuery,
+    useResetPasswordMutation,
 } = authApiSlice
