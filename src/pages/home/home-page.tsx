@@ -136,7 +136,7 @@ export const Homepage = () => {
         </section>
 
         <section className="px-8 mt-8 w-full flex justify-center">
-          <div className="max-w-[1300px]">
+          <div className="max-w-[1300px] w-full">
             <div className="max-w-[1300px] flex items-center space-x-6">
               <h4 className="text-lg">Trending</h4>
               <SliderButton

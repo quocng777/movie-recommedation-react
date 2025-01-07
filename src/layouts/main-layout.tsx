@@ -1,3 +1,4 @@
+import Footer from "@/components/custom/footer";
 import { UserPopover } from "@/components/custom/user-popover";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,7 +33,7 @@ export const MainLayout = ({ children}: AuthLayoutProps) => {
                             <header className="w-full border-b py-4 px-12 sticky top-0 bg-opacity-80 z-50 bg-black">
                                 <div className="flex w-full justify-between">
                                     <Link to={'/'}>
-                                        <p className="font-bold">TMDB</p>
+                                        <p className="font-bold">TMDB2</p>
                                     </Link>
                                     <div className="flex items-center space-x-4">
                                         <div className="relative">
@@ -67,6 +68,7 @@ export const MainLayout = ({ children}: AuthLayoutProps) => {
                                 </div>     
                             </header>
                             {children}
+                            <Footer />
                         </div>
                     )
             }

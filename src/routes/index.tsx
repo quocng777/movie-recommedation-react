@@ -4,12 +4,15 @@ import { useSelector } from "react-redux";
 import { AuthLayout } from "@/layouts/auth-layout";
 import { SearchPage } from "@/pages/search/search-page";
 import { MainLayout } from "@/layouts/main-layout";
-import { Suspense } from "react";
+import { lazy, Suspense } from "react";
 import { FallbackScreen } from "@/components/custom/fallback-screen";
 import InterruptsPage from "@/pages/error/interrupts";
 import NotFoundPage from "@/pages/error/not-found-page";
 import { PlaylistDetailsPage } from "@/pages/playlist/playlist-details-page";
 import { ActivateAccountPage } from "@/pages/auth/activate-account-page";
+
+const RegisterPageLazy = lazy(() => import("../pages/auth/register-page"));
+const PlaylistPageLazy = lazy(() => import("../pages/playlist/playlist-page.tsx"));
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const user = useSelector(getCurrentAuthentication);
@@ -72,20 +75,11 @@ export const router = createBrowserRouter([
   },
   {
     path: "/register",
-    lazy: async () => {
-      const { default: RegisterPage } = await import(
-        "../pages/auth/register-page"
-      );
-      return {
-        element: (
-          <Suspense fallback={<FallbackScreen />}>
-            <AuthLayout>
-              <RegisterPage />
-            </AuthLayout>
-          </Suspense>
-        ),
-      };
-    },
+    element: (
+      <Suspense fallback={<FallbackScreen />}>
+        <RegisterPageLazy />
+      </Suspense>
+    ),
   },
   {
     path: "/reset-password",
@@ -123,20 +117,13 @@ export const router = createBrowserRouter([
   },
   {
     path: "/playlists",
-    lazy: async () => {
-      const { PlaylistPage  } = await import("@/pages/playlist/playlist-page");
-      return {
-        element: (
-          <Suspense fallback={<FallbackScreen />}>
-            <ProtectedRoute>
-              <MainLayout>
-                <PlaylistPage key={window.location.pathname + window.location.search}/>
-              </MainLayout>
-            </ProtectedRoute>
-          </Suspense>
-        ),
-      };
-    }
+    element: (
+      <Suspense fallback={<FallbackScreen />}>
+        <MainLayout>
+          <PlaylistPageLazy />
+        </MainLayout>
+      </Suspense>
+    ),
   },
   {
     path: "/playlists/:playlistId",

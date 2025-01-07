@@ -2,7 +2,7 @@ import { RootState } from "@/app/api/store";
 import { PlaylistCard } from "@/components/custom/playlist-card";
 import { useSelector } from "react-redux";
 
-export const PlaylistPage = () => {
+const PlaylistPage = () => {
     const playlists = useSelector((state: RootState) => {
         return state.playlist;
     });
@@ -23,3 +23,5 @@ export const PlaylistPage = () => {
         </div>
     );
 };
+
+export default PlaylistPage;
