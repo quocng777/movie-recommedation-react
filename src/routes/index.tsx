@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate, useLocation } from "react-router-dom";
+import { createBrowserRouter, Navigate, Outlet, useLocation } from "react-router-dom";
 import { getCurrentAuthentication } from "../app/api/auth/auth-slice";
 import { useSelector } from "react-redux";
 import { AuthLayout } from "@/layouts/auth-layout";
@@ -15,6 +15,7 @@ const RegisterPageLazy = lazy(() => import("../pages/auth/register-page"));
 const PlaylistPageLazy = lazy(() => import("../pages/playlist/playlist-page.tsx"));
 const MovieDetailPageLazy = lazy(() => import("../pages/movie/movie-detail"));
 const LikedMoviesPageLazy = lazy(() => import("../pages/playlist/liked-movies-page.tsx"));
+const WatchListPageLazy = lazy(() => import("../pages/playlist/watch-list-page.tsx"));
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const user = useSelector(getCurrentAuthentication);
@@ -105,30 +106,44 @@ export const router = createBrowserRouter([
     },
   },
   {
-    path: "/interrupts",
-    element: <InterruptsPage />,
-  },
-  {
-    path: "/playlists",
+    path: "",
     element: (
       <Suspense fallback={<FallbackScreen />}>
         <ProtectedRoute>
           <MainLayout>
-            <PlaylistPageLazy />
+            <Outlet />
           </MainLayout>
         </ProtectedRoute>
       </Suspense>
     ),
-  },
-  {
-    path: "/playlists/:playlistId",
-    element: (
-      <ProtectedRoute>
-        <MainLayout>
+    children: [
+      {
+        path: "/playlists",
+        element: (
+          <Suspense fallback={<FallbackScreen />}>
+            <PlaylistPageLazy />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/playlists/:playlistId",
+        element: (
           <PlaylistDetailsPage />
-        </MainLayout>
-      </ProtectedRoute>
-    ),
+        ),
+      },
+      {
+        path: "/like-list",
+        element: (
+          <LikedMoviesPageLazy />
+        )
+      },
+      {
+        path: '/watch-list',
+        element: (
+          <WatchListPageLazy />
+        )
+      },
+    ]
   },
   {
     path: "/activate-account",
@@ -137,14 +152,8 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: "/like-list",
-    element: (
-      <ProtectedRoute>
-        <MainLayout>
-          <LikedMoviesPageLazy />
-        </MainLayout>
-      </ProtectedRoute>
-    )
+    path: "/interrupts",
+    element: <InterruptsPage />,
   },
   {
     path: "*",

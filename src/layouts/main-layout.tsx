@@ -22,6 +22,7 @@ export const MainLayout = ({ children}: AuthLayoutProps) => {
       navigate(`/search?query=${searchQuery}`);
     }
   };
+  const [openUserPopover, setOpenUserPopover] = useState(false);
 
   return (
     <>
@@ -48,8 +49,12 @@ export const MainLayout = ({ children}: AuthLayoutProps) => {
                               onClick={handleSearch}/>
                     </div>
                       {isAuthenticated && 
-                        <UserPopover>
-                          <div className="border size-10 rounded-full flex justify-center items-center  cursor-pointer shrink-0">
+                        <UserPopover
+                          open={openUserPopover}
+                          onOpenChange={setOpenUserPopover}
+                          closePopover={() => setOpenUserPopover(false)}
+                        >
+                          <div className="border size-10 rounded-full flex justify-center items-center  cursor-pointer shrink-0 bg-black">
                             <Avatar className="shrink-0">
                               <AvatarImage src={authentication?.picture} className="size-10 rounded-full shrink-0" />
                               <AvatarFallback>{authentication.username[0].toUpperCase()}</AvatarFallback>
