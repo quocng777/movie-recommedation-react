@@ -1,11 +1,13 @@
 import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
 import { Popover } from "../ui/popover";
-import { ReactElement } from "react";
-import { Bookmark, Heart, History } from "lucide-react";
+import { MouseEvent, ReactElement } from "react";
 import { MovieAction } from "@/constants/movies";
+import { useMovieActions } from "@/hooks/use-movie-actions";
+import { Eye, EyeFill, Heart, HeartFill } from "react-bootstrap-icons";
 
 export type MovieActionPopoverProps = {
     children: ReactElement;
+    movieId: number;
 };
 
 export type MovieActionItem = {
@@ -15,29 +17,22 @@ export type MovieActionItem = {
     color?: string;
 };
 
-export const movieActions: MovieActionItem[] = [
-    {
-        type: MovieAction.WATCH_LIST,
-        icon: <History />,
-        name: 'Save to Watch later',
-        color: 'hover:text-green-500'
-    },
-    {
-        type: MovieAction.MY_LIST,
-        icon: <Bookmark />,
-        name: 'Save to my list',
-        color: 'hover:text-sky-400'
-    },
-    {
-        type: MovieAction.LIKE_LIST,
-        icon: <Heart />,
-        name: 'Like this movie',
-        color: 'hover:text-pink-500'
-    },
-];
+const MovieActionPopover = (props: MovieActionPopoverProps) => { 
+  const { children, movieId } = props;
+  const {isLiked, isInWatchLaterList, likeMovie, watchLater} = useMovieActions(movieId);
 
-const MovieActionPopover = (props: MovieActionPopoverProps) => {
-    const { children } = props;
+  const onLikeActionClick = (event: MouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    likeMovie();
+  };
+
+  const onWatchListActionClick = (event: MouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    watchLater();
+  }; 
+
     return (
         <Popover>
             <PopoverTrigger asChild>
@@ -45,17 +40,42 @@ const MovieActionPopover = (props: MovieActionPopoverProps) => {
             </PopoverTrigger>
             <PopoverContent className="bg-black z-[90] rounded-lg" sideOffset={4}>
                 <div>
-                    <ul className="grid gap-3 px-2 py-2">
+                    <ul className="grid gap-3 px-2 py-2 text-sm">
+                      <div className={`flex gap-4 items-center px-4 py-2 hover:bg-primary-foreground rounded-lg`} onClick={onWatchListActionClick}>
                         {
-                            movieActions.map(
-                                (action) => (
-                                    <div key={action.type} className={`flex gap-4 items-center px-4 py-2 hover:bg-primary-foreground rounded-lg ${action.color}`}>
-                                        {action.icon}
-                                        <p>{action.name}</p>
-                                    </div>
-                                )
+                          isInWatchLaterList 
+                            ? (
+                              <>
+                                <EyeFill className="text-green-600" />
+                                <p>Remove from watch list</p>
+                              </>
+                            )
+                            : (
+                              <>
+                                <Eye />
+                                <p>Add to watch list</p>
+                              </>
                             )
                         }
+                      </div>
+                      <div className={`flex gap-4 items-center px-4 py-2 hover:bg-primary-foreground rounded-lg`} onClick={onLikeActionClick}>
+                        {
+                          isLiked
+                            ? (
+                              <>
+                                <HeartFill className="text-pink-600"/>
+                                <p>Unlike this movie</p>
+                              </>
+                            )
+                            : (
+                              <>
+                                <Heart />
+                                <p>Like this movie</p>
+                              </>
+                            )
+                        }
+                      </div>
+                          
                     </ul>
                 </div>
             </PopoverContent>

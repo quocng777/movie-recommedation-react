@@ -30,7 +30,7 @@ export const MovieCard = (props: MovieCardProps) => {
             <div className="w-40 relative h-[15rem] group">
                 <img src={getResourceFromTmdb(movie.poster_path)} onLoad={onImageLoad} className={`${!loaded ? 'opacity-0' : 'group-hover:blur-sm'}`}/>
                 {!loaded && <Skeleton className="top-0 absolute bottom-0 right-0 left-0 opacity-100" />}
-                <MovieActionPopover>
+                <MovieActionPopover movieId={movie.id}>
                     <Button variant="ghost" size="icon" className="rounded-full shrink-0 absolute top-2 right-2" onClick={onMoreClick}>
                         <ThreeDotsVertical />
                     </Button>

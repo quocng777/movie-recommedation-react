@@ -53,7 +53,7 @@ export const PlayListMovieCard = (props: PlaylistMovieCardProps) => {
                 onLoad={onImageLoad} 
                 className={`${!loaded ? 'opacity-0' : 'group-hover:blur-sm'} rounded-lg`}/>
               {!loaded && <Skeleton className="top-0 absolute bottom-0 right-0 left-0 opacity-100" />}
-              <MovieActionPopover>
+              <MovieActionPopover movieId={movieId}>
                   <Button variant="ghost" size="icon" className="rounded-full shrink-0 absolute top-2 right-2" onClick={onMoreClick}>
                       <ThreeDotsVertical />
                   </Button>
