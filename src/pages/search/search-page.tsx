@@ -6,7 +6,7 @@ import { SearchResultItem } from "@/components/custom/search-result-item";
 import Pagination from "@/components/custom/pagination";
 import { useTopBarLoader } from "@/hooks/use-top-loader";
 
-export const SearchPage = () => {
+const SearchPage = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("query") || "";
   const page = searchParams.get("page") ? parseInt(searchParams.get("page")!) : 1;
@@ -79,3 +79,5 @@ export const SearchPage = () => {
     </div>
   );
 };
+
+export default SearchPage;

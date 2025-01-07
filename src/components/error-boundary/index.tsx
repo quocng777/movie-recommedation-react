@@ -1,31 +1,46 @@
-import React, { Component } from "react";
-import { Navigate } from "react-router-dom";
+import { Component, ErrorInfo, ReactNode } from "react";
 
-interface ErrorBoundaryState {
-  hasError: boolean;
-  error: Error | null;
+interface Props {
+  children: ReactNode;
 }
 
-class ErrorBoundary extends Component<
-  { children: React.ReactNode },
-  ErrorBoundaryState
-> {
-  constructor(props: any) {
-    super(props);
-    this.state = { hasError: false, error: null };
+interface State {
+  hasError: boolean;
+}
+
+class ErrorBoundary extends Component<Props, State> {
+  public state: State = {
+    hasError: false,
+  };
+
+  public static getDerivedStateFromError(): State {
+    return { hasError: true };
   }
 
-  static getDerivedStateFromError(error: Error) {
-    return { hasError: true, error: error };
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    // eslint-disable-next-line no-console
+    console.error("Uncaught error:", error, errorInfo);
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error("Error caught in ErrorBoundary: ", error, errorInfo);
-  }
-
-  render() {
+  public render() {
     if (this.state.hasError) {
-      return <Navigate to="/interrupts" />; 
+      this.setState({ hasError: false });
+      return (
+        <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-r from-gray-900 to-gray-800 text-white">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold mb-4">
+              Oops! Something went wrong.
+            </h1>
+            <p className="text-xl mb-6">
+              We encountered an issue. Please try to back to home.
+            </p>
+            <a
+              href="/"
+              className="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white text-lg rounded-md shadow-md"
+            >Home</a>
+          </div>
+        </div>
+      );
     }
 
     return this.props.children;
