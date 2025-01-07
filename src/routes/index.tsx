@@ -119,18 +119,22 @@ export const router = createBrowserRouter([
     path: "/playlists",
     element: (
       <Suspense fallback={<FallbackScreen />}>
-        <MainLayout>
-          <PlaylistPageLazy />
-        </MainLayout>
+        <ProtectedRoute>
+          <MainLayout>
+            <PlaylistPageLazy />
+          </MainLayout>
+        </ProtectedRoute>
       </Suspense>
     ),
   },
   {
     path: "/playlists/:playlistId",
     element: (
-      <MainLayout>
+      <ProtectedRoute>
+        <MainLayout>
           <PlaylistDetailsPage />
-      </MainLayout>
+        </MainLayout>
+      </ProtectedRoute>
     ),
   },
   {
