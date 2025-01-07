@@ -106,6 +106,12 @@ export const movieApiSlice = apiSlice.injectEndpoints({
             url: `/tmdb/movie/${movieId}/videos`,
             method: 'GET'
           })
+        }),
+        nowPlaying: builder.query<Response<TmdbPageResponse<Movie>>, void>({
+          query: () => ({
+            url: `/tmdb/movie/now_playing`,
+            method: 'GET'
+          })
         })
     })
 });
@@ -129,4 +135,5 @@ export const {
     useRemoveFromWatchLaterMutation,
     usePopularMoviesQuery,
     useTrailerVideoQuery,
+    useNowPlayingQuery,
 } = movieApiSlice;

@@ -1,30 +1,32 @@
-import { useLazyGetKeywordQuery, useLazyMovieTrendingQuery, usePopularMoviesQuery } from "@/app/api/movies/movie-api-slice";
-import { Movie, MovieMediaType, MovieTrendingDuration, SearchKeyword } from "@/app/api/types/movie.type";
+import { useLazyGetKeywordQuery, useLazyMovieTrendingQuery, useNowPlayingQuery, usePopularMoviesQuery } from "@/app/api/movies/movie-api-slice";
+import { Movie, MovieMediaType, MovieTrailerType, MovieTrendingDuration, SearchKeyword } from "@/app/api/types/movie.type";
 import { MovieCard } from "@/components/custom/movie-card";
 import { MovieCardSkeleton } from "@/components/custom/movie-card-sekeleton";
 import { SliderButton } from "@/components/custom/slider-button";
 import { TrailerCard } from "@/components/custom/trailer-card";
 import { Input } from "@/components/ui/input";
 import { useTopBarLoader } from "@/hooks/use-top-loader";
+import { delay } from "@/lib/helpers/delay";
 import { Search } from "lucide-react";
 import {  ChangeEvent, ChangeEventHandler, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export const Homepage = () => {
     const navigate = useNavigate();
-  
     const [trendingMovies, setTrendingMovies] = useState<Movie[]>([]);
     const [trendingDuration, setTrendingDuration] = useState<MovieTrendingDuration>(MovieTrendingDuration.DAY);
+    const [trailerType, setTrailerType] = useState<MovieTrailerType>(MovieTrailerType.POPULAR);
     const [isTrendingLoading, setIsTrendingLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
     const { staticStart: startTopBar, complete: completeTopBar } = useTopBarLoader();
     const [showSearchSuggestions, setShowSearchSuggestions] = useState(true);
     const [searchKeywords, setSearchKeywords] = useState<SearchKeyword[]>([]);
     const [popularMovies, setPopularMovies] = useState<Movie[]>([]);
-
+    const [nowPlayingMovies, setNowPlayingMovies] = useState<Movie[]>([]);
     const [ getTrendingMovies, {isSuccess: isGetTrendingMoviesSuccess, data: trendingMoviesData} ] = useLazyMovieTrendingQuery();
     const [getSearchKeywords, {isSuccess: isGetSearchKeywordsSuccess, data: searchKeywordsData}] = useLazyGetKeywordQuery();
     const {data: popularMovesData, isSuccess: isGetPopularSuccess} = usePopularMoviesQuery();
+    const {data: nowPlayingData, isSuccess: isGetNowPlayingSuccess} = useNowPlayingQuery();
 
     useEffect(() => {
         if(!isTrendingLoading) {
@@ -55,14 +57,35 @@ export const Homepage = () => {
       setPopularMovies(popularMovesData.data?.results!)
     }, [isGetPopularSuccess, popularMovesData]);
 
+    useEffect(() => {
+      if(!isGetNowPlayingSuccess) {
+        return;
+      }
+      setNowPlayingMovies(nowPlayingData.data?.results!)
+    }, [isGetNowPlayingSuccess, nowPlayingData]);
+
     const onLeftDurationClick = () => {
-        startTopBar();
-        setTrendingDuration(MovieTrendingDuration.DAY);
+      startTopBar();
+      setTrendingDuration(MovieTrendingDuration.DAY);
     };
+
+    const onPopularTrailerClick = async () => {
+      startTopBar();
+      await delay(400);
+      setTrailerType(MovieTrailerType.POPULAR);
+      completeTopBar();
+  };
 
     const onRightDurationClick = () => {
         startTopBar();
         setTrendingDuration(MovieTrendingDuration.WEEK);
+    };
+
+    const onInTheaterClick = async () => {
+      startTopBar();
+      await delay(400);
+      setTrailerType(MovieTrailerType.IN_THEATER);
+      completeTopBar();
     };
 
     const handleSearch = () => {
@@ -168,8 +191,8 @@ export const Homepage = () => {
             <div className="max-w-[1300px] flex items-center space-x-6">
               <h4 className="text-lg">Latest Trailers</h4>
               <SliderButton
-                onLeftClick={onLeftDurationClick}
-                onRightClick={onRightDurationClick}
+                onLeftClick={onPopularTrailerClick}
+                onRightClick={onInTheaterClick}
                 leftLabel="Popular"
                 rightLabel="In theater"
               />
@@ -178,7 +201,7 @@ export const Homepage = () => {
                     {isTrendingLoading && new Array(10).fill(null).map((_, idx) => {
                         return <MovieCardSkeleton key={idx} />
                     })}
-                    {popularMovies.map((movie) => {
+                    {(trailerType == MovieTrailerType.POPULAR ? popularMovies : nowPlayingMovies).map((movie) => {
                             return <TrailerCard key={movie.id} movie={movie}/>;
                     })}
                 </div>

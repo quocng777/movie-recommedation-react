@@ -1,107 +1,85 @@
 export type Movie =  {
-    adult: boolean;
-
-    backdrop_path: string;
-
-    id: number;
-
-    title: string;
-
-    original_language: string;
-
-    original_title: string;
-
-    overview: string;
-
-    poster_path: string;
-
-    media_type: string;
-
-    genre_ids: number[];
-
-    popularity: number;
-
-    release_date: string;
-
-    video: boolean;
-
-    vote_average: number;
-    
-    vote_count: number;
-    
-    tagline: string;
-
-    genres: Genre[];
-
-    runtime: number;
-
-    status: string;
-
-    budget: number;
-
-    revenue: number;
+  adult: boolean;
+  backdrop_path: string;
+  id: number;
+  title: string;
+  original_language: string;
+  original_title: string;
+  overview: string;
+  poster_path: string;
+  media_type: string;
+  genre_ids: number[];
+  popularity: number;
+  release_date: string;
+  video: boolean;
+  vote_average: number;
+  vote_count: number;
+  tagline: string;
+  genres: Genre[];
+  runtime: number;
+  status: string;
+  budget: number;
+  revenue: number;
 };
 export type Genre = {
-    id: number;
-    name: string;
-  };
+  id: number;
+  name: string;
+};
 export enum MovieMediaType  {
-    ALL =  'all',
-    MOVIE = 'movie',
-    TV = 'tv',
-    PEOPLE = 'people',
+  ALL =  'all',
+  MOVIE = 'movie',
+  TV = 'tv',
+  PEOPLE = 'people',
 }
 
 export enum MovieTrendingDuration {
-    DAY = 'day',
-    WEEK = 'week'
+  DAY = 'day',
+  WEEK = 'week'
+}
+
+export enum MovieTrailerType {
+  POPULAR = 'popular',
+  IN_THEATER = 'in_theater',
 }
 
 export type MovieTrendingType = {
-    mediaType: MovieMediaType,
-    duration: MovieTrendingDuration
+  mediaType: MovieMediaType,
+  duration: MovieTrendingDuration
 }
 
 export type TmdbPageResponse<T> = {
-    page: number;
-    results: T[];
-    total_pages: number;
-    total_results: number;
+  page: number;
+  results: T[];
+  total_pages: number;
+  total_results: number;
 }
 
 export type MovieCast ={
-    adult: boolean;
-
-    id: number;
-
-    profile_path: string;
-
-    name: string;
-
-    character: string;
+  adult: boolean;
+  id: number;
+  profile_path: string;
+  name: string;
+  character: string;
 }
 
 export type MovieCastResponse<T> ={
-
-    id: number;
-
-    cast: T[];
+  id: number;
+  cast: T[];
 }
 
 export type MovieKeywords = {
-    id: number;
-
-    name: string;
+  id: number;
+  name: string;
 }
 
 export type MovieKeywordsResponse<T> = {
-    id: number;
-    keywords: T[];
+  id: number;
+  keywords: T[];
 }
 
 export type  SearchKeyword = {
-    id: number,
-    name: string,
+  id: number,
+  name: string,
 }
 
 export type Video = {
