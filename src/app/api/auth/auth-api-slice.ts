@@ -1,12 +1,11 @@
 import { apiSlice } from "../base/api-slice";
 import { Response } from "../types/response";
-import { UserRes } from "../types/user.type";
 import { CreateUserReq, LoginReq, TokenRes } from "../types/auth.type";
 import { apiEndpoints } from "../constants";
 
 export const authApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
-        register: builder.mutation<Response<UserRes>, CreateUserReq>({
+        register: builder.mutation<Response<TokenRes>, CreateUserReq>({
             query: body => ({
                 url: apiEndpoints.REGISTER,
                 method: 'POST',
@@ -27,6 +26,30 @@ export const authApiSlice = apiSlice.injectEndpoints({
                 body   
             })
         }),
+        activateAccount: builder.query<void, {token: string}>({
+            query: queryArg => ({
+              url: `/auth/activate-account`,
+              method: 'GET',
+              params: queryArg,
+            })
+        }),
+        sendResetPassword: builder.query<void, {email: string}>({
+          query: queryArg => ({
+            url: `/auth/reset-password`,
+            method: 'GET',
+            params: queryArg,
+          })
+        }),
+        resetPassword: builder.mutation<void, {
+          token: string,
+          password: string,
+        }>({
+          query: queryArg => ({
+            url: `/auth/reset-password`,
+            method: 'POST',
+            body: queryArg,
+          })
+        }),
     })
 });
 
@@ -34,4 +57,7 @@ export const {
     useRegisterMutation,
     useGoogleLoginMutation,
     useLoginMutation,
+    useLazyActivateAccountQuery,
+    useLazySendResetPasswordQuery,
+    useResetPasswordMutation,
 } = authApiSlice

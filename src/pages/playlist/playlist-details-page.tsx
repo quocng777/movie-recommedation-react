@@ -1,7 +1,7 @@
 import { getCurrentAuthentication } from "@/app/api/auth/auth-slice";
 import { useGetMovieFromPlaylistQuery, useGetPlaylistQuery } from "@/app/api/playlist/playlist-api-slice";
 import { PlaylistAccessibility, PlaylistUser } from "@/app/api/types/playlist.type";
-import { PlayListMovieCard } from "@/components/custom/playlist-movie-card";
+import { CardViewLayout, PlayListMovieCard } from "@/components/custom/playlist-movie-card";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
@@ -88,7 +88,10 @@ export const PlaylistDetailsPage = () => {
                 <div className={`px-6 grid max-sm:grid-cols-2 max-md:grid-cols-3 max-lg:grid-cols-4 grid-cols-5 mt-8 gap-8`}>
                     {
                         movies.map((movie) => (
-                            <PlayListMovieCard movieId={movie} />
+                            <PlayListMovieCard 
+                              movieId={movie}
+                              viewLayout={CardViewLayout.GRID} 
+                            />
                         ))
                     }
                 </div>

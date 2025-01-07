@@ -1,7 +1,7 @@
 import { apiSlice } from "../base/api-slice";
 import { Response } from "../types/response";
 import { apiEndpoints } from "../constants";
-import { Movie, MovieCast, MovieCastResponse, MovieMediaType, MovieTrendingDuration, MovieTrendingType, TmdbPageResponse, MovieKeywords, MovieKeywordsResponse, SearchKeyword } from "../types/movie.type";
+import { Movie, MovieCast, MovieCastResponse, MovieMediaType, MovieTrendingDuration, MovieTrendingType, TmdbPageResponse, MovieKeywords, MovieKeywordsResponse, SearchKeyword, MovieVideo } from "../types/movie.type";
 
 export const movieApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
@@ -94,6 +94,24 @@ export const movieApiSlice = apiSlice.injectEndpoints({
                 method: 'DELETE',
                 body
             }),
+        }),
+        popularMovies: builder.query<Response<TmdbPageResponse<Movie>>, void>({
+          query: () => ({
+            url: `/tmdb/discover/movie`,
+            method: 'GET',
+          })
+        }),
+        trailerVideo: builder.query<Response<MovieVideo>, number>({
+          query: (movieId) => ({
+            url: `/tmdb/movie/${movieId}/videos`,
+            method: 'GET'
+          })
+        }),
+        nowPlaying: builder.query<Response<TmdbPageResponse<Movie>>, void>({
+          query: () => ({
+            url: `/tmdb/movie/now_playing`,
+            method: 'GET'
+          })
         })
     })
 });
@@ -115,4 +133,7 @@ export const {
     useLazyGetWatchLaterListQuery,
     useAddToWatchLaterMutation,
     useRemoveFromWatchLaterMutation,
+    usePopularMoviesQuery,
+    useTrailerVideoQuery,
+    useNowPlayingQuery,
 } = movieApiSlice;

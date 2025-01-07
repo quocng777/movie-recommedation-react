@@ -15,11 +15,10 @@ import { useRedirectToHomePage } from "@/hooks/use-redirect-to-hompage";
 import { useDispatch } from "react-redux";
 import { useLazyGetAuthenticationQuery } from "@/app/api/user/user.api.slice";
 import { setAuthenticatedUser } from "@/app/api/auth/auth-slice";
-import { useNavigate } from "react-router-dom";
 
 const RegisterPage = () => {
 
-    const [registerUser,  {isLoading, isSuccess, isError, error}] = useRegisterMutation();
+    const [registerUser,  {isLoading, isSuccess, isError, error, data}] = useRegisterMutation();
 
     const { toast } = useToast();
 
@@ -28,7 +27,6 @@ const RegisterPage = () => {
     const [ getAuth, { isSuccess : isAuthSuccess, data : authData }] = useLazyGetAuthenticationQuery();
 
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     useRedirectToHomePage();
 
@@ -57,13 +55,6 @@ const RegisterPage = () => {
     };
 
     useEffect(() => {
-        if(isSuccess) {
-            navigate('/login', {replace: true});
-            return;
-        }
-    }, [isSuccess]);
-
-    useEffect(() => {
         if(isError) {
             const errorData = getErrorResponseData(error);
             console.log(errorData)
@@ -89,14 +80,14 @@ const RegisterPage = () => {
     }, [isError]);
 
     useEffect(() => {
-        if(isGgSuccess) {
-            const tokens = (ggData?.data)!;
+        if(isSuccess || isGgSuccess) {
+            const tokens = (data?.data || ggData?.data)!;
             localStorage.setItem('access_token', tokens.accessToken);
             localStorage.setItem('refresh_token', tokens.refreshToken);
 
             getAuth();
         }
-    }, [isGgSuccess]);
+    }, [isSuccess, isGgSuccess]);
 
     useEffect(() => {
         if(isAuthSuccess) {
