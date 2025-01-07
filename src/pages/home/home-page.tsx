@@ -185,8 +185,8 @@ export const Homepage = () => {
                         return <MovieCardSkeleton key={idx} />
                     })}
                     {trendingMovies.map((movie) => {
-                            return <MovieCard key={movie.id} movie={movie} onClick={() => onMovieCardClick(movie.id.toString())} />;
-                        })}
+                      return <MovieCard key={movie.id} movie={movie} onClick={() => onMovieCardClick(movie.id.toString())} />;
+                    })}
                 </div>
                 <ScrollBar orientation="horizontal" />
               </ScrollArea>
@@ -208,6 +208,22 @@ export const Homepage = () => {
                     })}
                     {(trailerType == MovieTrailerType.POPULAR ? popularMovies : nowPlayingMovies).map((movie) => {
                             return <TrailerCard key={movie.id} movie={movie}/>;
+                    })}
+                </div>
+                <ScrollBar orientation="horizontal"/>
+            </ScrollArea>
+          </div>
+          <div className="max-w-[1300px] w-full">
+            <div className="max-w-[1300px] flex items-center space-x-6">
+              <h4 className="text-lg">What's popular</h4>
+            </div>
+            <ScrollArea className="w-full">
+              <div className="flex gap-4 py-6">
+                    {isTrendingLoading && new Array(10).fill(null).map((_, idx) => {
+                        return <MovieCardSkeleton key={idx} />
+                    })}
+                    {popularMovies.map((movie) => {
+                      return <MovieCard key={movie.id} movie={movie} onClick={() => onMovieCardClick(movie.id.toString())} />;
                     })}
                 </div>
                 <ScrollBar orientation="horizontal"/>
