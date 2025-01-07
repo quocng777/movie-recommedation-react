@@ -8,7 +8,7 @@ import { useAuthentication } from "@/hooks/use-authentication";
 import { useTopBarLoader } from "@/hooks/use-top-loader";
 import { LogOut } from "lucide-react";
 import { ReactNode } from "react";
-import { Bookmark } from "react-bootstrap-icons";
+import { Bookmark, Heart } from "react-bootstrap-icons";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
@@ -47,6 +47,10 @@ export const UserPopover = (props: UserPopoverProps) => {
         navigate('/playlists');
     };
 
+    const onLikeListClick = () => {
+      navigate('/like-list');
+    };
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -62,6 +66,12 @@ export const UserPopover = (props: UserPopoverProps) => {
                 <div className="flex gap-6 items-center">
                     <Bookmark className="size-5" />
                     <span className="font-semibold">Playlists</span>
+                </div>
+            </PopoverItem>
+            <PopoverItem onClick={onLikeListClick}>
+                <div className="flex gap-6 items-center">
+                    <Heart className="size-5" />
+                    <span className="font-semibold">Liked movies</span>
                 </div>
             </PopoverItem>
             <PopoverItem onClick={onLogoutClick}>

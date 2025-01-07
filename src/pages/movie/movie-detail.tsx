@@ -23,7 +23,7 @@ const languageMap: { [key: string]: string } = {
   en: "English",
   vn: "Vietnamese",
 };
-export const MovieDetail = () => {
+const MovieDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [movie, setMovie] = useState<Movie>();
   const [movieCast, setMovieCast] = useState<MovieCast[]>([]);

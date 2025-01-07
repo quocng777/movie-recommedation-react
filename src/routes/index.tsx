@@ -13,6 +13,8 @@ import { ActivateAccountPage } from "@/pages/auth/activate-account-page";
 
 const RegisterPageLazy = lazy(() => import("../pages/auth/register-page"));
 const PlaylistPageLazy = lazy(() => import("../pages/playlist/playlist-page.tsx"));
+const MovieDetailPageLazy = lazy(() => import("../pages/movie/movie-detail"));
+const LikedMoviesPageLazy = lazy(() => import("../pages/playlist/liked-movies-page.tsx"));
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const user = useSelector(getCurrentAuthentication);
@@ -31,22 +33,13 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 export const router = createBrowserRouter([
   {
     path: "/movie/:id",
-    lazy: async () => {
-      const { MovieDetail } = await import("../pages/movie/movie-detail");
-
-      return {
-        element: (
-          <Suspense fallback={<FallbackScreen />}>
-            <MainLayout>
-              <AuthLayout>
-                {" "}
-                <MovieDetail />
-              </AuthLayout>
-            </MainLayout>
-          </Suspense>
-        ),
-      };
-    },
+    element: (
+      <Suspense fallback={<FallbackScreen />}>
+        <MainLayout>
+          <MovieDetailPageLazy />
+        </MainLayout>
+      </Suspense>
+    )
   },
   {
     path: "/search",
@@ -142,6 +135,16 @@ export const router = createBrowserRouter([
     element: (
       <ActivateAccountPage />
     ),
+  },
+  {
+    path: "/like-list",
+    element: (
+      <ProtectedRoute>
+        <MainLayout>
+          <LikedMoviesPageLazy />
+        </MainLayout>
+      </ProtectedRoute>
+    )
   },
   {
     path: "*",
