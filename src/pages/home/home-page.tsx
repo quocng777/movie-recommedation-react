@@ -5,6 +5,7 @@ import { MovieCardSkeleton } from "@/components/custom/movie-card-sekeleton";
 import { SliderButton } from "@/components/custom/slider-button";
 import { TrailerCard } from "@/components/custom/trailer-card";
 import { Input } from "@/components/ui/input";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useTopBarLoader } from "@/hooks/use-top-loader";
 import { delay } from "@/lib/helpers/delay";
 import { Search } from "lucide-react";
@@ -178,7 +179,8 @@ export const Homepage = () => {
                 rightLabel="This week"
               />
             </div>
-                <div className="flex gap-4 overflow-x-auto py-6">
+              <ScrollArea className="w-full">
+                <div className="flex gap-4 py-6">
                     {isTrendingLoading && new Array(10).fill(null).map((_, idx) => {
                         return <MovieCardSkeleton key={idx} />
                     })}
@@ -186,6 +188,8 @@ export const Homepage = () => {
                             return <MovieCard key={movie.id} movie={movie} onClick={() => onMovieCardClick(movie.id.toString())} />;
                         })}
                 </div>
+                <ScrollBar orientation="horizontal" />
+              </ScrollArea>
           </div>
           <div className="max-w-[1300px] w-full">
             <div className="max-w-[1300px] flex items-center space-x-6">
@@ -197,7 +201,8 @@ export const Homepage = () => {
                 rightLabel="In theater"
               />
             </div>
-                <div className="flex gap-4 overflow-x-auto py-6">
+            <ScrollArea className="w-full">
+              <div className="flex gap-4 py-6">
                     {isTrendingLoading && new Array(10).fill(null).map((_, idx) => {
                         return <MovieCardSkeleton key={idx} />
                     })}
@@ -205,6 +210,8 @@ export const Homepage = () => {
                             return <TrailerCard key={movie.id} movie={movie}/>;
                     })}
                 </div>
+                <ScrollBar orientation="horizontal"/>
+            </ScrollArea>
           </div>
         </section>
       </div>

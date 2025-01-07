@@ -4,8 +4,9 @@ import {
   useLazyMovieCastQuery,
   useLazyMovieDetailQuery,
   useLazyMovieKeywordsQuery,
+  useTrailerVideoQuery,
 } from "@/app/api/movies/movie-api-slice";
-import { Movie, MovieCast, MovieKeywords } from "@/app/api/types/movie.type";
+import { Movie, MovieCast, MovieKeywords, Video } from "@/app/api/types/movie.type";
 import { FallbackScreen } from "@/components/custom/fallback-screen";
 import { getResourceFromTmdb } from "@/lib/helpers/get-resource-tmbd";
 import { MovieCastCard } from "@/components/custom/moviecast-card";
@@ -17,6 +18,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/app/api/store";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { AddMovieToPlaylistDialog } from "@/components/custom/add-movie-to-playlist-dialog";
+import { TrailerVideoDialog } from "@/components/custom/trailer-video-dialog";
 const languageMap: { [key: string]: string } = {
   en: "English",
   vn: "Vietnamese",
@@ -43,6 +45,9 @@ export const MovieDetail = () => {
     getMovieKeywords,
     { data: movieKeywordData, isSuccess: isGetMovieKeywordsSuccess },
   ] = useLazyMovieKeywordsQuery();
+  const {data: trailersData, isSuccess: isGetTrailersSuccess} = useTrailerVideoQuery(parseInt(id!));
+  const [trailer, setTrailer] = useState<Video | undefined>();
+  const [openTrailerDialog, setOpenTrailerDialog] = useState(false);
 
   const onLikeMovieClick: MouseEventHandler = () => {
       if(!isAuthenticated) {
@@ -57,6 +62,10 @@ export const MovieDetail = () => {
     }
     watchLater();
   };
+
+  const onPlayTrailerClick = () => {
+    setOpenTrailerDialog(true);
+  }
 
   useEffect(() => {
     if (id) {
@@ -97,6 +106,13 @@ export const MovieDetail = () => {
       setMovieKeywords(movieKeywordData.data?.keywords!);
     }
   }, [isGetMovieKeywordsSuccess]);
+
+  useEffect(() => {
+    if(!isGetTrailersSuccess) {
+      return;
+    }
+    setTrailer(trailersData.data?.results.find(video => video.type == 'Trailer') ?? trailersData.data?.results[0]);
+  }, [isGetTrailersSuccess, trailersData])
 
   if (isLoading) return <FallbackScreen />;
   if (error) return <div>{error}</div>;
@@ -220,16 +236,16 @@ export const MovieDetail = () => {
                   </p>
                 </TooltipContent>
               </Tooltip>
-              <Tooltip>
+              {trailer && <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button size="icon" className="bg-blue-500 rounded-full text-white hover:bg-blue-500 hover:bg-opacity-80">
+                  <Button size="icon" className="bg-blue-500 rounded-full text-white hover:bg-blue-500 hover:bg-opacity-80" onClick={onPlayTrailerClick}>
                     <Play />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>View trailer</p>
                 </TooltipContent>
-              </Tooltip>
+              </Tooltip> }
             </div>
 
             {/* Tagline */}
@@ -299,6 +315,7 @@ export const MovieDetail = () => {
           </div>
         </div>
       </div>
+      { trailer && <TrailerVideoDialog video={trailer} open={openTrailerDialog} onOpenChange={setOpenTrailerDialog}/> }
     </div>
   );
 };

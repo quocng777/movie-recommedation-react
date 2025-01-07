@@ -41,7 +41,7 @@ export const TrailerCard = (props: MovieCardProps) => {
     return (
         <>
         <div className="rounded-lg overflow-hidden cursor-pointer shrink-0 w-[300px]" onClick={onCardClick}>
-            <div className="w-[300px] relative group">
+            <div className="w-[300px] h-[168.75px] relative group">
                 <img src={getResourceFromTmdb(movie.backdrop_path)} onLoad={onImageLoad} className={`${!loaded ? 'opacity-0' : 'group-hover:blur-sm'} rounded-lg`}/>
                 {!loaded && <Skeleton className="top-0 absolute bottom-0 right-0 left-0 opacity-100" />}
                 <MovieActionPopover>
