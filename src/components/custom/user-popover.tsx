@@ -12,7 +12,6 @@ import { ReactNode } from "react";
 import { Bookmark, Heart, Tv } from "react-bootstrap-icons";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { boolean } from "zod";
 
 export type UserPopoverProps = {
     children: ReactNode;

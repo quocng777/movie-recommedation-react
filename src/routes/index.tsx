@@ -2,20 +2,20 @@ import { createBrowserRouter, Navigate, Outlet, useLocation } from "react-router
 import { getCurrentAuthentication } from "../app/api/auth/auth-slice";
 import { useSelector } from "react-redux";
 import { AuthLayout } from "@/layouts/auth-layout";
-import { SearchPage } from "@/pages/search/search-page";
 import { MainLayout } from "@/layouts/main-layout";
 import { lazy, Suspense } from "react";
 import { FallbackScreen } from "@/components/custom/fallback-screen";
-import InterruptsPage from "@/pages/error/interrupts";
 import NotFoundPage from "@/pages/error/not-found-page";
 import { PlaylistDetailsPage } from "@/pages/playlist/playlist-details-page";
 import { ActivateAccountPage } from "@/pages/auth/activate-account-page";
 
+const MovieListPage = lazy(() => import("../pages/movie/movie-list-page.tsx"));
 const RegisterPageLazy = lazy(() => import("../pages/auth/register-page"));
 const PlaylistPageLazy = lazy(() => import("../pages/playlist/playlist-page.tsx"));
 const MovieDetailPageLazy = lazy(() => import("../pages/movie/movie-detail"));
 const LikedMoviesPageLazy = lazy(() => import("../pages/playlist/liked-movies-page.tsx"));
 const WatchListPageLazy = lazy(() => import("../pages/playlist/watch-list-page.tsx"));
+const SearchPageLazy = lazy(() => import("../pages/search/search-page"));
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const user = useSelector(getCurrentAuthentication);
@@ -33,24 +33,40 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 export const router = createBrowserRouter([
   {
-    path: "/movie/:id",
+    path: "/movie",
     element: (
       <Suspense fallback={<FallbackScreen />}>
         <MainLayout>
-          <MovieDetailPageLazy />
-        </MainLayout>
-      </Suspense>
-    )
-  },
-  {
-    path: "/search",
-    element: (
-      <Suspense fallback={<FallbackScreen />}>
-        <MainLayout>
-          <SearchPage />
+          <Outlet />
         </MainLayout>
       </Suspense>
     ),
+    children: [
+      {
+        path: "search",
+        element: (
+          <Suspense fallback={<FallbackScreen />}>
+            <SearchPageLazy />
+          </Suspense>
+        ),
+      },
+      {
+        path: ":id",
+        element: (
+          <Suspense fallback={<FallbackScreen />}>
+            <MovieDetailPageLazy />
+          </Suspense>
+        ),
+      },
+      {
+        path: "",
+        element: (
+          <Suspense fallback={<FallbackScreen />}>
+            <MovieListPage />
+          </Suspense>
+        ),
+      },
+    ],
   },
   {
     path: "/login",
@@ -78,7 +94,9 @@ export const router = createBrowserRouter([
   {
     path: "/reset-password",
     lazy: async () => {
-      const { default: ResetPasswordPage } = await import("../pages/auth/reset-password-page.tsx");
+      const { default: ResetPasswordPage } = await import(
+        "../pages/auth/reset-password-page.tsx"
+      );
       return {
         element: (
           <Suspense fallback={<FallbackScreen />}>
@@ -127,33 +145,21 @@ export const router = createBrowserRouter([
       },
       {
         path: "/playlists/:playlistId",
-        element: (
-          <PlaylistDetailsPage />
-        ),
+        element: <PlaylistDetailsPage />,
       },
       {
         path: "/like-list",
-        element: (
-          <LikedMoviesPageLazy />
-        )
+        element: <LikedMoviesPageLazy />,
       },
       {
-        path: '/watch-list',
-        element: (
-          <WatchListPageLazy />
-        )
+        path: "/watch-list",
+        element: <WatchListPageLazy />,
       },
-    ]
+    ],
   },
   {
     path: "/activate-account",
-    element: (
-      <ActivateAccountPage />
-    ),
-  },
-  {
-    path: "/interrupts",
-    element: <InterruptsPage />,
+    element: <ActivateAccountPage />,
   },
   {
     path: "*",

@@ -53,9 +53,24 @@ export default {
   				'5': 'hsl(var(--chart-5))'
   			}
   		},
-		backgroundImage: {
-			'discover-bg': "url('https://hips.hearstapps.com/hmg-prod/images/spiderman-cruzando-el-multiverso-pelicula-estreno-647b17a4c14ca.jpg?crop=1xw:1xh;center,top&resize=1200:*')"
-		}
+			backgroundImage: {
+				'discover-bg': "url('https://hips.hearstapps.com/hmg-prod/images/spiderman-cruzando-el-multiverso-pelicula-estreno-647b17a4c14ca.jpg?crop=1xw:1xh;center,top&resize=1200:*')",
+				'gray-rose-gradient': 'linear-gradient(235deg, rgb(17, 24, 39) 40%,rgb(43, 18, 30) 99%)'
+			},
+			keyframes: {
+				"accordion-down": {
+					from: { height: "0" },
+					to: { height: "var(--radix-accordion-content-height)" },
+				},
+				"accordion-up": {
+					from: { height: "var(--radix-accordion-content-height)" },
+					to: { height: "0" },
+				},
+			},
+			animation: {
+				"accordion-down": "accordion-down 0.2s ease-out",
+				"accordion-up": "accordion-up 0.2s ease-out",
+			},
   	}
   },
   plugins: [tailwindcssAnimate],

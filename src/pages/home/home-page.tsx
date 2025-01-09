@@ -91,7 +91,7 @@ export const Homepage = () => {
 
     const handleSearch = () => {
         if (searchQuery.trim()) {
-            navigate(`/search?query=${encodeURIComponent(searchQuery.trim())}`);
+            navigate(`/movie/search?query=${encodeURIComponent(searchQuery.trim())}`);
         }
     }
 
