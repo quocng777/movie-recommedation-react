@@ -4,22 +4,22 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { CalendarIcon, FilterX, Grid, ListVideo, Trash, TrashIcon } from "lucide-react";
+import { CalendarIcon, FilterX, Grid, ListVideo, TrashIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import dayjs from "dayjs";
 import { Slider } from "@/components/ui/slider";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useMovieGenresQuery, useLazyDiscoverMoviesQuery, usePopularMoviesQuery } from "@/app/api/movies/movie-api-slice";
+import { useMovieGenresQuery, useLazyDiscoverMoviesQuery } from "@/app/api/movies/movie-api-slice";
 import { Genre, Movie } from "@/app/api/types/movie.type";
 import { SortOptions } from "@/app/api/constants/sort-options";
-import { Trash2Fill } from "react-bootstrap-icons";
-import { Tooltip, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent } from "@/components/ui/tooltip";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
 import { MovieCard } from "@/components/custom/movie-card";
 import { MovieCardList } from "@/components/custom/movie-card-list";
 import { CardViewLayout } from "@/components/custom/playlist-movie-card";
 import { MovieCardSkeleton } from "@/components/custom/movie-card-sekeleton";
+import { MovieCardListSkeleton } from "@/components/custom/movie-card-list-skeleton";
 
 const MovieListPage = () => {
   const navigate = useNavigate();
@@ -400,15 +400,20 @@ const MovieListPage = () => {
             </div>
           ) : (
             <div className="flex flex-wrap gap-4">
-              {movies.map((movie) => (
-                <MovieCardList
-                  key={movie.id}
-                  movie={movie}
-                  onClick={() => {
-                    navigate(`/movie/${movie.id}`);
-                  }}
-                />
-              ))}
+              {!isFilteringMovies
+                ? movies.map((movie) => (
+                    <MovieCardList
+                      key={movie.id}
+                      movie={movie}
+                      onClick={() => {
+                        navigate(`/movie/${movie.id}`);
+                      }}
+                    />
+                  ))
+                : new Array(10).fill(null).map((_, idx) => {
+                    return <MovieCardListSkeleton key={idx} />
+                  })
+              }
             </div>
           )}
         </div>
