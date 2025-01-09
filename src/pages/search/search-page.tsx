@@ -1,12 +1,13 @@
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useLazySearchMoviesQuery } from "@/app/api/movies/movie-api-slice";
 import { Movie } from "@/app/api/types/movie.type";
 import { useEffect, useState } from "react";
-import { SearchResultItem } from "@/components/custom/search-result-item";
+import { MovieCardList } from "@/components/custom/movie-card-list";
 import Pagination from "@/components/custom/pagination";
 import { useTopBarLoader } from "@/hooks/use-top-loader";
 
 const SearchPage = () => {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const query = searchParams.get("query") || "";
   const page = searchParams.get("page") ? parseInt(searchParams.get("page")!) : 1;
@@ -54,14 +55,11 @@ const SearchPage = () => {
         ) : movies.length > 0 ? (
           <ul className="space-y-4">
             {movies.map((movie) => (
-              <SearchResultItem
-                key={movie.id}
-                id={movie.id.toString()}
-                title={movie.title}
-                posterPath={movie.poster_path}
-                releaseDate={movie.release_date}
-                overview={movie.overview}
-                originalTitle={movie.original_title}
+              <MovieCardList
+                movie={movie}
+                onClick={() => {
+                  navigate(`/movie/${movie.id}`);
+                }}
               />
             ))}
           </ul>

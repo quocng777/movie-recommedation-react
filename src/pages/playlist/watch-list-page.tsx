@@ -58,7 +58,7 @@ const WatchListPage = () => {
                     movieId={movie}
                     onClick={() => navigate(`/movie/${movie}`)}
                   />
-              ))
+              ))  
             }
           </div>
       </div>

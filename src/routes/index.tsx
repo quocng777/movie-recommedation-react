@@ -5,11 +5,11 @@ import { AuthLayout } from "@/layouts/auth-layout";
 import { MainLayout } from "@/layouts/main-layout";
 import { lazy, Suspense } from "react";
 import { FallbackScreen } from "@/components/custom/fallback-screen";
-import InterruptsPage from "@/pages/error/interrupts";
 import NotFoundPage from "@/pages/error/not-found-page";
 import { PlaylistDetailsPage } from "@/pages/playlist/playlist-details-page";
 import { ActivateAccountPage } from "@/pages/auth/activate-account-page";
 
+const MovieListPage = lazy(() => import("../pages/movie/movie-list-page.tsx"));
 const RegisterPageLazy = lazy(() => import("../pages/auth/register-page"));
 const PlaylistPageLazy = lazy(() => import("../pages/playlist/playlist-page.tsx"));
 const MovieDetailPageLazy = lazy(() => import("../pages/movie/movie-detail"));
@@ -55,6 +55,14 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<FallbackScreen />}>
             <MovieDetailPageLazy />
+          </Suspense>
+        ),
+      },
+      {
+        path: "",
+        element: (
+          <Suspense fallback={<FallbackScreen />}>
+            <MovieListPage />
           </Suspense>
         ),
       },

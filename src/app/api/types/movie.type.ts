@@ -21,10 +21,12 @@ export type Movie =  {
   budget: number;
   revenue: number;
 };
+
 export type Genre = {
   id: number;
   name: string;
 };
+
 export enum MovieMediaType  {
   ALL =  'all',
   MOVIE = 'movie',

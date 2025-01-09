@@ -11,6 +11,7 @@ export const apiEndpoints = {
     SEARCH_KEYWORD: "/tmdb/search/keyword",
     LIKED_MOVIE: '/movies/liked',
     WATCH_LATER: '/movies/watch-later',
+    MOVIE_GENRES: '/tmdb/genre/movie/list',
 };
 
 export const customApiCode = {
