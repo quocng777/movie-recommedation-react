@@ -13,18 +13,27 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useMovieGenresQuery, useLazyDiscoverMoviesQuery } from "@/app/api/movies/movie-api-slice";
 import { Genre, Movie } from "@/app/api/types/movie.type";
 import { SortOptions } from "@/app/api/constants/sort-options";
-import { Tooltip, TooltipContent } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
 import { MovieCard } from "@/components/custom/movie-card";
 import { MovieCardList } from "@/components/custom/movie-card-list";
 import { CardViewLayout } from "@/components/custom/playlist-movie-card";
 import { MovieCardSkeleton } from "@/components/custom/movie-card-sekeleton";
 import { MovieCardListSkeleton } from "@/components/custom/movie-card-list-skeleton";
+import { useTopBarLoader } from "@/hooks/use-top-loader";
+import CustomPagination from "@/components/custom/pagination";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/custom/spinner";
 
 const MovieListPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const page = searchParams.get("page") ? parseInt(searchParams.get("page")!) : 1;
+
+  const {staticStart: startTopBarLoader, complete: completeTopBarLoader } = useTopBarLoader();
+  const [isInfiniteScroll, setInfiniteScroll] = useState(false);
+  const [isInfiniteLoading, setIsInfiniteLoading] = useState(false);
   const [cardViewLayout, setCardViewLayout] = useState(CardViewLayout.GRID);
   const [sortValue, setSortValue] = useState<string>(SortOptions.POPULARITY_DESC.KEY);
   const [fromDate, setFromDate] = useState<Date>();
@@ -37,6 +46,7 @@ const MovieListPage = () => {
   const [genres, setGenres] = useState<Genre[]>([]);
   const [movies, setMovies] = useState<Movie[]>([]);
   const buttonRef = useRef(null);
+  const observerRef = useRef(null);
   
   const { isSuccess: isGetMovieGenresSuccess, data: movieGenresData } = useMovieGenresQuery();
   const [ triggerFilteredMovies, { isLoading: isFilteringMovies, isSuccess: isFilterMoviesSuccess, data: filteredMoviesData }] = useLazyDiscoverMoviesQuery();
@@ -64,10 +74,31 @@ const MovieListPage = () => {
   }, []);
 
   useEffect(() => {
+    if (!isInfiniteScroll || !filteredMoviesData?.data) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          handleLoadMore();
+        }
+      },
+      { root: null, threshold: 1.0 }
+    );
+
+    
+    if (observerRef.current) observer.observe(observerRef.current);
+
+    return () => {
+      if (observerRef.current) observer.unobserve(observerRef.current);
+    };
+  }, [isInfiniteScroll, movies, currentPage]);
+
+  useEffect(() => {
     if (!isGetMovieGenresSuccess) {
       return;
     }
     setGenres(movieGenresData.data?.genres || []);
+    completeTopBarLoader();
   }, [isGetMovieGenresSuccess, movieGenresData]);
 
   useEffect(() => {
@@ -80,13 +111,22 @@ const MovieListPage = () => {
       scoreValues,
       voteValues,
     });
+    startTopBarLoader();
   }, [])
 
   useEffect(() => {
     if (!isFilterMoviesSuccess) {
       return;
     }
-    setMovies(filteredMoviesData.data?.results || []);
+
+    if (isInfiniteScroll && isInfiniteLoading) {
+      setMovies((prevMovies) => [...prevMovies, ...(filteredMoviesData.data?.results! || [])]);
+      setIsInfiniteLoading(false);
+    } else {
+      setMovies(filteredMoviesData.data?.results! || []);
+    }
+
+    completeTopBarLoader();
     console.log('filteredMoviesData', filteredMoviesData);
   }, [isFilterMoviesSuccess, filteredMoviesData]);
 
@@ -117,8 +157,13 @@ const MovieListPage = () => {
       voteValues,
     })
 
+    if (isInfiniteScroll) {
+      setCurrentPage(1);
+      setMovies([]);
+    }
+
     triggerFilteredMovies({
-      page,
+      page: currentPage,
       sortValue,
       fromDate: fromDate?.toISOString(),
       toDate: toDate?.toISOString(),
@@ -126,6 +171,8 @@ const MovieListPage = () => {
       scoreValues,
       voteValues,
     });
+
+    startTopBarLoader();
   }
 
   const handleClearFilters = () => {
@@ -135,6 +182,46 @@ const MovieListPage = () => {
     setScoreValues([0, 10]);
     setVoteValues([0, 500]);
   }
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    handleFilter();
+  };
+
+  const handleLoadMore = () => {
+    if (isInfiniteLoading || currentPage >= (filteredMoviesData?.data?.total_pages! || Number.MAX_SAFE_INTEGER))
+      return;
+    setIsInfiniteLoading(true);
+    const nextPage = currentPage + 1;
+    triggerFilteredMovies({
+      page: nextPage,
+      sortValue,
+      fromDate: fromDate?.toISOString(),
+      toDate: toDate?.toISOString(),
+      selectedGenres,
+      scoreValues,
+      voteValues,
+    });
+
+    setCurrentPage(nextPage);
+    startTopBarLoader();
+  }
+
+  const handleToggleInfiniteScroll = (enabled : boolean) => {
+    setInfiniteScroll(enabled);
+
+    triggerFilteredMovies({
+      page: currentPage,
+      sortValue,
+      fromDate: fromDate?.toISOString(),
+      toDate: toDate?.toISOString(),
+      selectedGenres,
+      scoreValues,
+      voteValues,
+    });
+
+    startTopBarLoader();
+  };
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
@@ -365,38 +452,51 @@ const MovieListPage = () => {
           </Button>
         </div>
         <div className="flex-grow p-6 w-full">
-          <div className="">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="text-rose-600 p-3"
-                  onClick={handleCardViewLayoutClick}
-                >
-                  {cardViewLayout == CardViewLayout.GRID ? (
-                    <Grid size={16} />
-                  ) : (
-                    <ListVideo className="text-3xl shrink-0" />
-                  )}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent className="p-2 duration-200">
-                {cardViewLayout == CardViewLayout.GRID
-                  ? "Change to List View"
-                  : "Change to Grid View"}
-              </TooltipContent>
-            </Tooltip>
+          <div className="flex flex-row justify-between items-center mb-4">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="text-rose-600 p-3"
+                    onClick={handleCardViewLayoutClick}
+                  >
+                    {cardViewLayout == CardViewLayout.GRID ? (
+                      <Grid size={20} />
+                    ) : (
+                      <ListVideo size={20} className="text-3xl shrink-0" />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent className="p-2 duration-200">
+                  {cardViewLayout == CardViewLayout.GRID
+                    ? "Change to List View"
+                    : "Change to Grid View"}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="infinite-switch"
+                checked={isInfiniteScroll}
+                onCheckedChange={handleToggleInfiniteScroll}
+              />
+              <Label htmlFor="infinite-switch">Enable Infinite Scroll</Label>
+            </div>
           </div>
           {cardViewLayout === CardViewLayout.GRID ? (
             <div className="flex flex-wrap gap-4">
-              {!isFilteringMovies 
+              {!isFilteringMovies
                 ? movies.map((movie) => (
-                    <MovieCard key={movie.id} movie={movie} onClick={() => {}} />
+                    <MovieCard
+                      key={movie.id}
+                      movie={movie}
+                      onClick={() => {}}
+                    />
                   ))
                 : new Array(10).fill(null).map((_, idx) => {
-                    return <MovieCardSkeleton key={idx} />
-                  })
-              }
+                    return <MovieCardSkeleton key={idx} />;
+                  })}
             </div>
           ) : (
             <div className="flex flex-wrap gap-4">
@@ -411,13 +511,29 @@ const MovieListPage = () => {
                     />
                   ))
                 : new Array(10).fill(null).map((_, idx) => {
-                    return <MovieCardListSkeleton key={idx} />
-                  })
-              }
+                    return <MovieCardListSkeleton key={idx} />;
+                  })}
             </div>
           )}
+          {isInfiniteScroll && (
+            <div ref={observerRef} className="w-full flex justify-center mt-6">
+              <Spinner isOpening={isInfiniteLoading} />
+            </div>
+          )}
+          {!isInfiniteScroll &&
+            isFilterMoviesSuccess &&
+            filteredMoviesData?.data && (
+              <div className="flex w-full justify-center mt-12">
+                <CustomPagination
+                  currentPage={currentPage}
+                  totalPages={filteredMoviesData.data?.total_pages!}
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            )}
         </div>
       </div>
+
       {isStickyVisible && (
         <div
           className={`w-full fixed bottom-0 left-0 right-0 z-50 shadow-lg transition-transform duration-300`}
