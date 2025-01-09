@@ -6,6 +6,7 @@ import { Button } from "../ui/button";
 import { ThreeDotsVertical } from "react-bootstrap-icons";
 import MovieActionPopover from "./movie-action-popover";
 import dayjs from "dayjs";
+import DefaultImage from "./default-image";
 
 export type MovieCardProps = {
     movie: Movie;
@@ -32,13 +33,19 @@ export const MovieCard = (props: MovieCardProps) => {
         onClick={onClick}
       >
         <div className="w-40 relative h-[15rem] group">
-          <img
-            src={getResourceFromTmdb(movie.poster_path)}
-            onLoad={onImageLoad}
-            className={`${!loaded ? "opacity-0" : "group-hover:blur-sm"}`}
-          />
-          {!loaded && (
-            <Skeleton className="top-0 absolute bottom-0 right-0 left-0 opacity-100" />
+          {movie.poster_path ? (
+            <>
+              <img
+                src={getResourceFromTmdb(movie.poster_path)}
+                onLoad={onImageLoad}
+                className={`${!loaded ? "opacity-0" : "group-hover:blur-sm"}`}
+              />
+              {!loaded && (
+                <Skeleton className="top-0 absolute bottom-0 right-0 left-0 opacity-100" />
+              )}
+            </>
+          ) : (
+            <DefaultImage alt={movie.title} className="w-40 h-[15rem] flex-shrink-0" />
           )}
           <div className="absolute -bottom-4 left-6 transform -translate-x-1/2 w-10 h-10 rounded-full flex items-center justify-start">
             <div className="relative w-14 h-14 rounded-full shadow-xl">
