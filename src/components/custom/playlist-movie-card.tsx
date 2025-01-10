@@ -43,7 +43,7 @@ export const PlayListMovieCard = (props: PlaylistMovieCardProps) => {
     };
     
     return (
-        <div className={`rounded-lg overflow-hidden cursor-pointer shrink-0 justify-self-center ${isGridView ? 'flex flex-col w-40' : 'flex w-full gap-8 bg-slate-800'}`} onClick={onClick}>
+        <div className={`rounded-lg overflow-hidden cursor-pointer shrink-0 justify-self-center ${isGridView ? 'flex flex-col w-40' : 'flex w-full gap-8 bg-gray-rose-gradient h-[112px]'}`} onClick={onClick}>
           <div className={`relative group shrink-0 ${isGridView ? 'w-40 h-[15rem]' : 'w-[200px]'}`}>
               <img 
                 src={movie?.poster_path 

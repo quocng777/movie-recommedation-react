@@ -176,8 +176,31 @@ export const movieApiSlice = apiSlice.injectEndpoints({
                     method: "GET",
                 };
             }
-        })
+        }),
 
+        addMovieRating: builder.mutation<Response<void>, {movieId: number, score: number}>({
+          query: (rating) => ({
+            url: `/movies/${rating.movieId}/rating`,
+            method: 'POST',
+            body: {
+              score: rating.score,
+            }
+          })
+        }),
+
+        getMovieRating: builder.query<Response<{movieId: number, score: number}>, number>({
+          query: (movieId) => ({
+            url: `/movies/${movieId}/rating`,
+            method: 'GET',
+          })
+        }),
+
+        deleteMovieRating: builder.mutation<void, number>({
+          query: (movieId) => ({
+            url: `/movies/${movieId}/rating`,
+            method: 'DELETE',
+          })
+        }),
     })
 });
 
@@ -203,4 +226,7 @@ export const {
     useNowPlayingQuery,
     useMovieGenresQuery,
     useLazyDiscoverMoviesQuery,
+    useAddMovieRatingMutation,
+    useGetMovieRatingQuery,
+    useDeleteMovieRatingMutation,
 } = movieApiSlice;
