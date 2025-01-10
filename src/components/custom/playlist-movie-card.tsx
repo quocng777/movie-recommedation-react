@@ -6,6 +6,7 @@ import { Button } from "../ui/button";
 import { ThreeDotsVertical } from "react-bootstrap-icons";
 import MovieActionPopover from "./movie-action-popover";
 import { useMovieDetailQuery } from "@/app/api/movies/movie-api-slice";
+import { ratingScore } from "./rating-picker";
 
 export enum CardViewLayout {
   GRID = 'grid',
@@ -16,11 +17,12 @@ export type PlaylistMovieCardProps = {
   movieId: number;
   onClick?: () => void;
   viewLayout: CardViewLayout;
+  rating?: number;
 };
 
 export const PlayListMovieCard = (props: PlaylistMovieCardProps) => {
     const [ movie, setMovie ] = useState<Movie | undefined>();
-    const { movieId, onClick, viewLayout } = props;
+    const { movieId, onClick, viewLayout, rating } = props;
     const [loaded, setLoaded] = useState(false);
     const { data: movieData, isSuccess } = useMovieDetailQuery({id: movieId.toString()});
 
@@ -43,8 +45,8 @@ export const PlayListMovieCard = (props: PlaylistMovieCardProps) => {
     };
     
     return (
-        <div className={`rounded-lg overflow-hidden cursor-pointer shrink-0 justify-self-center ${isGridView ? 'flex flex-col w-40' : 'flex w-full gap-8 bg-slate-800'}`} onClick={onClick}>
-          <div className={`relative group shrink-0 ${isGridView ? 'w-40 h-[15rem]' : 'w-[200px]'}`}>
+        <div className={`rounded-lg overflow-hidden cursor-pointer shrink-0 justify-self-center ${isGridView ? 'flex flex-col w-40' : 'flex w-full gap-8 bg-gray-rose-gradient h-[135px]'}`} onClick={onClick}>
+          <div className={`relative group shrink-0 ${isGridView ? 'w-40 h-[15rem]' : 'w-[240px]'}`}>
               <img 
                 src={movie?.poster_path 
                   ? getResourceFromTmdb(
@@ -62,9 +64,16 @@ export const PlayListMovieCard = (props: PlaylistMovieCardProps) => {
           <div className="mt-2 flex flex-col pr-6 gap-0.5">
               <span className="font-semibold text-ellipsis line-clamp-1">{movie?.original_title}</span>
               <span className="text-sm">{movie?.release_date}</span>
-              <p className="line-clamp-2">
+              <p className={`line-clamp-2 text-sm ${isGridView ? 'text-xs' : ''}`}>
                 {movie?.overview}
               </p>
+              {
+                rating && (
+                  <div className="text-xs mt-1">
+                    You felt {ratingScore[rating as keyof typeof ratingScore].title} {ratingScore[rating as keyof typeof ratingScore].emoji}
+                  </div>
+                )
+              }
           </div>
       </div>
     )

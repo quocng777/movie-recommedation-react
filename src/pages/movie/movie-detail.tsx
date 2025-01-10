@@ -1,6 +1,9 @@
 import { useParams } from "react-router-dom";
-import { useState, useEffect, MouseEventHandler } from "react";
+import { useState, useEffect, MouseEventHandler, MouseEvent, useRef } from "react";
 import {
+  useAddMovieRatingMutation,
+  useDeleteMovieRatingMutation,
+  useGetMovieRatingQuery,
   useLazyMovieCastQuery,
   useLazyMovieDetailQuery,
   useLazyMovieKeywordsQuery,
@@ -19,6 +22,10 @@ import { RootState } from "@/app/api/store";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { AddMovieToPlaylistDialog } from "@/components/custom/add-movie-to-playlist-dialog";
 import { TrailerVideoDialog } from "@/components/custom/trailer-video-dialog";
+import { RatingIndicator } from "@/components/custom/rating-indicator";
+import { RatingPicker, ratingScore } from "@/components/custom/rating-picker";
+import { toast } from "@/hooks/use-toast";
+
 const languageMap: { [key: string]: string } = {
   en: "English",
   vn: "Vietnamese",
@@ -48,6 +55,13 @@ const MovieDetail = () => {
   const {data: trailersData, isSuccess: isGetTrailersSuccess} = useTrailerVideoQuery(parseInt(id!));
   const [trailer, setTrailer] = useState<Video | undefined>();
   const [openTrailerDialog, setOpenTrailerDialog] = useState(false);
+  const [openRatingPopover, setOpenRatingPopover] = useState(false);
+  const {data: ratingData, isSuccess: isGetRatingSuccess} = useGetMovieRatingQuery(parseInt(id!));
+  const [addMovieRating, {isSuccess: isAddRatingSuccess, isError: isAddRatingError}] = useAddMovieRatingMutation();
+  const [selectedRating, setSelectedRating] = useState(0);
+  const [deleteMovieRating] = useDeleteMovieRatingMutation();
+  const isDbClickCalled = useRef(false);
+
 
   const onLikeMovieClick: MouseEventHandler = () => {
       if(!isAuthenticated) {
@@ -65,7 +79,42 @@ const MovieDetail = () => {
 
   const onPlayTrailerClick = () => {
     setOpenTrailerDialog(true);
-  }
+  };
+
+  const onRatingClick = (score: number) => {
+    if(score === selectedRating) {
+      return;
+    }
+    addMovieRating({
+      movieId: parseInt(id!),
+      score,
+    });
+    setSelectedRating(score);
+    setOpenRatingPopover(false);
+  };
+
+  const onRatingBtnClick: MouseEventHandler = (event: MouseEvent<HTMLButtonElement>) => {
+    setTimeout(() => {
+      event.preventDefault();
+      event.stopPropagation();
+      if(!isAuthenticated || isDbClickCalled.current) {
+        isDbClickCalled.current = false;
+        return;
+      }
+      setOpenRatingPopover(true);
+    }, 300)
+  };
+
+  const onRatingBtnDoubleClick: MouseEventHandler = (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    isDbClickCalled.current = true;
+    if(!isAuthenticated || selectedRating === 0) {
+      return;
+    }
+    deleteMovieRating(movie?.id!);
+    setSelectedRating(0);
+  }; 
 
   useEffect(() => {
     if (id) {
@@ -112,7 +161,35 @@ const MovieDetail = () => {
       return;
     }
     setTrailer(trailersData.data?.results.find(video => video.type == 'Trailer') ?? trailersData.data?.results[0]);
-  }, [isGetTrailersSuccess, trailersData])
+  }, [isGetTrailersSuccess, trailersData]);
+
+  useEffect(() => {
+    if(!isGetRatingSuccess) {
+      return;
+    }
+    setSelectedRating(ratingData.data?.score!);
+  }, [isGetRatingSuccess, ratingData]);
+
+  useEffect(() => {
+    if(!isAddRatingError) {
+      return;
+    }
+    setSelectedRating(0);
+    toast({
+      title: 'Error',
+      description: `Error when added rating for ${movie?.title} 😰`
+    });
+  });
+
+  useEffect(() => {
+    if(!isAddRatingSuccess) {
+      return;
+    }
+    toast({
+      title: 'Success',
+      description: `Added rating for ${movie?.title}`
+    });
+  }, [isAddRatingSuccess])
 
   if (isLoading) return <FallbackScreen />;
   if (error) return <div>{error}</div>;
@@ -155,20 +232,53 @@ const MovieDetail = () => {
                 </span>
               ))}
             </div>
-
-            {/* UserScore and What is your vibe */}
             <div className="flex items-center gap-6 mt-6">
               <div className="flex items-center gap-2">
                 <div className="bg-gray-800 text-white w-12 h-12 rounded-full flex justify-center items-center">
-                  {movie.vote_average}
+                  <RatingIndicator rating={movie.vote_average} />
                 </div>
               </div>
-              <button className="bg-gray-800 text-white px-4 py-2 rounded-lg text-sm">
-                What's your vibe?
-              </button>
+              {
+                <RatingPicker
+                  onOpenChange={setOpenRatingPopover}
+                  open={openRatingPopover}
+                  selectedRating={selectedRating}
+                  onRatingClick={onRatingClick}>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Button 
+                          className="bg-gray-rose-gradient text-white px-4 py-4 rounded-full text-sm hover:scale-105" 
+                          onClick={onRatingBtnClick}
+                          onDoubleClick={onRatingBtnDoubleClick}
+                        >
+                        {selectedRating !== 0
+                          ? (
+                            <div className="flex font-bold gap-2 items-center">
+                              <span className="text-xl">
+                              {
+                                ratingScore[selectedRating as keyof typeof ratingScore]!.emoji!
+                              }
+                              </span> 
+                              <p>
+                                Your rating
+                              </p>
+                            </div>
+                          )
+                          : <p className="font-bold">Rating this movie 🌟</p>
+                        }
+                      </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        {
+                          isAuthenticated 
+                            ? <p>Add rating for this movie</p>
+                            : <p>Login to add rating for this movie</p>
+                        }
+                      </TooltipContent>
+                    </Tooltip>
+                </RatingPicker>
+              }
             </div>
-
-            {/* Action Buttons */}
             <div className="flex gap-4 mt-6 text-white">
               <Tooltip>
                 <TooltipTrigger asChild>

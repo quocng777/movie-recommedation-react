@@ -9,7 +9,7 @@ import { useTopBarLoader } from "@/hooks/use-top-loader";
 import { delay } from "@/lib/helpers/delay";
 import { LogOut } from "lucide-react";
 import { ReactNode } from "react";
-import { Bookmark, Heart, Tv } from "react-bootstrap-icons";
+import { Bookmark, Heart, Star, Tv } from "react-bootstrap-icons";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
@@ -63,6 +63,11 @@ export const UserPopover = (props: UserPopoverProps) => {
       closePopover();
     };
 
+    const onRatingsClick = () => {
+      navigate('/ratings');
+      closePopover();
+    };
+
   return (
     <Popover open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger asChild>
@@ -90,6 +95,12 @@ export const UserPopover = (props: UserPopoverProps) => {
                 <div className="flex gap-6 items-center">
                     <Tv className="size-5" />
                     <span className="font-semibold">Watch list</span>
+                </div>
+            </PopoverItem>
+            <PopoverItem onClick={onRatingsClick}>
+                <div className="flex gap-6 items-center">
+                    <Star className="size-5" />
+                    <span className="font-semibold">Ratings</span>
                 </div>
             </PopoverItem>
             <PopoverItem onClick={onLogoutClick}>
