@@ -12,7 +12,7 @@ import { Search } from "lucide-react";
 import {  ChangeEvent, ChangeEventHandler, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export const Homepage = () => {
+const Homepage = () => {
     const navigate = useNavigate();
     const [trendingMovies, setTrendingMovies] = useState<Movie[]>([]);
     const [trendingDuration, setTrendingDuration] = useState<MovieTrendingDuration>(MovieTrendingDuration.DAY);
@@ -232,4 +232,6 @@ export const Homepage = () => {
         </section>
       </div>
     );
-}
+};
+
+export default Homepage;
