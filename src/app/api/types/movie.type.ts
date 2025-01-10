@@ -101,3 +101,9 @@ export type MovieVideo = {
   id: number,
   results: Video[],
 }
+
+export type Rating = {
+  id: number;
+  movieId: number;
+  score: number;
+}
