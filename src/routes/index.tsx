@@ -8,6 +8,7 @@ import { FallbackScreen } from "@/components/custom/fallback-screen";
 import NotFoundPage from "@/pages/error/not-found-page";
 import { PlaylistDetailsPage } from "@/pages/playlist/playlist-details-page";
 import { ActivateAccountPage } from "@/pages/auth/activate-account-page";
+import CastDetail from "@/pages/person/person-detail.tsx";
 
 const MovieListPage = lazy(() => import("../pages/movie/movie-list-page.tsx"));
 const RegisterPageLazy = lazy(() => import("../pages/auth/register-page"));
@@ -32,6 +33,35 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 export const router = createBrowserRouter([
+    {
+        path: "/person",
+        element: (
+          <Suspense fallback={<FallbackScreen />}>
+            <MainLayout>
+              <Outlet />
+            </MainLayout>
+          </Suspense>
+        ),
+        children: [
+         
+          {
+            path: ":person_id",
+            element: (
+              <Suspense fallback={<FallbackScreen />}>
+                <CastDetail/>
+              </Suspense>
+            ),
+          },
+          {
+            path: "",
+            element: (
+              <Suspense fallback={<FallbackScreen />}>
+                {/* <MovieListPage /> */}
+              </Suspense>
+            ),
+          },
+        ],
+      },
   {
     path: "/movie",
     element: (
