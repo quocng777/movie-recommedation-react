@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { MovieCardList } from "@/components/custom/movie-card-list";
 import Pagination from "@/components/custom/pagination";
 import { useTopBarLoader } from "@/hooks/use-top-loader";
+import { Spinner } from "@/components/custom/spinner";
 
 const SearchPage = () => {
   const navigate = useNavigate();
@@ -51,7 +52,9 @@ const SearchPage = () => {
           )}
         </h3>
         {isLoading ? (
-          <p>Loading...</p>
+          <div className="flex justify-center items-center h-40">
+            <Spinner isOpening={isLoading}/>
+          </div>
         ) : movies.length > 0 ? (
           <ul className="space-y-4">
             {movies.map((movie) => (
@@ -64,7 +67,7 @@ const SearchPage = () => {
             ))}
           </ul>
         ) : (
-          <p>There are no results that matched "{query}".</p>
+          <p className="text-gray-400">There are no results that matched "{query}".</p>
         )}
       </div>
       {isGetSearchResultSuccess && searchResultData?.data && (

@@ -3,7 +3,8 @@ export type RatingIndicatorProps = {
 }
 
 export const RatingIndicator = (props: RatingIndicatorProps) => {
-  const {rating} = props;
+  let { rating } = props;
+  if (!rating) rating = 0;
 
   return (
     <div className="relative w-14 h-14 rounded-full shadow-xl">
@@ -23,7 +24,9 @@ export const RatingIndicator = (props: RatingIndicatorProps) => {
           r="16"
           fill="none"
           stroke={
-            rating * 10 >= 70
+            rating === 0
+              ? "#fff"
+              : rating * 10 >= 70
               ? "#22c55e"
               : rating * 10 >= 50
               ? "#d97706"
@@ -38,11 +41,15 @@ export const RatingIndicator = (props: RatingIndicatorProps) => {
         />
       </svg>
       <div className="absolute inset-0 flex items-center justify-center text-xs font-semibold">
-        <p className="font-bold">
-          {`${(rating * 10).toFixed(0)}`}
-        </p>
-        <p className="text-[8px]">%</p>
+        {rating ? (
+          <>
+            <span className="font-bold">{`${(rating * 10).toFixed(0)}`}</span>
+            <span className="text-[8px]">%</span>
+          </>
+        ) : (
+            <span className="text-[8px]">NR</span>
+        )}
       </div>
     </div>
-  )
+  );
 }

@@ -158,7 +158,6 @@ const MovieListPage = () => {
     })
 
     if (isInfiniteScroll) {
-      setCurrentPage(1);
       setMovies([]);
     }
 
@@ -172,6 +171,7 @@ const MovieListPage = () => {
       voteValues,
     });
 
+    setCurrentPage(1);
     startTopBarLoader();
   }
 
@@ -185,7 +185,15 @@ const MovieListPage = () => {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    handleFilter();
+    triggerFilteredMovies({
+      page: page,
+      sortValue,
+      fromDate: fromDate?.toISOString(),
+      toDate: toDate?.toISOString(),
+      selectedGenres,
+      scoreValues,
+      voteValues,
+    });
   };
 
   const handleLoadMore = () => {
@@ -491,7 +499,9 @@ const MovieListPage = () => {
                     <MovieCard
                       key={movie.id}
                       movie={movie}
-                      onClick={() => {}}
+                      onClick={() => {
+                        navigate(`/movie/${movie.id}`);
+                      }}
                     />
                   ))
                 : new Array(10).fill(null).map((_, idx) => {

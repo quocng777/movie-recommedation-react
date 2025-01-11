@@ -1,5 +1,5 @@
 import { getResourceFromTmdb } from "@/lib/helpers/get-resource-tmbd";
-import React, { useState } from "react";
+import { useState } from "react";
 import DefaultImage from "./default-image";
 import { Link } from "react-router-dom";
 import { Skeleton } from "../ui/skeleton";
@@ -16,6 +16,7 @@ type MovieCardListProps = {
 
 export const MovieCardList = ({ movie, onClick }: MovieCardListProps) => {
   const [loaded, setLoaded] = useState(false);
+  let voteAvg = movie.vote_average ? movie.vote_average : 0;
 
   const onImageLoad = () => {
     setLoaded(true);
@@ -72,17 +73,17 @@ export const MovieCardList = ({ movie, onClick }: MovieCardListProps) => {
                   r="16"
                   fill="none"
                   stroke={
-                    movie.vote_average === 0
+                    voteAvg === 0
                       ? "#fff"
-                      : movie.vote_average * 10 >= 70
+                      : voteAvg * 10 >= 70
                       ? "#65a30d"
-                      : movie.vote_average * 10 >= 50
+                      : voteAvg * 10 >= 50
                       ? "#d97706"
                       : "#e11d48"
                   }
                   strokeWidth="2"
                   strokeDasharray="100, 100"
-                  strokeDashoffset={`${100 - movie.vote_average * 10}`}
+                  strokeDashoffset={`${100 - voteAvg * 10}`}
                   strokeLinecap="round"
                   transform="rotate(-180 18 18)"
                 />

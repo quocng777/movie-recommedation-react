@@ -1,3 +1,5 @@
+import { UserMiniDto } from "./user.type";
+
 export type Movie =  {
   adult: boolean;
   backdrop_path: string;
@@ -100,6 +102,15 @@ export type Video = {
 export type MovieVideo = {
   id: number,
   results: Video[],
+}
+
+export type Review = {
+  id: number,
+  movie_id: number,
+  comment: string,
+  created_at: Date,
+  updated_at: Date,
+  user: UserMiniDto,
 }
 
 export type Rating = {

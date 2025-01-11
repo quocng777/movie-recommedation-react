@@ -17,6 +17,7 @@ const MovieDetailPageLazy = lazy(() => import("../pages/movie/movie-detail"));
 const LikedMoviesPageLazy = lazy(() => import("../pages/playlist/liked-movies-page.tsx"));
 const WatchListPageLazy = lazy(() => import("../pages/playlist/watch-list-page.tsx"));
 const SearchPageLazy = lazy(() => import("../pages/search/search-page"));
+const ReviewListPageLazy = lazy(() => import("../pages/reviews/review-list-page"));
 const RatingListPageLazy = lazy(() => import("../pages/playlist/rating-list-page.tsx"));
 const HomePageLazy = lazy(() => import("../pages/home/home-page.tsx"));
 
@@ -87,6 +88,14 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<FallbackScreen />}>
             <MovieDetailPageLazy />
+          </Suspense>
+        ),
+      },
+      {
+        path: ":id/reviews",
+        element: (
+          <Suspense fallback={<FallbackScreen />}>
+            <ReviewListPageLazy />
           </Suspense>
         ),
       },
