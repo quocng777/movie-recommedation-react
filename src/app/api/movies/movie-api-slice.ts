@@ -1,7 +1,7 @@
 import { apiSlice } from "../base/api-slice";
 import { Response } from "../types/response";
 import { apiEndpoints } from "../constants";
-import { Movie, MovieCast, MovieCastResponse, MovieMediaType, MovieTrendingDuration, MovieTrendingType, TmdbPageResponse, MovieKeywords, MovieKeywordsResponse, SearchKeyword, MovieVideo, Genre, Review } from "../types/movie.type";
+import { Movie, MovieCast, MovieCastResponse, MovieMediaType, MovieTrendingDuration, MovieTrendingType, TmdbPageResponse, MovieKeywords, MovieKeywordsResponse, SearchKeyword, MovieVideo, Genre, Review, Rating } from "../types/movie.type";
 import { FilterParams } from "../types/params.type";
 import { SortOptions } from "../constants/sort-options";
 
@@ -242,6 +242,13 @@ export const movieApiSlice = apiSlice.injectEndpoints({
                 method: 'DELETE',
             })
         }),
+
+        getRatings: builder.query<Response<Rating[]>, void>({
+          query: () => ({
+            url: `/movies/rating`,
+            method: 'GET',
+          })
+        })
     })
 });
 
@@ -275,4 +282,5 @@ export const {
     useAddMovieReviewMutation,
     useEditMovieReviewMutation,
     useDeleteMovieReviewMutation,
+    useGetRatingsQuery,
 } = movieApiSlice;

@@ -40,6 +40,7 @@ const languageMap: { [key: string]: string } = {
 
 const MovieDetail = () => {
   const navigate = useNavigate();
+
   const { id } = useParams<{ id: string }>();
   const [movie, setMovie] = useState<Movie>();
   const [movieCast, setMovieCast] = useState<MovieCast[]>([]);
@@ -155,6 +156,12 @@ const MovieDetail = () => {
     deleteReview({reviewId, movieId: parseInt(id!)});
   }
 
+  const onCastClick = (id: string) =>
+  {
+    navigate("/person/"+ id);
+    return;
+  }
+    
   useEffect(() => {
     if (id) {
       setIsLoading(true);
@@ -504,10 +511,10 @@ const MovieDetail = () => {
                   return <MovieCardSkeleton key={idx} />;
                 })}
               {movieCast.length === 0 && !isMovieCastLoading && (
-                <p className="text-gray-500">No cast available</p>
+              <p className="text-gray-500">No cast available</p>
               )}
               {movieCast.map((cast) => {
-                return <MovieCastCard key={cast.id} cast={cast} />;
+                return <MovieCastCard key={cast.id} cast={cast} onClick={()=>onCastClick(cast.id.toString())}/>;
               })}
             </div>
           </div>

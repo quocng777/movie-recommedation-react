@@ -112,3 +112,9 @@ export type Review = {
   updated_at: Date,
   user: UserMiniDto,
 }
+
+export type Rating = {
+  id: number;
+  movieId: number;
+  score: number;
+}

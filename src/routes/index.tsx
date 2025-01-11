@@ -8,6 +8,7 @@ import { FallbackScreen } from "@/components/custom/fallback-screen";
 import NotFoundPage from "@/pages/error/not-found-page";
 import { PlaylistDetailsPage } from "@/pages/playlist/playlist-details-page";
 import { ActivateAccountPage } from "@/pages/auth/activate-account-page";
+import CastDetail from "@/pages/person/person-detail.tsx";
 
 const MovieListPage = lazy(() => import("../pages/movie/movie-list-page.tsx"));
 const RegisterPageLazy = lazy(() => import("../pages/auth/register-page"));
@@ -17,6 +18,8 @@ const LikedMoviesPageLazy = lazy(() => import("../pages/playlist/liked-movies-pa
 const WatchListPageLazy = lazy(() => import("../pages/playlist/watch-list-page.tsx"));
 const SearchPageLazy = lazy(() => import("../pages/search/search-page"));
 const ReviewListPageLazy = lazy(() => import("../pages/reviews/review-list-page"));
+const RatingListPageLazy = lazy(() => import("../pages/playlist/rating-list-page.tsx"));
+const HomePageLazy = lazy(() => import("../pages/home/home-page.tsx"));
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const user = useSelector(getCurrentAuthentication);
@@ -33,6 +36,35 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 export const router = createBrowserRouter([
+    {
+        path: "/person",
+        element: (
+          <Suspense fallback={<FallbackScreen />}>
+            <MainLayout>
+              <Outlet />
+            </MainLayout>
+          </Suspense>
+        ),
+        children: [
+         
+          {
+            path: ":person_id",
+            element: (
+              <Suspense fallback={<FallbackScreen />}>
+                <CastDetail/>
+              </Suspense>
+            ),
+          },
+          {
+            path: "",
+            element: (
+              <Suspense fallback={<FallbackScreen />}>
+                {/* <MovieListPage /> */}
+              </Suspense>
+            ),
+          },
+        ],
+      },
   {
     path: "/movie",
     element: (
@@ -119,18 +151,12 @@ export const router = createBrowserRouter([
   },
   {
     path: "",
-    lazy: async () => {
-      const { Homepage } = await import("../pages/home/home-page");
-      return {
-        element: (
-          <Suspense fallback={<FallbackScreen />}>
-            <MainLayout>
-              <Homepage />
-            </MainLayout>
-          </Suspense>
-        ),
-      };
-    },
+    element: (
+    <Suspense fallback={<FallbackScreen />}>
+      <MainLayout>
+        <HomePageLazy />
+      </MainLayout>
+    </Suspense>)
   },
   {
     path: "",
@@ -164,6 +190,10 @@ export const router = createBrowserRouter([
         path: "/watch-list",
         element: <WatchListPageLazy />,
       },
+      {
+        path: "/ratings",
+        element: <RatingListPageLazy />
+      }
     ],
   },
   {
