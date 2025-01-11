@@ -67,7 +67,7 @@ const SearchPage = () => {
             ))}
           </ul>
         ) : (
-          <p>There are no results that matched "{query}".</p>
+          <p className="text-gray-400">There are no results that matched "{query}".</p>
         )}
       </div>
       {isGetSearchResultSuccess && searchResultData?.data && (

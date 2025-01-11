@@ -1,5 +1,5 @@
 import { getResourceFromTmdb } from "@/lib/helpers/get-resource-tmbd";
-import React, { useState } from "react";
+import { useState } from "react";
 import DefaultImage from "./default-image";
 import { Link } from "react-router-dom";
 import { Skeleton } from "../ui/skeleton";

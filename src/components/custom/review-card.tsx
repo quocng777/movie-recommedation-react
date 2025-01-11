@@ -9,7 +9,6 @@ import { Tooltip, TooltipContent } from "../ui/tooltip";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/api/store";
-import { useDeleteMovieRatingMutation } from "@/app/api/movies/movie-api-slice";
 
 type ReviewCardProps = {
   review: Review;

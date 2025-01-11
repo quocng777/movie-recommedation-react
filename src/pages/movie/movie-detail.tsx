@@ -615,7 +615,11 @@ const MovieDetail = () => {
         open={openEditReviewDialog}
         onOpenChange={setOpenEditReviewDialog}
         triggerElement={<></>}
-        onSave={(content) => handleEditReview(latestReview[0].id, content)}
+        onSave={(content) => {
+          if(targetReview) {
+            handleEditReview(targetReview.id, content);
+          }
+        }}
         initialText={targetReview?.comment!}
       />
       <DeleteModal
