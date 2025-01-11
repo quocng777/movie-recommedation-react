@@ -5,7 +5,7 @@ import { FallbackScreen } from "@/components/custom/fallback-screen";
 import { MovieCardSkeleton } from "@/components/custom/movie-card-sekeleton";
 import {
   useLazyPersonDetailQuery,
-  useLazyPersonCombinedCreditsQuery
+  useLazyPersonCombinedCreditsQuery,
 } from "@/app/api/person/person-api-slice";
 import { getResourceFromTmdb } from "@/lib/helpers/get-resource-tmbd";
 import { Credit, Person } from "@/app/api/types/person.type";
@@ -21,7 +21,7 @@ function getGenderText(gender: number | undefined): string {
   return gender !== undefined ? genderMap[gender] || "Unknown" : "Unknown";
 }
 const PersonDetail = () => {
-const navigate = useNavigate();
+  const navigate = useNavigate();
   const { person_id } = useParams<{ person_id: string }>();
   const [person, setPerson] = useState<Person>();
   const [credits, setCredits] = useState<Credit[]>([]);
@@ -38,10 +38,10 @@ const navigate = useNavigate();
     { data: movieData, isSuccess: IsSuccessGetPersonMovieCredit },
   ] = useLazyPersonCombinedCreditsQuery();
 
-  const onMovieClick= (movie_id: string) =>{
+  const onMovieClick = (movie_id: string) => {
     navigate("/movie/" + movie_id);
     return;
-  }
+  };
   useEffect(() => {
     if (person_id) {
       setIsLoading(true);
@@ -57,20 +57,21 @@ const navigate = useNavigate();
   }, [IsSuccessGetPersonDetail, personData]);
   useEffect(() => {
     if (IsSuccessGetPersonMovieCredit && movieData) {
-      console.log(movieData.data?.cast!)
+      console.log(movieData.data?.cast!);
       setCredits(movieData.data?.cast!);
       setIsMovieLoading(false);
-      
     }
   }, [IsSuccessGetPersonMovieCredit, movieData]);
 
   if (isLoading) return <FallbackScreen />;
   const sortedCredits = credits
-      .map((credit) => ({
-        ...credit,
-        releaseYear: credit.release_date ? new Date(credit.release_date).getFullYear() : undefined,
-      }))
-      .sort((a, b) => (b.releaseYear || 0) - (a.releaseYear || 0));
+    .map((credit) => ({
+      ...credit,
+      releaseYear: credit.release_date
+        ? new Date(credit.release_date).getFullYear()
+        : undefined,
+    }))
+    .sort((a, b) => (b.releaseYear || 0) - (a.releaseYear || 0));
   return (
     <div className="flex flex-col md:flex-row bg-black bg-center p-6 rounded-lg shadow-md">
       {/* Left Section - Image and Personal Info */}
@@ -138,7 +139,13 @@ const navigate = useNavigate();
                   return <MovieCardSkeleton key={idx} />;
                 })}
               {credits.map((credit) => {
-                return <MovieCreditsCard key={credit.id} movie={credit} onClick={()=> onMovieClick(credit.id.toString())}/>;
+                return (
+                  <MovieCreditsCard
+                    key={credit.id}
+                    movie={credit}
+                    onClick={() => onMovieClick(credit.id.toString())}
+                  />
+                );
               })}
             </div>
             <ScrollBar orientation="horizontal" />
@@ -146,25 +153,28 @@ const navigate = useNavigate();
         </div>
 
         <div className="p-6 bg-black">
-      <div className="bg-black shadow-md rounded-lg p-4 border border-gray-700">
-        {sortedCredits.map((credit, index) => (
-          <div
-            key={index}
-            className="flex items-start py-3 border-b border-gray-700 last:border-b-0"
-          >
-            <div className="w-16 text-gray-500 font-medium">
-              {credit.releaseYear ? credit.releaseYear : "N/A"}
-            </div>
-            <div className="flex-grow">
-              <h3 className="cursor-pointer text-blue-500 font-semibold hover:underline" onClick={()=> onMovieClick(credit.id.toString())}>
-                {credit.title}
-              </h3>
-              <p className="text-gray-300 text-sm">as {credit.character}</p>
-            </div>
+          <div className="bg-black shadow-md rounded-lg p-4 border border-gray-700">
+            {sortedCredits.map((credit, index) => (
+              <div
+                key={index}
+                className="flex items-start py-3 border-b border-gray-700 last:border-b-0"
+              >
+                <div className="w-16 text-gray-500 font-medium">
+                  {credit.releaseYear ? credit.releaseYear : "N/A"}
+                </div>
+                <div className="flex-grow">
+                  <h3
+                    className="text-white font-semibold hover:text-blue-500 cursor-pointer"
+                    onClick={() => onMovieClick(credit.id.toString())}
+                  >
+                    {credit.title}
+                  </h3>
+                  <p className="text-gray-300 text-sm">as {credit.character}</p>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-    </div>
+        </div>
       </div>
     </div>
   );
