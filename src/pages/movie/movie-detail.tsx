@@ -74,6 +74,7 @@ const MovieDetail = () => {
   const [openEditReviewDialog, setOpenEditReviewDialog] = useState(false);
   const [openDeleteReviewDialog, setOpenDeleteReviewDialog] = useState(false);
   const [latestReview, setLatestReview] = useState<Review[]>([]);
+  const [totalReview, setTotalReview] = useState<number>(0);
   const [targetReview, setTargetReview] = useState<Review>();
   const [getLatestReviews, {data: reviewData, isSuccess: isGetReviewSuccess}] = useLazyGetMovieLatestReviewQuery();
   const [addReview, {isSuccess: isAddReviewgSuccess, isError: isAddReviewError}] = useAddMovieReviewMutation();
@@ -236,7 +237,8 @@ const MovieDetail = () => {
     }
 
     console.log("reviewData", reviewData);
-    setLatestReview(reviewData.data ? reviewData.data : []);
+    setLatestReview(reviewData.data?.reviews ? reviewData.data.reviews : []);
+    setTotalReview(reviewData.data ? reviewData.data.total : 0);
   }, [isGetReviewSuccess, reviewData]);
 
   useEffect(() => {
@@ -522,7 +524,7 @@ const MovieDetail = () => {
                 <span className="w-1 h-8 bg-rose-600"></span>
                 <span className="text-xl text-white hover:text-rose-600 cursor-pointer hover:transition-colors">
                   User reviews{" "}
-                  {latestReview.length ? `(${latestReview.length}) >` : ""}
+                  {`(${totalReview ? totalReview : 0})`}
                 </span>
               </div>
 

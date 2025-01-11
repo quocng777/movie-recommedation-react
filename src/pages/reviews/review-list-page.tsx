@@ -53,7 +53,7 @@ const ReviewListPage = () => {
 
   useEffect(() => {
     if (isGetReviewsSuccess) {
-      setReviews(reviewData?.data ? reviewData.data : []);
+      setReviews(reviewData.data?.reviews ? reviewData.data.reviews : []);
       setIsLoading(false);
       completeTopBarLoader();
     }

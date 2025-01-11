@@ -202,14 +202,14 @@ export const movieApiSlice = apiSlice.injectEndpoints({
           })
         }),
 
-        getMovieReviews: builder.query<Response<Review[]>, number>({
+        getMovieReviews: builder.query<Response<{total: number, reviews: Review[]}>, number>({
           query: (movieId) => ({
             url: `/movies/${movieId}/reviews`,
             method: 'GET',
           })
         }),
 
-        getMovieLatestReview: builder.query<Response<Review[]>, { movieId: number, limit: number }>({
+        getMovieLatestReview: builder.query<Response<{total: number, reviews: Review[]}>, { movieId: number, limit: number }>({
           query: ({ movieId, limit }) => ({
             url: `/movies/${movieId}/reviews/latest?limit=${limit}`,
             method: 'GET',
@@ -274,5 +274,5 @@ export const {
     useLazyGetMovieLatestReviewQuery,
     useAddMovieReviewMutation,
     useEditMovieReviewMutation,
-    useDeleteMovieReviewMutation
+    useDeleteMovieReviewMutation,
 } = movieApiSlice;
