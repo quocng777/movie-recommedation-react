@@ -117,6 +117,11 @@ const MovieDetail = () => {
     setSelectedRating(0);
   }; 
 
+  const onCastClick = (id: string) =>
+  {
+    navigate("/person/"+ id);
+    return;
+  }
   useEffect(() => {
     if (id) {
       setIsLoading(true);
