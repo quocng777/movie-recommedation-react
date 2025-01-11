@@ -31,7 +31,7 @@ const languageMap: { [key: string]: string } = {
   vn: "Vietnamese",
 };
 const MovieDetail = () => {
-    const navigate= useNavigate();
+const navigate= useNavigate();
   const { id } = useParams<{ id: string }>();
   const [movie, setMovie] = useState<Movie>();
   const [movieCast, setMovieCast] = useState<MovieCast[]>([]);
@@ -387,6 +387,7 @@ const MovieDetail = () => {
               <p className="text-gray-500">No cast available</p>
             )}
             {movieCast.map((cast) => {
+              return <MovieCastCard key={cast.id} cast={cast} onClick={()=>onCastClick(cast.id.toString())}/>;
               return <MovieCastCard key={cast.id} cast={cast} onClick={()=>onCastClick(cast.id.toString())}/>;
             })}
           </div>
