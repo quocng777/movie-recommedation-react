@@ -30,6 +30,30 @@ const languageMap: { [key: string]: string } = {
   en: "English",
   vn: "Vietnamese",
 };
+
+const reviewMockData = [
+  {
+    id: 1,
+    user: {
+      name: "John Doe",
+      avatar: "https://randomuser.me/api/portraits/thumb/women/57.jpg",
+      comment: "This is a great movie. I love it",
+      rating: 4,
+      date: "2021-09-12",
+    },
+  },
+  {
+    id: 2,
+    user: {
+      name: "Jane Doe",
+      avatar: "https://randomuser.me/api/portraits/thumb/women/18.jpg",
+      comment: "This is a great movie. I love it",
+      rating: 5,
+      date: "2021-09-12",
+    },
+  },
+];
+
 const MovieDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [movie, setMovie] = useState<Movie>();
@@ -283,79 +307,86 @@ const MovieDetail = () => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <AddMovieToPlaylistDialog movieId={movie.id}>
-                    <Button size="icon" className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-sky-500">
+                    <Button
+                      size="icon"
+                      className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-sky-500"
+                    >
                       <Bookmark />
                     </Button>
                   </AddMovieToPlaylistDialog>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>
-                    {
-                      !isAuthenticated 
-                      ? 'Login to add to your playlist'
-                      : 'Add to playlist'
-                    }
+                    {!isAuthenticated
+                      ? "Login to add to your playlist"
+                      : "Add to playlist"}
                   </p>
                 </TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button size="icon" className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-pink-500" onClick={onLikeMovieClick}>
-                  {
-                    isLiked 
-                    ? <HeartFill className="text-pink-500" />
-                    : <Heart />
-                  }
-                </Button>
+                  <Button
+                    size="icon"
+                    className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-pink-500"
+                    onClick={onLikeMovieClick}
+                  >
+                    {isLiked ? (
+                      <HeartFill className="text-pink-500" />
+                    ) : (
+                      <Heart />
+                    )}
+                  </Button>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>
-                    {
-                      !isAuthenticated 
-                      ? 'Login to like this movie'
-                      : (
-                        isLiked 
-                        ? 'Remove out of like list'
-                        : 'Like this movie'
-                      )
-                    }
+                    {!isAuthenticated
+                      ? "Login to like this movie"
+                      : isLiked
+                      ? "Remove out of like list"
+                      : "Like this movie"}
                   </p>
                 </TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button size="icon" className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-green-500" onClick={onAddWatchListClick}>
-                    {
-                      !isInWatchLaterList 
-                      ? <Eye />
-                      : <EyeFill className="text-green-500" />
-                    }
+                  <Button
+                    size="icon"
+                    className="bg-gray-800 rounded-full text-white hover:bg-background hover:text-green-500"
+                    onClick={onAddWatchListClick}
+                  >
+                    {!isInWatchLaterList ? (
+                      <Eye />
+                    ) : (
+                      <EyeFill className="text-green-500" />
+                    )}
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>
-                    {
-                      !isAuthenticated 
-                      ? 'Login to add to your watch list'
-                      : (
-                        isInWatchLaterList 
-                        ? 'Remove from watch list'
-                        : 'Add to watch list'
-                      )
-                    }
+                    {!isAuthenticated
+                      ? "Login to add to your watch list"
+                      : isInWatchLaterList
+                      ? "Remove from watch list"
+                      : "Add to watch list"}
                   </p>
                 </TooltipContent>
               </Tooltip>
-              {trailer && <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button size="icon" className="bg-blue-500 rounded-full text-white hover:bg-blue-500 hover:bg-opacity-80" onClick={onPlayTrailerClick}>
-                    <Play />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>View trailer</p>
-                </TooltipContent>
-              </Tooltip> }
+              {trailer && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="icon"
+                      className="bg-blue-500 rounded-full text-white hover:bg-blue-500 hover:bg-opacity-80"
+                      onClick={onPlayTrailerClick}
+                    >
+                      <Play />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>View trailer</p>
+                  </TooltipContent>
+                </Tooltip>
+              )}
             </div>
 
             {/* Tagline */}
@@ -370,19 +401,35 @@ const MovieDetail = () => {
       {/* Phần nội dung bên dưới */}
       <div className="flex flex-1 max-w-7xl mx-auto mt-6 gap-6">
         {/* Left Column */}
-        <div className="w-3/4 pl-4">
-          <h2 className="text-lg font-bold mb-4">Cast</h2>
-          <div className="flex gap-4 overflow-x-auto py-6">
-            {isMovieCastLoading &&
-              new Array(10).fill(null).map((_, idx) => {
-                return <MovieCardSkeleton key={idx} />;
+        {/* Cast */}
+        <div className="w-3/4 pl-4 flex flex-col space-y-8">
+          <div className="px-2">
+            <h2 className="text-lg font-bold">Cast</h2>
+            <div className="flex gap-4 overflow-x-auto py-6">
+              {isMovieCastLoading &&
+                new Array(10).fill(null).map((_, idx) => {
+                  return <MovieCardSkeleton key={idx} />;
+                })}
+              {movieCast.length === 0 && !isMovieCastLoading && (
+                <p className="text-gray-500">No cast available</p>
+              )}
+              {movieCast.map((cast) => {
+                return <MovieCastCard key={cast.id} cast={cast} />;
               })}
-            {movieCast.length === 0 && !isMovieCastLoading && (
-              <p className="text-gray-500">No cast available</p>
-            )}
-            {movieCast.map((cast) => {
-              return <MovieCastCard key={cast.id} cast={cast} />;
-            })}
+            </div>
+          </div>
+
+          {/* Review */}
+          <div>
+            <div className="flex items-center space-x-2 font-semibold">
+              <span className="w-1 h-8 bg-rose-600"></span>
+              <span className="text-xl text-white hover:text-rose-600 cursor-pointer hover:transition-colors">
+                User reviews {reviewMockData.length ? `(${reviewMockData.length}) >` : ""}
+              </span>
+            </div>
+            <div className="flex">
+                
+            </div>
           </div>
         </div>
 
@@ -425,7 +472,13 @@ const MovieDetail = () => {
           </div>
         </div>
       </div>
-      { trailer && <TrailerVideoDialog video={trailer} open={openTrailerDialog} onOpenChange={setOpenTrailerDialog}/> }
+      {trailer && (
+        <TrailerVideoDialog
+          video={trailer}
+          open={openTrailerDialog}
+          onOpenChange={setOpenTrailerDialog}
+        />
+      )}
     </div>
   );
 };
