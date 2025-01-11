@@ -1,7 +1,7 @@
 import { apiSlice } from "../base/api-slice";
 import { Response } from "../types/response";
 import { apiEndpoints } from "../constants";
-import { Movie, MovieCast, MovieCastResponse, MovieMediaType, MovieTrendingDuration, MovieTrendingType, TmdbPageResponse, MovieKeywords, MovieKeywordsResponse, SearchKeyword, MovieVideo, Genre } from "../types/movie.type";
+import { Movie, MovieCast, MovieCastResponse, MovieMediaType, MovieTrendingDuration, MovieTrendingType, TmdbPageResponse, MovieKeywords, MovieKeywordsResponse, SearchKeyword, MovieVideo, Genre, Review } from "../types/movie.type";
 import { FilterParams } from "../types/params.type";
 import { SortOptions } from "../constants/sort-options";
 
@@ -201,6 +201,47 @@ export const movieApiSlice = apiSlice.injectEndpoints({
             method: 'DELETE',
           })
         }),
+
+        getMovieReviews: builder.query<Response<Review[]>, number>({
+          query: (movieId) => ({
+            url: `/movies/${movieId}/reviews`,
+            method: 'GET',
+          })
+        }),
+
+        getMovieLatestReview: builder.query<Response<Review[]>, { movieId: number, limit: number }>({
+          query: ({ movieId, limit }) => ({
+            url: `/movies/${movieId}/reviews/latest?limit=${limit}`,
+            method: 'GET',
+          })
+        }),
+
+        addMovieReview: builder.mutation<Response<void>, { movieId: number, content: string }>({
+            query: ({ movieId, content }) => ({
+                url: `/movies/${movieId}/reviews`,
+                method: 'POST',
+                body: {
+                    comment: content,
+                }
+            })
+        }),
+
+        editMovieReview: builder.mutation<Response<void>, { reviewId: number, movieId: number, content: string }>({
+            query: ({ reviewId, movieId, content }) => ({
+                url: `/movies/${movieId}/reviews/${reviewId}`,
+                method: 'PATCH',
+                body: {
+                    comment: content,
+                }
+            })
+        }),
+
+        deleteMovieReview: builder.mutation<Response<void>, { reviewId: number, movieId: number }>({
+            query: ({ reviewId, movieId }) => ({
+                url: `/movies/${movieId}/reviews/${reviewId}`,
+                method: 'DELETE',
+            })
+        }),
     })
 });
 
@@ -229,4 +270,9 @@ export const {
     useAddMovieRatingMutation,
     useGetMovieRatingQuery,
     useDeleteMovieRatingMutation,
+    useLazyGetMovieReviewsQuery,
+    useLazyGetMovieLatestReviewQuery,
+    useAddMovieReviewMutation,
+    useEditMovieReviewMutation,
+    useDeleteMovieReviewMutation
 } = movieApiSlice;

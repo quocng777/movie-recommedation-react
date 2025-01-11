@@ -9,29 +9,24 @@ import { Tooltip, TooltipContent } from "../ui/tooltip";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/api/store";
+import { useDeleteMovieRatingMutation } from "@/app/api/movies/movie-api-slice";
 
 type ReviewCardProps = {
   review: Review;
   onEdit?: () => void;
+  onDelete?: () => void;
 };
 
 export const ReviewCard = ({
   review: { user, comment, updated_at }, 
   onEdit,
+  onDelete,
 }: ReviewCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const defaultContentHeight = 120;
   const authUserId = useSelector((state: RootState) => state.auth.user?.id);
   const editable = authUserId === user.id;
-
-  const handleEdit = () => {
-    console.log("Edit");
-  }
-
-  const handleDelete = () => {
-    console.log("Delete");
-  }
 
   return (
     <div className="bg-gray-rose-gradient rounded-xl shadow-xl p-4 mb-6 w-full">
@@ -60,16 +55,22 @@ export const ReviewCard = ({
         {editable && (
           <div>
             <Tooltip>
-            <TooltipTrigger>
-              <Button className="bg-transparent hover:bg-gray-800 mr-2">
-                <PenBox className="text-white" />
-              </Button>
+              <TooltipTrigger>
+                <Button
+                  className="bg-transparent hover:bg-gray-800 mr-2"
+                  onClick={onEdit}
+                >
+                  <PenBox className="text-white" />
+                </Button>
               </TooltipTrigger>
               <TooltipContent>Edit your comment</TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger>
-                <Button className="bg-transparent hover:bg-gray-800">
+                <Button 
+                  className="bg-transparent hover:bg-gray-800" 
+                  onClick={onDelete}
+                >
                   <Trash2 className="text-white" />
                 </Button>
               </TooltipTrigger>

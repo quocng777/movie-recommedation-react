@@ -1,15 +1,19 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect, MouseEventHandler, MouseEvent, useRef } from "react";
 import {
   useAddMovieRatingMutation,
+  useAddMovieReviewMutation,
   useDeleteMovieRatingMutation,
+  useDeleteMovieReviewMutation,
+  useEditMovieReviewMutation,
   useGetMovieRatingQuery,
+  useLazyGetMovieLatestReviewQuery,
   useLazyMovieCastQuery,
   useLazyMovieDetailQuery,
   useLazyMovieKeywordsQuery,
   useTrailerVideoQuery,
 } from "@/app/api/movies/movie-api-slice";
-import { Movie, MovieCast, MovieKeywords, Video } from "@/app/api/types/movie.type";
+import { Movie, MovieCast, MovieKeywords, Review, Video } from "@/app/api/types/movie.type";
 import { FallbackScreen } from "@/components/custom/fallback-screen";
 import { getResourceFromTmdb } from "@/lib/helpers/get-resource-tmbd";
 import { MovieCastCard } from "@/components/custom/moviecast-card";
@@ -25,36 +29,17 @@ import { TrailerVideoDialog } from "@/components/custom/trailer-video-dialog";
 import { RatingIndicator } from "@/components/custom/rating-indicator";
 import { RatingPicker, ratingScore } from "@/components/custom/rating-picker";
 import { toast } from "@/hooks/use-toast";
+import { ReviewCard } from "@/components/custom/review-card";
+import EditorDialog from "@/components/custom/editor-dialog";
+import DeleteModal from "@/components/custom/delete-modal";
 
 const languageMap: { [key: string]: string } = {
   en: "English",
   vn: "Vietnamese",
 };
 
-const reviewMockData = [
-  {
-    id: 1,
-    user: {
-      name: "John Doe",
-      avatar: "https://randomuser.me/api/portraits/thumb/women/57.jpg",
-      comment: "This is a great movie. I love it",
-      rating: 4,
-      date: "2021-09-12",
-    },
-  },
-  {
-    id: 2,
-    user: {
-      name: "Jane Doe",
-      avatar: "https://randomuser.me/api/portraits/thumb/women/18.jpg",
-      comment: "This is a great movie. I love it",
-      rating: 5,
-      date: "2021-09-12",
-    },
-  },
-];
-
 const MovieDetail = () => {
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [movie, setMovie] = useState<Movie>();
   const [movieCast, setMovieCast] = useState<MovieCast[]>([]);
@@ -85,7 +70,15 @@ const MovieDetail = () => {
   const [selectedRating, setSelectedRating] = useState(0);
   const [deleteMovieRating] = useDeleteMovieRatingMutation();
   const isDbClickCalled = useRef(false);
-
+  const [openAddReviewDialog, setOpenAddReviewDialog] = useState(false);
+  const [openEditReviewDialog, setOpenEditReviewDialog] = useState(false);
+  const [openDeleteReviewDialog, setOpenDeleteReviewDialog] = useState(false);
+  const [latestReview, setLatestReview] = useState<Review[]>([]);
+  const [targetReview, setTargetReview] = useState<Review>();
+  const [getLatestReviews, {data: reviewData, isSuccess: isGetReviewSuccess}] = useLazyGetMovieLatestReviewQuery();
+  const [addReview, {isSuccess: isAddReviewgSuccess, isError: isAddReviewError}] = useAddMovieReviewMutation();
+  const [editReview, {isSuccess: isEditReviewSuccess, isError: isEditReviewError}] = useEditMovieReviewMutation();
+  const [deleteReview, {isSuccess: isDeleteReviewSuccess, isError: isDeleteReviewError}] = useDeleteMovieReviewMutation();
 
   const onLikeMovieClick: MouseEventHandler = () => {
       if(!isAuthenticated) {
@@ -140,6 +133,27 @@ const MovieDetail = () => {
     setSelectedRating(0);
   }; 
 
+  const handleAddReview = (comment: string) => {
+    addReview({
+      movieId: parseInt(id!),
+      content: comment,
+    });
+    
+    getLatestReviews({ movieId: movie ? movie.id : 0, limit: 1 });
+  };
+
+  const handleEditReview = (reviewId: number, comment: string) => {
+    editReview({
+      reviewId,
+      movieId: parseInt(id!),
+      content: comment,
+    });
+  }
+
+  const handleDeleteReview = (reviewId: number) => {
+    deleteReview({reviewId, movieId: parseInt(id!)});
+  }
+
   useEffect(() => {
     if (id) {
       setIsLoading(true);
@@ -148,6 +162,7 @@ const MovieDetail = () => {
       getMovieDetail({ id });
       getMovieCast({ id });
       getMovieKeywords({ id });
+      getLatestReviews({ movieId: parseInt(id), limit: 1 });
     }
   }, [id]);
 
@@ -165,7 +180,7 @@ const MovieDetail = () => {
         }
         setIsLoading(false)
   }
-}, [isGetMovieDataSuccess, movieData, apiError]);
+  }, [isGetMovieDataSuccess, movieData, apiError]);
 
   useEffect(() => {
     if (isGetMovieCastSuccess) {
@@ -213,11 +228,87 @@ const MovieDetail = () => {
       title: 'Success',
       description: `Added rating for ${movie?.title}`
     });
-  }, [isAddRatingSuccess])
+  }, [isAddRatingSuccess]);
+
+  useEffect(() => {
+    if(!isGetReviewSuccess) {
+      return;
+    }
+
+    console.log("reviewData", reviewData);
+    setLatestReview(reviewData.data ? reviewData.data : []);
+  }, [isGetReviewSuccess, reviewData]);
+
+  useEffect(() => {
+    if(!isAddReviewError) {
+      return;
+    }
+    toast({
+      title: 'Error',
+      description: `Error when added review for ${movie?.title} 😰`
+    });
+  });
+
+  useEffect(() => {
+    if(!isAddReviewgSuccess) {
+      return;
+    }
+    getLatestReviews({ movieId: movie ? movie.id : 0, limit: 1 });
+    setOpenAddReviewDialog(false);
+    toast({
+      title: 'Success',
+      description: `Added review for ${movie?.title}`
+    });
+  }, [isAddReviewgSuccess]);
+
+  useEffect(() => {
+    if(!isEditReviewError) {
+      return;
+    }
+    toast({
+      title: 'Error',
+      description: `Error when edited review for ${movie?.title} 😰`
+    });
+  })
+
+  useEffect(() => {
+    if(!isEditReviewSuccess) {
+      return;
+    }
+    setOpenEditReviewDialog(false);
+    getLatestReviews({ movieId: movie ? movie.id : 0, limit: 1 });
+    toast({
+      title: 'Success',
+      description: `Edited review for ${movie?.title}`
+    });
+  }, [isEditReviewSuccess]);
+
+  useEffect(() => {
+    if(!isDeleteReviewError) {
+      return;
+    }
+    toast({
+      title: 'Error',
+      description: `Error when deleted review for ${movie?.title} 😰`
+    });
+  });
+
+  useEffect(() => {
+    if(!isDeleteReviewSuccess) {
+      return;
+    }
+    setOpenDeleteReviewDialog(false);
+    getLatestReviews({ movieId: movie ? movie.id : 0, limit: 1 });
+    toast({
+      title: 'Success',
+      description: `Deleted review for ${movie?.title}`
+    });
+  }, [isDeleteReviewSuccess]);
 
   if (isLoading) return <FallbackScreen />;
-  if (error) return <div>{error}</div>;
-  if (!movie) return <div>Movie not found</div>;
+  if (error) return <div className="flex p-4 justify-center">{error}</div>;
+  if (!movie) return <div className="flex p-4 justify-center">Movie not found</div>;
+
   return (
     <div className="min-h-screen flex flex-col text-white">
       {/* Header */}
@@ -267,39 +358,39 @@ const MovieDetail = () => {
                   onOpenChange={setOpenRatingPopover}
                   open={openRatingPopover}
                   selectedRating={selectedRating}
-                  onRatingClick={onRatingClick}>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Button 
-                          className="bg-gray-rose-gradient text-white px-4 py-4 rounded-full text-sm hover:scale-105" 
-                          onClick={onRatingBtnClick}
-                          onDoubleClick={onRatingBtnDoubleClick}
-                        >
-                        {selectedRating !== 0
-                          ? (
-                            <div className="flex font-bold gap-2 items-center">
-                              <span className="text-xl">
+                  onRatingClick={onRatingClick}
+                >
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Button
+                        className="bg-gray-rose-gradient text-white px-4 py-4 rounded-full text-sm hover:scale-105"
+                        onClick={onRatingBtnClick}
+                        onDoubleClick={onRatingBtnDoubleClick}
+                      >
+                        {selectedRating !== 0 ? (
+                          <div className="flex font-bold gap-2 items-center">
+                            <span className="text-xl">
                               {
-                                ratingScore[selectedRating as keyof typeof ratingScore]!.emoji!
+                                ratingScore[
+                                  selectedRating as keyof typeof ratingScore
+                                ]!.emoji!
                               }
-                              </span> 
-                              <p>
-                                Your rating
-                              </p>
-                            </div>
-                          )
-                          : <p className="font-bold">Rating this movie 🌟</p>
-                        }
+                            </span>
+                            <p>Your rating</p>
+                          </div>
+                        ) : (
+                          <p className="font-bold">Rating this movie 🌟</p>
+                        )}
                       </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        {
-                          isAuthenticated 
-                            ? <p>Add rating for this movie</p>
-                            : <p>Login to add rating for this movie</p>
-                        }
-                      </TooltipContent>
-                    </Tooltip>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {isAuthenticated ? (
+                        <p>Add rating for this movie</p>
+                      ) : (
+                        <p>Login to add rating for this movie</p>
+                      )}
+                    </TooltipContent>
+                  </Tooltip>
                 </RatingPicker>
               }
             </div>
@@ -399,10 +490,10 @@ const MovieDetail = () => {
       </div>
 
       {/* Phần nội dung bên dưới */}
-      <div className="flex flex-1 max-w-7xl mx-auto mt-6 gap-6">
+      <div className="flex flex-1 w-full p-2 mx-auto mt-6 gap-6">
         {/* Left Column */}
         {/* Cast */}
-        <div className="w-3/4 pl-4 flex flex-col space-y-8">
+        <div className="w-3/4 px-4 flex flex-col space-y-8">
           <div className="px-2">
             <h2 className="text-lg font-bold">Cast</h2>
             <div className="flex gap-4 overflow-x-auto py-6">
@@ -420,16 +511,57 @@ const MovieDetail = () => {
           </div>
 
           {/* Review */}
-          <div>
-            <div className="flex items-center space-x-2 font-semibold">
-              <span className="w-1 h-8 bg-rose-600"></span>
-              <span className="text-xl text-white hover:text-rose-600 cursor-pointer hover:transition-colors">
-                User reviews {reviewMockData.length ? `(${reviewMockData.length}) >` : ""}
-              </span>
+          <div className="p-2">
+            <div className="flex justify-between items-center">
+              <div
+                className="flex items-center space-x-2 font-semibold"
+                onClick={() => {
+                  navigate(`/movie/${movie.id}/reviews`);
+                }}
+              >
+                <span className="w-1 h-8 bg-rose-600"></span>
+                <span className="text-xl text-white hover:text-rose-600 cursor-pointer hover:transition-colors">
+                  User reviews{" "}
+                  {latestReview.length ? `(${latestReview.length}) >` : ""}
+                </span>
+              </div>
+
+              <EditorDialog
+                triggerElement={
+                  <Button className="text-gray-200 rounded-full bg-rose-900 text-gray-300 hover:bg-rose-800 hover:text-white py-2 px-4">
+                    Add New Review
+                  </Button>
+                }
+                open={openAddReviewDialog}
+                onOpenChange={setOpenAddReviewDialog}
+                onSave={handleAddReview}
+              />
             </div>
-            <div className="flex">
-                
+            <div className="flex my-4">
+              {latestReview.length > 0 ? (
+                <ReviewCard
+                  review={latestReview[0]}
+                  onEdit={() => {
+                    setTargetReview(latestReview[0]);
+                    setOpenEditReviewDialog(true);
+                  }}
+                  onDelete={() => {
+                    setTargetReview(latestReview[0]);
+                    setOpenDeleteReviewDialog(true);
+                  }}
+                />
+              ) : (
+                <div className="text-gray-500">No review available</div>
+              )}
             </div>
+            <Button
+              className="w-full border text-gray-300 rounded-full bg-transparent hover:bg-rose-900 hover:text-gray-200 transition-all duration-200"
+              onClick={() => {
+                navigate(`/movie/${movie.id}/reviews`);
+              }}
+            >
+              View all
+            </Button>
           </div>
         </div>
 
@@ -479,6 +611,23 @@ const MovieDetail = () => {
           onOpenChange={setOpenTrailerDialog}
         />
       )}
+      <EditorDialog
+        open={openEditReviewDialog}
+        onOpenChange={setOpenEditReviewDialog}
+        triggerElement={<></>}
+        onSave={(content) => handleEditReview(latestReview[0].id, content)}
+        initialText={targetReview?.comment!}
+      />
+      <DeleteModal
+        isOpen={openDeleteReviewDialog}
+        onClose={() => setOpenDeleteReviewDialog(!openDeleteReviewDialog)}
+        onDelete={() => {
+          if(targetReview) {
+            handleDeleteReview(targetReview.id);
+          }
+        }}
+        content={`Are you sure you want to delete this review?`}
+      />
     </div>
   );
 };
