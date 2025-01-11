@@ -12,6 +12,8 @@ export const apiEndpoints = {
     LIKED_MOVIE: '/movies/liked',
     WATCH_LATER: '/movies/watch-later',
     MOVIE_GENRES: '/tmdb/genre/movie/list',
+    PERSON : "/tmdb/person",
+    MOVIE_CREDITS: "/movie_credits"
 };
 
 export const customApiCode = {

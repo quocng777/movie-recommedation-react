@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect, MouseEventHandler, MouseEvent, useRef } from "react";
 import {
   useAddMovieRatingMutation,
@@ -31,6 +31,7 @@ const languageMap: { [key: string]: string } = {
   vn: "Vietnamese",
 };
 const MovieDetail = () => {
+const navigate= useNavigate();
   const { id } = useParams<{ id: string }>();
   const [movie, setMovie] = useState<Movie>();
   const [movieCast, setMovieCast] = useState<MovieCast[]>([]);
@@ -116,6 +117,11 @@ const MovieDetail = () => {
     setSelectedRating(0);
   }; 
 
+  const onCastClick = (id: string) =>
+  {
+    navigate("/person/"+ id);
+    return;
+  }
   useEffect(() => {
     if (id) {
       setIsLoading(true);
@@ -381,7 +387,7 @@ const MovieDetail = () => {
               <p className="text-gray-500">No cast available</p>
             )}
             {movieCast.map((cast) => {
-              return <MovieCastCard key={cast.id} cast={cast} />;
+              return <MovieCastCard key={cast.id} cast={cast} onClick={()=>onCastClick(cast.id.toString())}/>;
             })}
           </div>
         </div>
