@@ -388,7 +388,6 @@ const navigate= useNavigate();
             )}
             {movieCast.map((cast) => {
               return <MovieCastCard key={cast.id} cast={cast} onClick={()=>onCastClick(cast.id.toString())}/>;
-              return <MovieCastCard key={cast.id} cast={cast} onClick={()=>onCastClick(cast.id.toString())}/>;
             })}
           </div>
         </div>
