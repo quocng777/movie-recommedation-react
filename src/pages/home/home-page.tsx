@@ -10,6 +10,7 @@ import { useTopBarLoader } from "@/hooks/use-top-loader";
 import { delay } from "@/lib/helpers/delay";
 import { Search } from "lucide-react";
 import {  ChangeEvent, ChangeEventHandler, useEffect, useState } from "react";
+import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router-dom";
 
 const Homepage = () => {
@@ -127,6 +128,9 @@ const Homepage = () => {
 
     return (
       <div className="w-full">
+        <Helmet>
+          <title>Homepage</title>
+        </Helmet>
         <section className="px-8 flex justify-center w-full bg-discover-bg bg-no-repeat py-8 bg-black bg-center relative bg-cover">
           <div className="absolute inset-0 bg-black opacity-35 z-10"></div>
           <div className="max-w-[1300px] z-20">

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { MovieCardList } from "@/components/custom/movie-card-list";
 import Pagination from "@/components/custom/pagination";
 import { useTopBarLoader } from "@/hooks/use-top-loader";
+import { Helmet } from "react-helmet";
 import { Spinner } from "@/components/custom/spinner";
 
 const SearchPage = () => {
@@ -42,6 +43,9 @@ const SearchPage = () => {
 
   return (
     <div className="max-w-[1200px] container mx-auto p-4">
+      <Helmet>
+        <title>Search - {query}</title>
+      </Helmet>
       <div className="px-8 py-6">
         <h3 className="text-xl font-bold mb-4">
           Search Results for "{query}"{" "}

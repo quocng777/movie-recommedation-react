@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import playfulCatImg from "@/assets/playful-cat.svg";
+import { Helmet } from "react-helmet";
 
 export const PlaylistDetailsPage = () => {
     const { playlistId } = useParams();
@@ -48,6 +49,9 @@ export const PlaylistDetailsPage = () => {
 
     return (
         <div className="w-full">
+            <Helmet>
+              <title>Playlists</title>
+            </Helmet>
             <div className="w-full flex flex-col max-w-[1200px] mx-auto">
                 {playlist && <div className="px-6 py-4 flex items-center gap-32">
                     <div>

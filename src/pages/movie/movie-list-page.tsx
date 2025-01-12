@@ -25,6 +25,7 @@ import CustomPagination from "@/components/custom/pagination";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/custom/spinner";
+import { Helmet } from "react-helmet";
 
 const MovieListPage = () => {
   const navigate = useNavigate();
@@ -233,6 +234,9 @@ const MovieListPage = () => {
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
+      <Helmet>
+        <title>Movie list</title>
+      </Helmet>
       <div className="w-full max-w-[1440px] flex flex-row p-6 space-x-6">
         <div className="w-[300px] flex-shrink-0 space-y-4">
           <Accordion
