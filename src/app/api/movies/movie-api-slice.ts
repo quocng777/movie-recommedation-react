@@ -251,7 +251,7 @@ export const movieApiSlice = apiSlice.injectEndpoints({
         }),
         recommendMovie:  builder.query<Response<Movie>, { movie_id: string }>({
             query: ({movie_id}) => ({
-              url: `/movies/` + movie_id,
+              url: `/movies/movie/` + movie_id,
               method: 'GET',
             })
           }),
