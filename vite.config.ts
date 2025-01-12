@@ -10,5 +10,5 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  base: '/movie-recommedation-react/'
+  base: '/movie-recommendation-react/'
 })
