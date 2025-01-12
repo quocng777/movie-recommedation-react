@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useState, useEffect, MouseEventHandler, MouseEvent, useRef } from "react";
+import { useState, useEffect, MouseEventHandler, MouseEvent, useRef, useLayoutEffect } from "react";
 import {
   useAddMovieRatingMutation,
   useAddMovieReviewMutation,
@@ -81,6 +81,9 @@ const MovieDetail = () => {
   const [addReview, {isSuccess: isAddReviewgSuccess, isError: isAddReviewError}] = useAddMovieReviewMutation();
   const [editReview, {isSuccess: isEditReviewSuccess, isError: isEditReviewError}] = useEditMovieReviewMutation();
   const [deleteReview, {isSuccess: isDeleteReviewSuccess, isError: isDeleteReviewError}] = useDeleteMovieReviewMutation();
+  const castSectionRef = useRef<HTMLDivElement>(null);
+  const hash = window.location.hash.substring(1);
+
 
   const onLikeMovieClick: MouseEventHandler = () => {
       if(!isAuthenticated) {
@@ -313,6 +316,13 @@ const MovieDetail = () => {
       description: `Deleted review for ${movie?.title}`
     });
   }, [isDeleteReviewSuccess]);
+  useLayoutEffect(() => {
+    if(hash == 'cast' && castSectionRef.current) {
+      castSectionRef.current.scrollIntoView({
+        behavior: 'smooth'
+      });
+    }
+  }, [isLoading, movie]);
 
   if (isLoading) return <FallbackScreen />;
   if (error) return <div className="flex p-4 justify-center">{error}</div>;
@@ -488,21 +498,14 @@ const MovieDetail = () => {
                 </Tooltip>
               )}
             </div>
-
-            {/* Tagline */}
             <p className="italic text-lg mt-6">{movie.tagline}</p>
-
-            {/* Overview */}
             <p className="mt-4">{movie.overview}</p>
           </div>
         </div>
       </div>
 
-      {/* Phần nội dung bên dưới */}
       <div className="flex flex-1 w-full p-2 mx-auto mt-6 gap-6">
-        {/* Left Column */}
-        {/* Cast */}
-        <div className="w-3/4 px-4 flex flex-col space-y-8">
+        <div className="w-3/4 px-4 flex flex-col space-y-8" ref={castSectionRef}>
           <div className="px-2">
             <h2 className="text-lg font-bold">Cast</h2>
             <div className="flex gap-4 overflow-x-auto py-6">
@@ -537,7 +540,7 @@ const MovieDetail = () => {
 
               <EditorDialog
                 triggerElement={
-                  <Button className="text-gray-200 rounded-full bg-rose-900 text-gray-300 hover:bg-rose-800 hover:text-white py-2 px-4">
+                  <Button className="text-gray-200 rounded-full bg-rose-900 hover:bg-rose-800 hover:text-white py-2 px-4">
                     Add New Review
                   </Button>
                 }

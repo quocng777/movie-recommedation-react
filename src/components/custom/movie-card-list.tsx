@@ -8,6 +8,7 @@ import { Movie } from "@/app/api/types/movie.type";
 import { useMovieActions } from "@/hooks/use-movie-actions";
 import { EyeFill, HeartFill } from "react-bootstrap-icons";
 import { Eye, Heart } from "lucide-react";
+import { RatingIndicator } from "./rating-indicator";
 
 type MovieCardListProps = {
   movie: Movie;
@@ -16,7 +17,6 @@ type MovieCardListProps = {
 
 export const MovieCardList = ({ movie, onClick }: MovieCardListProps) => {
   const [loaded, setLoaded] = useState(false);
-  let voteAvg = movie.vote_average ? movie.vote_average : 0;
 
   const onImageLoad = () => {
     setLoaded(true);
@@ -56,45 +56,8 @@ export const MovieCardList = ({ movie, onClick }: MovieCardListProps) => {
       <div className="flex flex-col justify-center">
         <div className="flex flex-col py-2 px-3 space-y-4">
           <div className="flex flex-row items-center space-x-2">
-            <div className="relative w-10 h-10 rounded-full shadow-xl">
-              <svg className="w-full h-full rotate-90" viewBox="0 0 36 36">
-                <circle
-                  cx="18"
-                  cy="18"
-                  r="16"
-                  fill="#111827"
-                  stroke="#9ca3af"
-                  strokeWidth="2"
-                  className="opacity-50"
-                />
-                <circle
-                  cx="18"
-                  cy="18"
-                  r="16"
-                  fill="none"
-                  stroke={
-                    voteAvg === 0
-                      ? "#fff"
-                      : voteAvg * 10 >= 70
-                      ? "#65a30d"
-                      : voteAvg * 10 >= 50
-                      ? "#d97706"
-                      : "#e11d48"
-                  }
-                  strokeWidth="2"
-                  strokeDasharray="100, 100"
-                  strokeDashoffset={`${100 - voteAvg * 10}`}
-                  strokeLinecap="round"
-                  transform="rotate(-180 18 18)"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center text-xs font-semibold">
-                {`${
-                  movie.vote_average
-                    ? (movie.vote_average * 10).toFixed(0) + "%"
-                    : "NR"
-                }`}
-              </div>
+            <div className="relative w-10 h-10 rounded-full shadow-xl scale-[80%] mr-3">
+              <RatingIndicator rating={movie.vote_average} />
             </div>
             <div>
               <Link

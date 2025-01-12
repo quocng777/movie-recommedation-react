@@ -31,6 +31,7 @@
     "@reduxjs/toolkit": "^2.4.0",
     "@shadcn/ui": "^0.0.4",
     "@souhaildev/reactemojis": "^1.0.5",
+    "@types/quill": "^2.0.14",
     "@types/react-copy-to-clipboard": "^5.0.7",
     "@types/react-router-dom": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
