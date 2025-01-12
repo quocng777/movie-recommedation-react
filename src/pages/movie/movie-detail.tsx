@@ -266,7 +266,7 @@ const MovieDetail = () => {
         for (const genre of movie.genres) {
           const { data, error } = await getMoviesFromAIRetriever({
             collection_name: "movies",
-            query: genre.toString(),
+            query: "Genre: "+ genre.toString(),
             amount: 10,
             threshold: 0.25,
           });
