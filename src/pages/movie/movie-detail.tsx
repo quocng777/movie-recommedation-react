@@ -266,7 +266,7 @@ const MovieDetail = () => {
         for (const genre of movie.genres) {
           const { data, error } = await getMoviesFromAIRetriever({
             collection_name: "movies",
-            query: "Genre: "+ genre.toString(),
+            query: "Genre" + genre.name.toString(),
             amount: 10,
             threshold: 0.25,
           });
@@ -278,11 +278,19 @@ const MovieDetail = () => {
             );
             continue;
           }
-          console.log(data?.data?.data?.result);
+          // Giả sử movie.id là ID bạn muốn tránh thêm vào list
+          const movieIdToAvoid = movie.id;
+          
           if (data?.data) {
             const ids = data.data.data.result.map((res) => res.toString());
-            allIds.push(...ids);
+
+            ids.forEach((id) => {
+              if (id.toString() !== movieIdToAvoid.toString() && !allIds.includes(id)) {
+                allIds.push(id);
+              }
+            });
           }
+
           console.log(allIds);
         }
 
@@ -710,7 +718,7 @@ const MovieDetail = () => {
           </div>
           <div className="px-2 max-w-[1000px] mx-auto">
             <div className="flex items-center space-x-6">
-              <h4 className="text-lg">Recommend by genres</h4>
+              <h4 className="text-lg">Recommend by genres of this movie</h4>
             </div>
             <ScrollArea className="w-full">
               <div className="flex gap-4 py-6">
