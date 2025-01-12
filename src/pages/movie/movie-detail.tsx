@@ -59,13 +59,8 @@ import DialogEditor from "@/components/custom/editor-dialog";
 import { ReviewCard } from "@/components/custom/review-card";
 import DeleteModal from "@/components/custom/delete-modal";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-
 import { MovieCard } from "@/components/custom/movie-card";
-import { retrieveSimilarItems } from "@/app/api/llm/llm-api";
-import {
-  useLazyRetrieveQuery,
-  useRetrieveQuery,
-} from "@/app/api/ai/ai-api-slice";
+import { useLazyRetrieveQuery } from "@/app/api/ai/ai-api-slice";
 const languageMap: { [key: string]: string } = {
   en: "English",
   vn: "Vietnamese",
@@ -639,26 +634,26 @@ const MovieDetail = () => {
           <div className="px-2">
             <h2 className="text-lg font-bold">Cast</h2>
             <ScrollArea className="w-full overflow-x-auto">
-    <div className="flex gap-4 py-6">
-      {isMovieCastLoading &&
-        new Array(10).fill(null).map((_, idx) => {
-          return <MovieCardSkeleton key={idx} />;
-        })}
-      {movieCast.length === 0 && !isMovieCastLoading && (
-        <p className="text-gray-500">No cast available</p>
-      )}
-      {movieCast.map((cast) => {
-        return (
-          <MovieCastCard
-            key={cast.id}
-            cast={cast}
-            onClick={() => onCastClick(cast.id.toString())}
-          />
-        );
-      })}
-    </div>
-    <ScrollBar orientation="horizontal" />
-  </ScrollArea>
+              <div className="flex gap-4 py-6">
+                {isMovieCastLoading &&
+                  new Array(10).fill(null).map((_, idx) => {
+                    return <MovieCardSkeleton key={idx} />;
+                  })}
+                {movieCast.length === 0 && !isMovieCastLoading && (
+                  <p className="text-gray-500">No cast available</p>
+                )}
+                {movieCast.map((cast) => {
+                  return (
+                    <MovieCastCard
+                      key={cast.id}
+                      cast={cast}
+                      onClick={() => onCastClick(cast.id.toString())}
+                    />
+                  );
+                })}
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
           </div>
 
           {/* Review */}
@@ -736,8 +731,6 @@ const MovieDetail = () => {
               <ScrollBar orientation="horizontal" />
             </ScrollArea>
           </div>
-
-          
         </div>
 
         {/* Right Column */}
