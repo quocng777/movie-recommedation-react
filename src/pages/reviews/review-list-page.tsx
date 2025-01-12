@@ -2,7 +2,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAddMovieReviewMutation, useDeleteMovieReviewMutation, useEditMovieReviewMutation, useLazyGetMovieReviewsQuery, useMovieDetailQuery } from "@/app/api/movies/movie-api-slice";
 import { Movie, Review } from "@/app/api/types/movie.type";
 import { useEffect, useState } from "react";
-import Pagination from "@/components/custom/pagination";
 import { useTopBarLoader } from "@/hooks/use-top-loader";
 import { Spinner } from "@/components/custom/spinner";
 import { ReviewCard } from "@/components/custom/review-card";
@@ -201,7 +200,7 @@ const ReviewListPage = () => {
       <div className="max-w-[1200px] container mx-auto p-4">
         <EditorDialog
           triggerElement={
-            <Button className="text-gray-200 rounded-full bg-rose-900 text-gray-300 hover:bg-rose-800 hover:text-white py-2 px-4">
+            <Button className=" rounded-full bg-rose-900 text-gray-300 hover:bg-rose-800 hover:text-white py-2 px-4">
               Add New Review
             </Button>
           }
