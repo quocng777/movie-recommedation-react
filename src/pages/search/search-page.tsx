@@ -5,7 +5,11 @@ import { useEffect, useState } from "react";
 import { MovieCardList } from "@/components/custom/movie-card-list";
 import Pagination from "@/components/custom/pagination";
 import { useTopBarLoader } from "@/hooks/use-top-loader";
+<<<<<<< HEAD
 import { Spinner } from "@/components/custom/spinner";
+=======
+import { Helmet } from "react-helmet";
+>>>>>>> 45a5f68 (chore: add title for pages)
 
 const SearchPage = () => {
   const navigate = useNavigate();
@@ -42,6 +46,9 @@ const SearchPage = () => {
 
   return (
     <div className="max-w-[1200px] container mx-auto p-4">
+      <Helmet>
+        <title>Search - {query}</title>
+      </Helmet>
       <div className="px-8 py-6">
         <h3 className="text-xl font-bold mb-4">
           Search Results for "{query}"{" "}

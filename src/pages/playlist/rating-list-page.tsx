@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Grid } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import noDataImg from "@/assets/nodata-image.svg";
+import { Helmet } from "react-helmet";
 
 const RatingListPage = () => {
   const {data: ratingsData} = useGetRatingsQuery();
@@ -27,6 +28,9 @@ const RatingListPage = () => {
 
   return (
     <div className="w-full">
+      <Helmet>
+        <title>Ratings</title>
+      </Helmet>
       <div className="w-full flex flex-col max-w-[1200px] mx-auto">
         <div className="px-6 mt-8">
           <h3 className="text-2xl font-semibold">Ratings</h3>          

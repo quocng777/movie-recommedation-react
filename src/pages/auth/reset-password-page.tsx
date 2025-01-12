@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import ResetPasswordForm from "./reset-password-form";
 import resetPasswordFormSchema from "@/lib/validation/reset-password-form-schema";
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 
 const ResetPasswordPage = () => {
     const [ searchParams ] = useSearchParams();
@@ -63,6 +64,9 @@ const ResetPasswordPage = () => {
 
     return (
         <div className="flex w-full justify-center h-full min-h-screen items-center gap-10">
+            <Helmet>
+              <title>Reset password</title>
+            </Helmet>
             <div className="max-w-[480px] w-full flex justify-center flex-col items-center max-md:hidden">
                 <h3 className=" text-4xl font-semibold">TMDB2</h3>
                 <img src={authBgImage}/>

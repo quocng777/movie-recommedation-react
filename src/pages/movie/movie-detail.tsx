@@ -29,9 +29,13 @@ import { TrailerVideoDialog } from "@/components/custom/trailer-video-dialog";
 import { RatingIndicator } from "@/components/custom/rating-indicator";
 import { RatingPicker, ratingScore } from "@/components/custom/rating-picker";
 import { toast } from "@/hooks/use-toast";
+<<<<<<< HEAD
 import { ReviewCard } from "@/components/custom/review-card";
 import EditorDialog from "@/components/custom/editor-dialog";
 import DeleteModal from "@/components/custom/delete-modal";
+=======
+import { Helmet } from "react-helmet";
+>>>>>>> 45a5f68 (chore: add title for pages)
 
 const languageMap: { [key: string]: string } = {
   en: "English",
@@ -330,7 +334,9 @@ const MovieDetail = () => {
 
   return (
     <div className="min-h-screen flex flex-col text-white">
-      {/* Header */}
+      <Helmet>
+        <title>Move details - ${movie.title}</title>
+      </Helmet>
       <div
         className="relative h-[600px] bg-cover bg-center flex items-center"
         style={{

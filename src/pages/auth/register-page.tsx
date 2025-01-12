@@ -15,6 +15,7 @@ import { useRedirectToHomePage } from "@/hooks/use-redirect-to-hompage";
 import { useDispatch } from "react-redux";
 import { useLazyGetAuthenticationQuery } from "@/app/api/user/user.api.slice";
 import { setAuthenticatedUser } from "@/app/api/auth/auth-slice";
+import { Helmet } from "react-helmet";
 
 const RegisterPage = () => {
 
@@ -97,6 +98,9 @@ const RegisterPage = () => {
 
     return (
         <div className="flex w-full justify-center h-full min-h-screen items-center gap-10">
+            <Helmet>
+              <title>Register</title>
+            </Helmet>
             <div className="max-w-[480px] w-full flex justify-center flex-col items-center max-md:hidden">
                 <h3 className=" text-4xl font-semibold">PopcornBox</h3>
                 <img src={authBgImage}/>
