@@ -29,13 +29,10 @@ import { TrailerVideoDialog } from "@/components/custom/trailer-video-dialog";
 import { RatingIndicator } from "@/components/custom/rating-indicator";
 import { RatingPicker, ratingScore } from "@/components/custom/rating-picker";
 import { toast } from "@/hooks/use-toast";
-<<<<<<< HEAD
-import { ReviewCard } from "@/components/custom/review-card";
-import EditorDialog from "@/components/custom/editor-dialog";
-import DeleteModal from "@/components/custom/delete-modal";
-=======
 import { Helmet } from "react-helmet";
->>>>>>> 45a5f68 (chore: add title for pages)
+import DialogEditor from "@/components/custom/editor-dialog";
+import { ReviewCard } from "@/components/custom/review-card";
+import DeleteModal from "@/components/custom/delete-modal";
 
 const languageMap: { [key: string]: string } = {
   en: "English",
@@ -544,7 +541,7 @@ const MovieDetail = () => {
                 </span>
               </div>
 
-              <EditorDialog
+              <DialogEditor
                 triggerElement={
                   <Button className="text-gray-200 rounded-full bg-rose-900 hover:bg-rose-800 hover:text-white py-2 px-4">
                     Add New Review
@@ -629,7 +626,7 @@ const MovieDetail = () => {
           onOpenChange={setOpenTrailerDialog}
         />
       )}
-      <EditorDialog
+      <DialogEditor
         open={openEditReviewDialog}
         onOpenChange={setOpenEditReviewDialog}
         triggerElement={<></>}

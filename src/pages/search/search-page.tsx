@@ -5,11 +5,8 @@ import { useEffect, useState } from "react";
 import { MovieCardList } from "@/components/custom/movie-card-list";
 import Pagination from "@/components/custom/pagination";
 import { useTopBarLoader } from "@/hooks/use-top-loader";
-<<<<<<< HEAD
-import { Spinner } from "@/components/custom/spinner";
-=======
 import { Helmet } from "react-helmet";
->>>>>>> 45a5f68 (chore: add title for pages)
+import { Spinner } from "@/components/custom/spinner";
 
 const SearchPage = () => {
   const navigate = useNavigate();
