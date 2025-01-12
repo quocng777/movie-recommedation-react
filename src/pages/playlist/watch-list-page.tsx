@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowDownUp, ListVideo } from "lucide-react";
 import { useState } from "react";
 import { Grid } from "react-bootstrap-icons";
+import { Helmet } from "react-helmet";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
@@ -30,6 +31,9 @@ const WatchListPage = () => {
 
   return (
     <div className="w-full">
+      <Helmet>
+        <title>Watch list</title>
+      </Helmet>
       <div className="w-full flex flex-col max-w-[1200px] mx-auto">
         <div className="px-6 mt-8">
           <h3 className="text-2xl font-semibold">My watch list</h3>          

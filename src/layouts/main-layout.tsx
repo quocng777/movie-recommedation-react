@@ -1,3 +1,4 @@
+import Chatbot from "@/components/custom/chat-bot";
 import Footer from "@/components/custom/footer";
 import { UserPopover } from "@/components/custom/user-popover";
 import { Button } from "@/components/ui/button";
@@ -99,6 +100,7 @@ export const MainLayout = ({ children}: AuthLayoutProps) => {
             </div>
           </header>
           {children}
+          <Chatbot />
           <Footer />
         </div>
       )}

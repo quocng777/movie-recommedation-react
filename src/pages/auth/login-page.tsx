@@ -18,6 +18,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Helmet } from 'react-helmet';
 
 const LoginPage = () => {
 
@@ -119,6 +120,9 @@ const LoginPage = () => {
 
     return (
         <div className="flex w-full justify-center h-full min-h-screen items-center gap-10">
+            <Helmet>
+              <title>Login</title>
+            </Helmet>
             <div className="max-w-[480px] w-full flex justify-center flex-col items-center max-md:hidden">
                 <h3 className=" text-4xl font-semibold">PopcornBox</h3>
                 <img src={authBgImage}/>
