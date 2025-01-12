@@ -5,10 +5,9 @@ import {
   MouseEventHandler,
   MouseEvent,
   useRef,
-  useLayoutEffect
+  useLayoutEffect,
 } from "react";
 import {
-    movieApiSlice,
   useAddMovieRatingMutation,
   useAddMovieReviewMutation,
   useDeleteMovieRatingMutation,
@@ -20,7 +19,6 @@ import {
   useLazyMovieDetailQuery,
   useLazyMovieKeywordsQuery,
   useLazyRecommendMovieQuery,
-  useRecommendMovieQuery,
   useTrailerVideoQuery,
 } from "@/app/api/movies/movie-api-slice";
 import {
@@ -60,10 +58,14 @@ import { Helmet } from "react-helmet";
 import DialogEditor from "@/components/custom/editor-dialog";
 import { ReviewCard } from "@/components/custom/review-card";
 import DeleteModal from "@/components/custom/delete-modal";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
-import { ScrollBar } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+
 import { MovieCard } from "@/components/custom/movie-card";
 import { retrieveSimilarItems } from "@/app/api/llm/llm-api";
+import {
+  useLazyRetrieveQuery,
+  useRetrieveQuery,
+} from "@/app/api/ai/ai-api-slice";
 const languageMap: { [key: string]: string } = {
   en: "English",
   vn: "Vietnamese",
@@ -114,18 +116,30 @@ const MovieDetail = () => {
   const [latestReview, setLatestReview] = useState<Review[]>([]);
   const [totalReview, setTotalReview] = useState<number>(0);
   const [targetReview, setTargetReview] = useState<Review>();
-  const [getLatestReviews, {data: reviewData, isSuccess: isGetReviewSuccess}] = useLazyGetMovieLatestReviewQuery();
-  const [addReview, {isSuccess: isAddReviewgSuccess, isError: isAddReviewError}] = useAddMovieReviewMutation();
-  const [editReview, {isSuccess: isEditReviewSuccess, isError: isEditReviewError}] = useEditMovieReviewMutation();
-  const [deleteReview, {isSuccess: isDeleteReviewSuccess, isError: isDeleteReviewError}] = useDeleteMovieReviewMutation();
+  const [
+    getLatestReviews,
+    { data: reviewData, isSuccess: isGetReviewSuccess },
+  ] = useLazyGetMovieLatestReviewQuery();
+  const [
+    addReview,
+    { isSuccess: isAddReviewgSuccess, isError: isAddReviewError },
+  ] = useAddMovieReviewMutation();
+  const [
+    editReview,
+    { isSuccess: isEditReviewSuccess, isError: isEditReviewError },
+  ] = useEditMovieReviewMutation();
+  const [
+    deleteReview,
+    { isSuccess: isDeleteReviewSuccess, isError: isDeleteReviewError },
+  ] = useDeleteMovieReviewMutation();
   const castSectionRef = useRef<HTMLDivElement>(null);
   const hash = window.location.hash.substring(1);
   const [isRecommendGenresMoviesLoading, setIsRecommendGenresMoviesLoading] =
-  useState(true);
-const [recommendGenresMovies, setRecommendGenresMovies] = useState<Movie[]>(
-  []
-);
-const[getRecommandMovie] = useLazyRecommendMovieQuery(); 
+    useState(true);
+  const [recommendGenresMovies, setRecommendGenresMovies] = useState<Movie[]>(
+    []
+  );
+  const [getRecommandMovie] = useLazyRecommendMovieQuery();
 
   const onLikeMovieClick: MouseEventHandler = () => {
     if (!isAuthenticated) {
@@ -243,49 +257,63 @@ const[getRecommandMovie] = useLazyRecommendMovieQuery();
       setIsLoading(false);
     }
   }, [isGetMovieDataSuccess, movieData, apiError]);
+  const [getMoviesFromAIRetriever] = useLazyRetrieveQuery();
   useEffect(() => {
     const fetchRecommendations = async () => {
       if (!movie || !movie.genres.length) return;
-  
+
       setIsRecommendGenresMoviesLoading(true);
       setError(null);
-  
+
       try {
-        const results = await Promise.all(
-          movie.genres.map((genre) => retrieveSimilarItems(genre.toString()))
-        );
-  
-        const allIds = results.flatMap((result) => result.data.result || []);
+        const allIds: string[] = [];
+
+        for (const genre of movie.genres) {
+          const { data, error } = await getMoviesFromAIRetriever({
+            collection_name: "movies",
+            query: genre.toString(),
+            amount: 10,
+            threshold: 0.25,
+          });
+
+          if (error) {
+            console.error(
+              `Error fetching retriever for genre ${genre}:`,
+              error
+            );
+            continue;
+          }
+          console.log(data?.data?.data?.result);
+          if (data?.data) {
+            const ids = data.data.data.result.map((res) => res.toString());
+            allIds.push(...ids);
+          }
+          console.log(allIds);
+        }
+
         const allMovies: Movie[] = [];
-  
+
         for (const id of allIds) {
-          // Sử dụng hook hoặc trực tiếp lấy data từ response nếu đã có dữ liệu
-          const response = await getRecommandMovie({ movie_id: id.toString() });
-  
-          if (response.status === 'fulfilled' && response.data) {
-            allMovies.push(response.data?.data!); 
+          const response = await getRecommandMovie({ movie_id: id });
+
+          if (response.status === "fulfilled" && response.data) {
+            allMovies.push(response.data?.data!);
           }
         }
-  
+
         setRecommendGenresMovies(allMovies);
         console.log("Fetched recommendations for all IDs:", allIds);
       } catch (err) {
         console.error("Error fetching recommendations:", err);
-        setError("Failed to fetch recommendations");
+        // setError("Failed to fetch recommendations");
       } finally {
         setIsRecommendGenresMoviesLoading(false);
       }
     };
-  
+
     fetchRecommendations();
   }, [movie]);
-  
-  
-  
-  
-  
-  
-  
+
   useEffect(() => {
     if (isGetMovieCastSuccess) {
       setMovieCast(movieCastData.data?.cast!);
@@ -413,9 +441,9 @@ const[getRecommandMovie] = useLazyRecommendMovieQuery();
     });
   }, [isDeleteReviewSuccess]);
   useLayoutEffect(() => {
-    if(hash == 'cast' && castSectionRef.current) {
+    if (hash == "cast" && castSectionRef.current) {
       castSectionRef.current.scrollIntoView({
-        behavior: 'smooth'
+        behavior: "smooth",
       });
     }
   }, [isLoading, movie]);
@@ -604,28 +632,33 @@ const[getRecommandMovie] = useLazyRecommendMovieQuery();
       </div>
 
       <div className="flex flex-1 w-full p-2 mx-auto mt-6 gap-6">
-        <div className="w-3/4 px-4 flex flex-col space-y-8" ref={castSectionRef}>
+        <div
+          className="w-3/4 px-4 flex flex-col space-y-8"
+          ref={castSectionRef}
+        >
           <div className="px-2">
             <h2 className="text-lg font-bold">Cast</h2>
-            <div className="flex gap-4 overflow-x-auto py-6">
-              {isMovieCastLoading &&
-                new Array(10).fill(null).map((_, idx) => {
-                  return <MovieCardSkeleton key={idx} />;
-                })}
-              {movieCast.length === 0 && !isMovieCastLoading && (
-                <p className="text-gray-500">No cast available</p>
-              )}
-              {movieCast.map((cast) => {
-                return (
-                  <MovieCastCard
-                    key={cast.id}
-                    cast={cast}
-                    onClick={() => onCastClick(cast.id.toString())}
-                  />
-                );
-              })}
-            </div>
-            
+            <ScrollArea className="w-full overflow-x-auto">
+    <div className="flex gap-4 py-6">
+      {isMovieCastLoading &&
+        new Array(10).fill(null).map((_, idx) => {
+          return <MovieCardSkeleton key={idx} />;
+        })}
+      {movieCast.length === 0 && !isMovieCastLoading && (
+        <p className="text-gray-500">No cast available</p>
+      )}
+      {movieCast.map((cast) => {
+        return (
+          <MovieCastCard
+            key={cast.id}
+            cast={cast}
+            onClick={() => onCastClick(cast.id.toString())}
+          />
+        );
+      })}
+    </div>
+    <ScrollBar orientation="horizontal" />
+  </ScrollArea>
           </div>
 
           {/* Review */}
@@ -680,7 +713,8 @@ const[getRecommandMovie] = useLazyRecommendMovieQuery();
               View all
             </Button>
           </div>
-          <div className="max-w-[1300px] flex items-center space-x-6">
+          <div className="px-2 max-w-[1000px] mx-auto">
+            <div className="flex items-center space-x-6">
               <h4 className="text-lg">Recommend by genres</h4>
             </div>
             <ScrollArea className="w-full">
@@ -701,6 +735,9 @@ const[getRecommandMovie] = useLazyRecommendMovieQuery();
               </div>
               <ScrollBar orientation="horizontal" />
             </ScrollArea>
+          </div>
+
+          
         </div>
 
         {/* Right Column */}

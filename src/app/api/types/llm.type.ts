@@ -4,6 +4,6 @@ export type LlmApiRetrieverResponse<T> = {
     status: number
   }
   
-  export type  RetrieverResult =  {
-    result : string[]
+  export type  RetrieverResult<T> =  {
+    result : T[]
   }
