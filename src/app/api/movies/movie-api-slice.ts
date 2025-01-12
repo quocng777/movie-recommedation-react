@@ -289,4 +289,6 @@ export const {
     useEditMovieReviewMutation,
     useDeleteMovieReviewMutation,
     useGetRatingsQuery,
+    useLazyRecommendMovieQuery,
+    useRecommendMovieQuery
 } = movieApiSlice;

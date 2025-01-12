@@ -1,6 +1,13 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useState, useEffect, MouseEventHandler, MouseEvent, useRef } from "react";
 import {
+  useState,
+  useEffect,
+  MouseEventHandler,
+  MouseEvent,
+  useRef,
+} from "react";
+import {
+    movieApiSlice,
   useAddMovieRatingMutation,
   useAddMovieReviewMutation,
   useDeleteMovieRatingMutation,
@@ -11,19 +18,38 @@ import {
   useLazyMovieCastQuery,
   useLazyMovieDetailQuery,
   useLazyMovieKeywordsQuery,
+  useLazyRecommendMovieQuery,
+  useRecommendMovieQuery,
   useTrailerVideoQuery,
 } from "@/app/api/movies/movie-api-slice";
-import { Movie, MovieCast, MovieKeywords, Review, Video } from "@/app/api/types/movie.type";
+import {
+  Movie,
+  MovieCast,
+  MovieKeywords,
+  Review,
+  Video,
+} from "@/app/api/types/movie.type";
 import { FallbackScreen } from "@/components/custom/fallback-screen";
 import { getResourceFromTmdb } from "@/lib/helpers/get-resource-tmbd";
 import { MovieCastCard } from "@/components/custom/moviecast-card";
 import { MovieCardSkeleton } from "@/components/custom/movie-card-sekeleton";
 import { Button } from "@/components/ui/button";
-import { Bookmark, Eye, EyeFill, Heart, HeartFill, Play } from "react-bootstrap-icons";
+import {
+  Bookmark,
+  Eye,
+  EyeFill,
+  Heart,
+  HeartFill,
+  Play,
+} from "react-bootstrap-icons";
 import { useMovieActions } from "@/hooks/use-movie-actions";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/api/store";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { AddMovieToPlaylistDialog } from "@/components/custom/add-movie-to-playlist-dialog";
 import { TrailerVideoDialog } from "@/components/custom/trailer-video-dialog";
 import { RatingIndicator } from "@/components/custom/rating-indicator";
@@ -32,7 +58,10 @@ import { toast } from "@/hooks/use-toast";
 import { ReviewCard } from "@/components/custom/review-card";
 import EditorDialog from "@/components/custom/editor-dialog";
 import DeleteModal from "@/components/custom/delete-modal";
-
+import { ScrollArea } from "@radix-ui/react-scroll-area";
+import { ScrollBar } from "@/components/ui/scroll-area";
+import { MovieCard } from "@/components/custom/movie-card";
+import { retrieveSimilarItems } from "@/app/api/llm/llm-api";
 const languageMap: { [key: string]: string } = {
   en: "English",
   vn: "Vietnamese",
@@ -47,7 +76,8 @@ const MovieDetail = () => {
   const [movieKeywords, setMovieKeywords] = useState<MovieKeywords[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isMovieCastLoading, setIsMovieCastLoading] = useState(true);
-  const {isLiked, likeMovie, isInWatchLaterList, watchLater} = useMovieActions(Number(id));
+  const { isLiked, likeMovie, isInWatchLaterList, watchLater } =
+    useMovieActions(Number(id));
   const isAuthenticated = useSelector((state: RootState) => !!state.auth.user);
   const [error, setError] = useState<string | null>(null);
   const [
@@ -62,12 +92,17 @@ const MovieDetail = () => {
     getMovieKeywords,
     { data: movieKeywordData, isSuccess: isGetMovieKeywordsSuccess },
   ] = useLazyMovieKeywordsQuery();
-  const {data: trailersData, isSuccess: isGetTrailersSuccess} = useTrailerVideoQuery(parseInt(id!));
+  const { data: trailersData, isSuccess: isGetTrailersSuccess } =
+    useTrailerVideoQuery(parseInt(id!));
   const [trailer, setTrailer] = useState<Video | undefined>();
   const [openTrailerDialog, setOpenTrailerDialog] = useState(false);
   const [openRatingPopover, setOpenRatingPopover] = useState(false);
-  const {data: ratingData, isSuccess: isGetRatingSuccess} = useGetMovieRatingQuery(parseInt(id!));
-  const [addMovieRating, {isSuccess: isAddRatingSuccess, isError: isAddRatingError}] = useAddMovieRatingMutation();
+  const { data: ratingData, isSuccess: isGetRatingSuccess } =
+    useGetMovieRatingQuery(parseInt(id!));
+  const [
+    addMovieRating,
+    { isSuccess: isAddRatingSuccess, isError: isAddRatingError },
+  ] = useAddMovieRatingMutation();
   const [selectedRating, setSelectedRating] = useState(0);
   const [deleteMovieRating] = useDeleteMovieRatingMutation();
   const isDbClickCalled = useRef(false);
@@ -77,20 +112,37 @@ const MovieDetail = () => {
   const [latestReview, setLatestReview] = useState<Review[]>([]);
   const [totalReview, setTotalReview] = useState<number>(0);
   const [targetReview, setTargetReview] = useState<Review>();
-  const [getLatestReviews, {data: reviewData, isSuccess: isGetReviewSuccess}] = useLazyGetMovieLatestReviewQuery();
-  const [addReview, {isSuccess: isAddReviewgSuccess, isError: isAddReviewError}] = useAddMovieReviewMutation();
-  const [editReview, {isSuccess: isEditReviewSuccess, isError: isEditReviewError}] = useEditMovieReviewMutation();
-  const [deleteReview, {isSuccess: isDeleteReviewSuccess, isError: isDeleteReviewError}] = useDeleteMovieReviewMutation();
-
+  const [
+    getLatestReviews,
+    { data: reviewData, isSuccess: isGetReviewSuccess },
+  ] = useLazyGetMovieLatestReviewQuery();
+  const [
+    addReview,
+    { isSuccess: isAddReviewgSuccess, isError: isAddReviewError },
+  ] = useAddMovieReviewMutation();
+  const [
+    editReview,
+    { isSuccess: isEditReviewSuccess, isError: isEditReviewError },
+  ] = useEditMovieReviewMutation();
+  const [
+    deleteReview,
+    { isSuccess: isDeleteReviewSuccess, isError: isDeleteReviewError },
+  ] = useDeleteMovieReviewMutation();
+  const [isRecommendGenresMoviesLoading, setIsRecommendGenresMoviesLoading] =
+    useState(true);
+  const [recommendGenresMovies, setRecommendGenresMovies] = useState<Movie[]>(
+    []
+  );
+  const[getRecommandMovie] = useLazyRecommendMovieQuery(); 
   const onLikeMovieClick: MouseEventHandler = () => {
-      if(!isAuthenticated) {
-        return;
-      }
-      likeMovie();
+    if (!isAuthenticated) {
+      return;
+    }
+    likeMovie();
   };
 
   const onAddWatchListClick: MouseEventHandler = () => {
-    if(!isAuthenticated) {
+    if (!isAuthenticated) {
       return;
     }
     watchLater();
@@ -101,7 +153,7 @@ const MovieDetail = () => {
   };
 
   const onRatingClick = (score: number) => {
-    if(score === selectedRating) {
+    if (score === selectedRating) {
       return;
     }
     addMovieRating({
@@ -112,35 +164,42 @@ const MovieDetail = () => {
     setOpenRatingPopover(false);
   };
 
-  const onRatingBtnClick: MouseEventHandler = (event: MouseEvent<HTMLButtonElement>) => {
+  const onRatingBtnClick: MouseEventHandler = (
+    event: MouseEvent<HTMLButtonElement>
+  ) => {
     setTimeout(() => {
       event.preventDefault();
       event.stopPropagation();
-      if(!isAuthenticated || isDbClickCalled.current) {
+      if (!isAuthenticated || isDbClickCalled.current) {
         isDbClickCalled.current = false;
         return;
       }
       setOpenRatingPopover(true);
-    }, 300)
+    }, 300);
   };
 
-  const onRatingBtnDoubleClick: MouseEventHandler = (event: MouseEvent<HTMLButtonElement>) => {
+  const onRatingBtnDoubleClick: MouseEventHandler = (
+    event: MouseEvent<HTMLButtonElement>
+  ) => {
     event.preventDefault();
     event.stopPropagation();
     isDbClickCalled.current = true;
-    if(!isAuthenticated || selectedRating === 0) {
+    if (!isAuthenticated || selectedRating === 0) {
       return;
     }
     deleteMovieRating(movie?.id!);
     setSelectedRating(0);
-  }; 
-
+  };
+  const onMovieCardClick = (id: string) => {
+    navigate("/movie/" + id);
+    return;
+  };
   const handleAddReview = (comment: string) => {
     addReview({
       movieId: parseInt(id!),
       content: comment,
     });
-    
+
     getLatestReviews({ movieId: movie ? movie.id : 0, limit: 1 });
   };
 
@@ -150,22 +209,22 @@ const MovieDetail = () => {
       movieId: parseInt(id!),
       content: comment,
     });
-  }
+  };
 
   const handleDeleteReview = (reviewId: number) => {
-    deleteReview({reviewId, movieId: parseInt(id!)});
-  }
+    deleteReview({ reviewId, movieId: parseInt(id!) });
+  };
 
-  const onCastClick = (id: string) =>
-  {
-    navigate("/person/"+ id);
+  const onCastClick = (id: string) => {
+    navigate("/person/" + id);
     return;
-  }
-    
+  };
+
   useEffect(() => {
     if (id) {
       setIsLoading(true);
       setIsMovieCastLoading(true);
+      setIsRecommendGenresMoviesLoading(true);
       setError(null);
       getMovieDetail({ id });
       getMovieCast({ id });
@@ -180,16 +239,60 @@ const MovieDetail = () => {
       setIsLoading(false);
     }
     if (apiError) {
-        const statusCode = (apiError as any)?.status || 500;
-        if (statusCode === 404) {
-          setError("No movie found with the given ID. Please check the ID and try again.");
-        } else {
-          setError("Something went wrong. Please try again.");
-        }
-        setIsLoading(false)
-  }
+      const statusCode = (apiError as any)?.status || 500;
+      if (statusCode === 404) {
+        setError(
+          "No movie found with the given ID. Please check the ID and try again."
+        );
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
+      setIsLoading(false);
+    }
   }, [isGetMovieDataSuccess, movieData, apiError]);
-
+  useEffect(() => {
+    const fetchRecommendations = async () => {
+      if (!movie || !movie.genres.length) return;
+  
+      setIsRecommendGenresMoviesLoading(true);
+      setError(null);
+  
+      try {
+        const results = await Promise.all(
+          movie.genres.map((genre) => retrieveSimilarItems(genre.toString()))
+        );
+  
+        const allIds = results.flatMap((result) => result.data.result || []);
+        const allMovies: Movie[] = [];
+  
+        for (const id of allIds) {
+          // Sử dụng hook hoặc trực tiếp lấy data từ response nếu đã có dữ liệu
+          const response = await getRecommandMovie({ movie_id: id.toString() });
+  
+          if (response.status === 'fulfilled' && response.data) {
+            allMovies.push(response.data?.data!); 
+          }
+        }
+  
+        setRecommendGenresMovies(allMovies);
+        console.log("Fetched recommendations for all IDs:", allIds);
+      } catch (err) {
+        console.error("Error fetching recommendations:", err);
+        setError("Failed to fetch recommendations");
+      } finally {
+        setIsRecommendGenresMoviesLoading(false);
+      }
+    };
+  
+    fetchRecommendations();
+  }, [movie]);
+  
+  
+  
+  
+  
+  
+  
   useEffect(() => {
     if (isGetMovieCastSuccess) {
       setMovieCast(movieCastData.data?.cast!);
@@ -204,42 +307,45 @@ const MovieDetail = () => {
   }, [isGetMovieKeywordsSuccess]);
 
   useEffect(() => {
-    if(!isGetTrailersSuccess) {
+    if (!isGetTrailersSuccess) {
       return;
     }
-    setTrailer(trailersData.data?.results.find(video => video.type == 'Trailer') ?? trailersData.data?.results[0]);
+    setTrailer(
+      trailersData.data?.results.find((video) => video.type == "Trailer") ??
+        trailersData.data?.results[0]
+    );
   }, [isGetTrailersSuccess, trailersData]);
 
   useEffect(() => {
-    if(!isGetRatingSuccess) {
+    if (!isGetRatingSuccess) {
       return;
     }
     setSelectedRating(ratingData.data?.score!);
   }, [isGetRatingSuccess, ratingData]);
 
   useEffect(() => {
-    if(!isAddRatingError) {
+    if (!isAddRatingError) {
       return;
     }
     setSelectedRating(0);
     toast({
-      title: 'Error',
-      description: `Error when added rating for ${movie?.title} 😰`
+      title: "Error",
+      description: `Error when added rating for ${movie?.title} 😰`,
     });
   });
 
   useEffect(() => {
-    if(!isAddRatingSuccess) {
+    if (!isAddRatingSuccess) {
       return;
     }
     toast({
-      title: 'Success',
-      description: `Added rating for ${movie?.title}`
+      title: "Success",
+      description: `Added rating for ${movie?.title}`,
     });
   }, [isAddRatingSuccess]);
 
   useEffect(() => {
-    if(!isGetReviewSuccess) {
+    if (!isGetReviewSuccess) {
       return;
     }
 
@@ -249,74 +355,75 @@ const MovieDetail = () => {
   }, [isGetReviewSuccess, reviewData]);
 
   useEffect(() => {
-    if(!isAddReviewError) {
+    if (!isAddReviewError) {
       return;
     }
     toast({
-      title: 'Error',
-      description: `Error when added review for ${movie?.title} 😰`
+      title: "Error",
+      description: `Error when added review for ${movie?.title} 😰`,
     });
   });
 
   useEffect(() => {
-    if(!isAddReviewgSuccess) {
+    if (!isAddReviewgSuccess) {
       return;
     }
     getLatestReviews({ movieId: movie ? movie.id : 0, limit: 1 });
     setOpenAddReviewDialog(false);
     toast({
-      title: 'Success',
-      description: `Added review for ${movie?.title}`
+      title: "Success",
+      description: `Added review for ${movie?.title}`,
     });
   }, [isAddReviewgSuccess]);
 
   useEffect(() => {
-    if(!isEditReviewError) {
+    if (!isEditReviewError) {
       return;
     }
     toast({
-      title: 'Error',
-      description: `Error when edited review for ${movie?.title} 😰`
+      title: "Error",
+      description: `Error when edited review for ${movie?.title} 😰`,
     });
-  })
+  });
 
   useEffect(() => {
-    if(!isEditReviewSuccess) {
+    if (!isEditReviewSuccess) {
       return;
     }
     setOpenEditReviewDialog(false);
     getLatestReviews({ movieId: movie ? movie.id : 0, limit: 1 });
     toast({
-      title: 'Success',
-      description: `Edited review for ${movie?.title}`
+      title: "Success",
+      description: `Edited review for ${movie?.title}`,
     });
   }, [isEditReviewSuccess]);
 
   useEffect(() => {
-    if(!isDeleteReviewError) {
+    if (!isDeleteReviewError) {
       return;
     }
     toast({
-      title: 'Error',
-      description: `Error when deleted review for ${movie?.title} 😰`
+      title: "Error",
+      description: `Error when deleted review for ${movie?.title} 😰`,
     });
   });
 
   useEffect(() => {
-    if(!isDeleteReviewSuccess) {
+    if (!isDeleteReviewSuccess) {
       return;
     }
     setOpenDeleteReviewDialog(false);
     getLatestReviews({ movieId: movie ? movie.id : 0, limit: 1 });
     toast({
-      title: 'Success',
-      description: `Deleted review for ${movie?.title}`
+      title: "Success",
+      description: `Deleted review for ${movie?.title}`,
     });
   }, [isDeleteReviewSuccess]);
 
   if (isLoading) return <FallbackScreen />;
   if (error) return <div className="flex p-4 justify-center">{error}</div>;
-  if (!movie) return <div className="flex p-4 justify-center">Movie not found</div>;
+  if (!movie)
+    return <div className="flex p-4 justify-center">Movie not found</div>;
 
   return (
     <div className="min-h-screen flex flex-col text-white">
@@ -511,12 +618,19 @@ const MovieDetail = () => {
                   return <MovieCardSkeleton key={idx} />;
                 })}
               {movieCast.length === 0 && !isMovieCastLoading && (
-              <p className="text-gray-500">No cast available</p>
+                <p className="text-gray-500">No cast available</p>
               )}
               {movieCast.map((cast) => {
-                return <MovieCastCard key={cast.id} cast={cast} onClick={()=>onCastClick(cast.id.toString())}/>;
+                return (
+                  <MovieCastCard
+                    key={cast.id}
+                    cast={cast}
+                    onClick={() => onCastClick(cast.id.toString())}
+                  />
+                );
               })}
             </div>
+            
           </div>
 
           {/* Review */}
@@ -530,8 +644,7 @@ const MovieDetail = () => {
               >
                 <span className="w-1 h-8 bg-rose-600"></span>
                 <span className="text-xl text-white hover:text-rose-600 cursor-pointer hover:transition-colors">
-                  User reviews{" "}
-                  {`(${totalReview ? totalReview : 0})`}
+                  User reviews {`(${totalReview ? totalReview : 0})`}
                 </span>
               </div>
 
@@ -572,6 +685,27 @@ const MovieDetail = () => {
               View all
             </Button>
           </div>
+          <div className="max-w-[1300px] flex items-center space-x-6">
+              <h4 className="text-lg">Recommend by genres</h4>
+            </div>
+            <ScrollArea className="w-full">
+              <div className="flex gap-4 py-6">
+                {isRecommendGenresMoviesLoading &&
+                  new Array(10).fill(null).map((_, idx) => {
+                    return <MovieCardSkeleton key={idx} />;
+                  })}
+                {recommendGenresMovies.map((movie) => {
+                  return (
+                    <MovieCard
+                      key={movie.id}
+                      movie={movie}
+                      onClick={() => onMovieCardClick(movie.id.toString())}
+                    />
+                  );
+                })}
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
         </div>
 
         {/* Right Column */}
@@ -625,7 +759,7 @@ const MovieDetail = () => {
         onOpenChange={setOpenEditReviewDialog}
         triggerElement={<></>}
         onSave={(content) => {
-          if(targetReview) {
+          if (targetReview) {
             handleEditReview(targetReview.id, content);
           }
         }}
@@ -635,7 +769,7 @@ const MovieDetail = () => {
         isOpen={openDeleteReviewDialog}
         onClose={() => setOpenDeleteReviewDialog(!openDeleteReviewDialog)}
         onDelete={() => {
-          if(targetReview) {
+          if (targetReview) {
             handleDeleteReview(targetReview.id);
           }
         }}
