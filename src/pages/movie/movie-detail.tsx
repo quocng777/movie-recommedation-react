@@ -712,7 +712,10 @@ const MovieDetail = () => {
           ref={castSectionRef}
         >
           <div className="px-2">
-            <h2 className="text-lg font-bold">Cast</h2>
+            <div className="flex items-center space-x-2 font-semibold">
+              <span className="w-1 h-8 bg-rose-600"></span>
+              <span className="text-xl text-white">Casts</span>
+            </div>
             <ScrollArea className="w-full overflow-x-auto">
               <div className="flex gap-4 py-6">
                 {isMovieCastLoading &&
@@ -788,67 +791,78 @@ const MovieDetail = () => {
               View all
             </Button>
           </div>
-          <div className="px-2 max-w-[1000px] mx-auto">
-            <div className="flex items-center space-x-6">
-              <h4 className="text-lg whitespace-nowrap">
-                <b>Recommend by genres of this movie</b>
-                <div className="flex gap-4 flex-wrap mt-4">
-                  {movie.genres?.map((genre) => (
-                    <span
-                      key={genre.id}
-                      className="bg-gray-700 px-4 py-1 rounded-full text-sm"
-                      //   onClick={() => handleGenreClick(genre.name)}
-                    >
-                      {genre.name}
-                    </span>
-                  ))}
-                </div>
-              </h4>
-            </div>
-            <ScrollArea className="w-full">
-              <div className="flex gap-4 py-6">
-                {isRecommendGenresMoviesLoading &&
-                  new Array(10).fill(null).map((_, idx) => {
-                    return <MovieCardSkeleton key={idx} />;
-                  })}
-                {recommendGenresMovies.map((movie) => {
-                  return (
-                    <RecommendMovieCard
-                      key={movie.tmdb_id}
-                      movie={movie}
-                      onClick={() => onMovieCardClick(movie.tmdb_id.toString())}
-                    />
-                  );
-                })}
-              </div>
-              <ScrollBar orientation="horizontal" />
-            </ScrollArea>
-          </div>
 
-          <div className="px-2 max-w-[1000px] mx-auto">
-            <div className="flex items-center space-x-6">
-              <h4 className="text-lg">
-                <b>Similar movies to you</b>
-              </h4>
+          <div className="ml-2">
+            <div className="flex items-center space-x-2 font-semibold mb-2">
+              <span className="w-1 h-8 bg-rose-600"></span>
+              <span className="text-xl text-white">Recommendations</span>
             </div>
-            <ScrollArea className="w-full">
-              <div className="flex gap-4 py-6">
-                {isSimilarMoviesLoading &&
-                  new Array(10).fill(null).map((_, idx) => {
-                    return <MovieCardSkeleton key={idx} />;
-                  })}
-                {similarMovies.map((movie) => {
-                  return (
-                    <RecommendMovieCard
-                      key={movie.tmdb_id}
-                      movie={movie}
-                      onClick={() => onMovieCardClick(movie.tmdb_id.toString())}
-                    />
-                  );
-                })}
+            <div className="px-2 max-w-[1000px] mx-auto">
+              <div className="flex items-center space-x-6">
+                <h4 className="text-lg whitespace-nowrap">
+                  <b>Recommend by genres of this movie</b>
+                  <div className="flex gap-4 flex-wrap mt-4">
+                    {movie.genres?.map((genre) => (
+                      <span
+                        key={genre.id}
+                        className="bg-gray-700 px-4 py-1 rounded-full text-sm"
+                        //   onClick={() => handleGenreClick(genre.name)}
+                      >
+                        {genre.name}
+                      </span>
+                    ))}
+                  </div>
+                </h4>
               </div>
-              <ScrollBar orientation="horizontal" />
-            </ScrollArea>
+              <ScrollArea className="w-full">
+                <div className="flex gap-4 py-6">
+                  {isRecommendGenresMoviesLoading &&
+                    new Array(10).fill(null).map((_, idx) => {
+                      return <MovieCardSkeleton key={idx} />;
+                    })}
+                  {recommendGenresMovies.map((movie) => {
+                    return (
+                      <RecommendMovieCard
+                        key={movie.tmdb_id}
+                        movie={movie}
+                        onClick={() =>
+                          onMovieCardClick(movie.tmdb_id.toString())
+                        }
+                      />
+                    );
+                  })}
+                </div>
+                <ScrollBar orientation="horizontal" />
+              </ScrollArea>
+            </div>
+
+            <div className="px-2 max-w-[1000px] mx-auto">
+              <div className="flex items-center space-x-6">
+                <h4 className="text-lg">
+                  <b>Similar movies to you</b>
+                </h4>
+              </div>
+              <ScrollArea className="w-full">
+                <div className="flex gap-4 py-6">
+                  {isSimilarMoviesLoading &&
+                    new Array(10).fill(null).map((_, idx) => {
+                      return <MovieCardSkeleton key={idx} />;
+                    })}
+                  {similarMovies.map((movie) => {
+                    return (
+                      <RecommendMovieCard
+                        key={movie.tmdb_id}
+                        movie={movie}
+                        onClick={() =>
+                          onMovieCardClick(movie.tmdb_id.toString())
+                        }
+                      />
+                    );
+                  })}
+                </div>
+                <ScrollBar orientation="horizontal" />
+              </ScrollArea>
+            </div>
           </div>
         </div>
 

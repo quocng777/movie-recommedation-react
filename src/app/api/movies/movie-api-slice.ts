@@ -249,12 +249,20 @@ export const movieApiSlice = apiSlice.injectEndpoints({
             method: 'GET',
           })
         }),
+        
         recommendMovie:  builder.query<Response<RecommendMovie>, { movie_id: string }>({
             query: ({movie_id}) => ({
               url: `/movies/movie/` + movie_id,
               method: 'GET',
             })
-          }),
+        }),
+
+        getMoviesFromObjectIds: builder.query<Response<Movie[]>, { objectIds: string[] }>({
+            query: ({ objectIds }) => ({
+                url: `/movies/get-with-objectids?objectIds=${objectIds.join(",")}`,
+                method: 'GET',
+            }),
+        }),
     })
 });
 
@@ -290,5 +298,6 @@ export const {
     useDeleteMovieReviewMutation,
     useGetRatingsQuery,
     useLazyRecommendMovieQuery,
-    useRecommendMovieQuery
+    useRecommendMovieQuery,
+    useLazyGetMoviesFromObjectIdsQuery,
 } = movieApiSlice;

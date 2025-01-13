@@ -19,6 +19,8 @@ import { Robot } from "react-bootstrap-icons";
 import { useLazyAiNavigationQuery } from "@/app/api/ai/ai-api-slice";
 import { NavigationRoute } from "@/app/api/types/ai-navigation.type";
 import { useNavigate } from "react-router-dom";
+import { useLazyGetMoviesFromObjectIdsQuery } from "@/app/api/movies/movie-api-slice";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "../ui/select";
 
 export type Message = {
   role: string;
@@ -28,6 +30,7 @@ export type Message = {
 export default function Chatbot() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
+  const [selectedValue, setSelectedValue] = useState("Navigate");
   const [getAiNavigation, {isFetching: isGenerating, data, isSuccess, isError}] = useLazyAiNavigationQuery();
 
   const messagesRef = useRef<HTMLDivElement>(null);
@@ -51,22 +54,43 @@ export default function Chatbot() {
           role: 'ai'
         }];
       })
-    } else if(data.data?.route == NavigationRoute.SEARCH_PAGE) {
+    } else if (data.data?.route == NavigationRoute.SEARCH_PAGE) {
+      const displayParams = data?.data?.params.keyword ? " with keyword" + data?.data?.params.keyword : "";
       setMessages((prev) => {
         return [...prev, {
-          content: "I redirected you site to find related movie 🚀",
+          content: `I redirected you site to find related movies${displayParams}' 🚀`,
           role: 'ai'
         }];
       })
       navigate(`/movie/search?query=${data?.data?.params.keyword}`);
-    } else {
+    } else if (data.data?.route == NavigationRoute.MOVIE_PAGE) {
+      const displayParams = data?.data?.params[0].name ? " " + data?.data?.params[0].displayParams : "";
       setMessages((prev) => {
         return [...prev, {
-          content: "😆, I found some actors, redirected the site for you",
+          content: `😆, I found the movie${displayParams}, redirected the detailed site for you 🚀`,
+          role: 'ai'
+        }];
+      });
+      navigate(`/movie/${data?.data?.params[0].id}`);
+    } else if (data.data?.route == NavigationRoute.GENRE_PAGE) {
+      let displayParams = data?.data?.params.map((item : { name: string, id: number}) => item.name).join(", ");
+      displayParams = displayParams ? " with genres " + displayParams : "";
+      setMessages((prev) => {
+        return [...prev, {
+          content: `😆, I found some movies matching your requirement${displayParams}, redirected to the site for you 🚀`,
+          role: 'ai'
+        }];
+      });
+      navigate(`/movie?genres=${data?.data?.params.map((item : { name: string, id: number}) => item.id).join(",")}`);
+    } else if (data.data?.route == NavigationRoute.CAST_PAGE) {
+      setMessages((prev) => {
+        const displayParams = data?.data?.params[0].name ? " " + data?.data?.params[0].name : "";
+        return [...prev, {
+          content: `😆, I found some actors for the film${displayParams}, redirected the site for you`,
           role: 'ai'
         }];
       })
-      navigate(`/movie/${data?.data?.params[0].tmdb_id}#cast`);
+      navigate(`/movie/${data?.data?.params[0].id}#cast`);
     }
   }, [isSuccess, data]);
 
@@ -76,7 +100,7 @@ export default function Chatbot() {
     }
     setMessages((prev) => {
       return [...prev, {
-        content: "Error: Something went wrong",
+        content: "🥲, something went wrong. Please try again later.",
         role: 'ai'
       }];
     })
@@ -104,9 +128,19 @@ export default function Chatbot() {
   return (
     <ExpandableChat size="md" position="bottom-right" icon={<Robot />}>
       <ExpandableChatHeader className="bg-muted/60 text-center flex justify-between">
-        <h1 className="text-lg font-semibold">TMDB2 AI </h1>
+        <div className="flex flex-row items-center space-x-2">
+          <h1 className="text-lg font-semibold">TMDB2 AI </h1>
+          <Select defaultValue={selectedValue} onValueChange={setSelectedValue}>
+            <SelectTrigger className="text-xs w-28">{selectedValue}</SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Navigate">Navigate</SelectItem>
+              <SelectItem value="Card">Card</SelectItem>
+              <SelectItem value="Text">Text</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         <Button variant="secondary" onClick={() => setMessages([])}>
-            New Chat
+          New Chat
         </Button>
       </ExpandableChatHeader>
       <ExpandableChatBody>
@@ -126,10 +160,9 @@ export default function Chatbot() {
                 key={index}
                 variant={message.role == "user" ? "sent" : "received"}
               >
-                {message.role !== 'user' && <ChatBubbleAvatar
-                  src=""
-                  fallback={"🤖"}
-                />}
+                {message.role !== "user" && (
+                  <ChatBubbleAvatar src="" fallback={"🤖"} />
+                )}
                 <ChatBubbleMessage
                   variant={message.role == "user" ? "sent" : "received"}
                 >

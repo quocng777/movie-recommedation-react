@@ -31,6 +31,8 @@ const MovieListPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const page = searchParams.get("page") ? parseInt(searchParams.get("page")!) : 1;
+  const selectedGenresParam = searchParams.get("genres");
+  const selectedGenresArray = selectedGenresParam ? selectedGenresParam.split(",").map((g) => parseInt(g)) : [];
 
   const {staticStart: startTopBarLoader, complete: completeTopBarLoader } = useTopBarLoader();
   const [isInfiniteScroll, setInfiniteScroll] = useState(false);
@@ -39,7 +41,7 @@ const MovieListPage = () => {
   const [sortValue, setSortValue] = useState<string>(SortOptions.POPULARITY_DESC.KEY);
   const [fromDate, setFromDate] = useState<Date>();
   const [toDate, setToDate] = useState<Date>();
-  const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
+  const [selectedGenres, setSelectedGenres] = useState<number[]>(selectedGenresArray);
   const [scoreValues, setScoreValues] = useState<number[]>([0, 10]);
   const [voteValues, setVoteValues] = useState<number[]>([0, 500]);
   const [isStickyVisible, setStickyVisible] = useState(false);

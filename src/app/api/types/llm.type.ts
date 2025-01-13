@@ -1,4 +1,3 @@
-// types/llm.ts
 export type LlmApiRetrieverResponse<T> = {
     data: T,
     status: number
