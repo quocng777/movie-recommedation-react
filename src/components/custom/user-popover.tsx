@@ -46,6 +46,7 @@ export const UserPopover = (props: UserPopoverProps) => {
         dispatch(logOut());
         await delay(200);
         completeSideBarLoader();
+        window.location.assign('/');
     };
 
     const onPlaylistClick = () => {
