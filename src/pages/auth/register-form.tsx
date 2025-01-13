@@ -8,6 +8,7 @@ import { Spinner } from "@/components/custom/spinner"
 import { GoogleOAuthProvider } from "@react-oauth/google"
 import { CustomGoogleLogin, CustomGoogleLoginProps } from "@/components/custom/google-login-button"
 import { Link } from "react-router-dom"
+import { EnvVariable } from "@/configuration/env-variable"
 
 export type  RegisterFormProps = {
     form: UseFormReturn<z.infer<typeof registerFormSchema>, any, undefined >,
@@ -27,7 +28,7 @@ const RegisterForm = (props: RegisterFormProps) => {
                 <div>
                     <p>Register with</p>
                     <div className="w-full flex justify-center">
-                        <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID}>
+                        <GoogleOAuthProvider clientId={EnvVariable.GOOGLE_OAUTH_CLIENT_ID}>
                             <CustomGoogleLogin onGoogleAuthSuccess={onGoogleAuthSuccess} onGoogleAuthError={onGoogleAuthError} />
                         </GoogleOAuthProvider>
                     </div>

@@ -4,10 +4,11 @@ import { Response } from "../types/response";
 import { TokenRes } from "../types/auth.type";
 import { logOut } from "../auth/auth-slice";
 import { apiEndpoints } from "../constants";
+import { EnvVariable } from "@/configuration/env-variable";
 
 
 const baseQuery = fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_API_BASE_URL,
+    baseUrl: EnvVariable.API_BASE_URL,
     credentials: 'include',
     prepareHeaders: (headers) => {
         const token = localStorage.getItem("access_token");

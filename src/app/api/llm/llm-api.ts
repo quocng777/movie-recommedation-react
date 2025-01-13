@@ -1,3 +1,4 @@
+import { EnvVariable } from "@/configuration/env-variable";
 import { LlmApiRetrieverResponse, RetrieverResult } from "../types/llm.type";
 import { Movie } from "../types/movie.type";
 export const retrieveSimilarItems = async (
@@ -7,7 +8,7 @@ export const retrieveSimilarItems = async (
 ) => {
   try {
     const url = new URL('https://awd-llm.azurewebsites.net/retriever/');
-    url.searchParams.append('llm_api_key', import.meta.env.VITE_LLM_API_KEY); 
+    url.searchParams.append('llm_api_key', EnvVariable.LLM_API_KEY); 
     url.searchParams.append('collection_name', 'movies');
     url.searchParams.append('query', query);
     url.searchParams.append('amount', amount.toString());
