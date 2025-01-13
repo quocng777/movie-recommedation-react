@@ -60,7 +60,6 @@ import DialogEditor from "@/components/custom/editor-dialog";
 import { ReviewCard } from "@/components/custom/review-card";
 import DeleteModal from "@/components/custom/delete-modal";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { MovieCard } from "@/components/custom/movie-card";
 import { useLazyRetrieveQuery } from "@/app/api/ai/ai-api-slice";
 import { RecommendMovieCard } from "@/components/custom/recommend-movie-card";
 const languageMap: { [key: string]: string } = {
@@ -77,6 +76,8 @@ const MovieDetail = () => {
   const [movieKeywords, setMovieKeywords] = useState<MovieKeywords[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isMovieCastLoading, setIsMovieCastLoading] = useState(true);
+  const [isSimilarMoviesLoading, setIsSimilarMoviesLoading] = useState(true);
+
   const { isLiked, likeMovie, isInWatchLaterList, watchLater } =
     useMovieActions(Number(id));
   const isAuthenticated = useSelector((state: RootState) => !!state.auth.user);
@@ -133,9 +134,11 @@ const MovieDetail = () => {
   const hash = window.location.hash.substring(1);
   const [isRecommendGenresMoviesLoading, setIsRecommendGenresMoviesLoading] =
     useState(true);
-  const [recommendGenresMovies, setRecommendGenresMovies] = useState<RecommendMovie[]>(
-    []
-  );
+  const [recommendGenresMovies, setRecommendGenresMovies] = useState<
+    RecommendMovie[]
+  >([]);
+
+  const [similarMovies, setSimilarMovies] = useState<RecommendMovie[]>([]);
   const [getRecommandMovie] = useLazyRecommendMovieQuery();
 
   const onLikeMovieClick: MouseEventHandler = () => {
@@ -229,6 +232,7 @@ const MovieDetail = () => {
       setIsLoading(true);
       setIsMovieCastLoading(true);
       setIsRecommendGenresMoviesLoading(true);
+      setIsSimilarMoviesLoading(true);
       setError(null);
       getMovieDetail({ id });
       getMovieCast({ id });
@@ -282,12 +286,15 @@ const MovieDetail = () => {
           }
           // Giả sử movie.id là ID bạn muốn tránh thêm vào list
           const movieIdToAvoid = movie.id;
-          
+
           if (data?.data) {
             const ids = data.data.data.result.map((res) => res.toString());
 
             ids.forEach((id) => {
-              if (id.toString() !== movieIdToAvoid.toString() && !allIds.includes(id)) {
+              if (
+                id.toString() !== movieIdToAvoid.toString() &&
+                !allIds.includes(id)
+              ) {
                 allIds.push(id);
               }
             });
@@ -310,13 +317,76 @@ const MovieDetail = () => {
         console.log("Fetched recommendations for all IDs:", allIds);
       } catch (err) {
         console.error("Error fetching recommendations:", err);
-        // setError("Failed to fetch recommendations");
       } finally {
         setIsRecommendGenresMoviesLoading(false);
       }
     };
 
     fetchRecommendations();
+  }, [movie]);
+  useEffect(() => {
+    const fetchSimilarMovies = async () => {
+      if (!movie || !movie.genres) return;
+
+      setIsRecommendGenresMoviesLoading(true);
+      setError(null);
+
+      try {
+        const allIds: string[] = [];
+        const genre = movie.genres; // genres giờ là một đối tượng
+
+        const { data, error } = await getMoviesFromAIRetriever({
+          collection_name: "movies",
+          query:
+            `Genre:${genre.join(",")}` +
+            " \n " +
+            `Title:${movie.title}` +
+            " \n " +
+            `Overview:${movie.overview}`,
+          amount: 10,
+          threshold: 0.25,
+        });
+
+        if (error) {
+          return;
+        }
+
+        const movieIdToAvoid = movie.id;
+
+        if (data?.data) {
+          const ids = data.data.data.result.map((res) => res.toString());
+
+          ids.forEach((id) => {
+            if (
+              id.toString() !== movieIdToAvoid.toString() &&
+              !allIds.includes(id)
+            ) {
+              allIds.push(id);
+            }
+          });
+        }
+
+        console.log("Unique movie IDs fetched:", allIds);
+
+        const allMovies: RecommendMovie[] = [];
+
+        for (const id of allIds) {
+          const response = await getRecommandMovie({ movie_id: id });
+
+          if (response.status === "fulfilled" && response.data) {
+            allMovies.push(response.data?.data!);
+          }
+        }
+        setSimilarMovies(allMovies);
+        console.log("Fetched recommendations for all IDs:", allIds);
+      } catch (err) {
+        console.error("Error fetching recommendations:", err);
+      } finally {
+        setIsSimilarMoviesLoading(false);
+      }
+    };
+
+    fetchSimilarMovies();
   }, [movie]);
 
   useEffect(() => {
@@ -720,7 +790,20 @@ const MovieDetail = () => {
           </div>
           <div className="px-2 max-w-[1000px] mx-auto">
             <div className="flex items-center space-x-6">
-              <h4 className="text-lg">Recommend by genres of this movie</h4>
+              <h4 className="text-lg whitespace-nowrap">
+                <b>Recommend by genres of this movie</b>
+                <div className="flex gap-4 flex-wrap mt-4">
+                  {movie.genres?.map((genre) => (
+                    <span
+                      key={genre.id}
+                      className="bg-gray-700 px-4 py-1 rounded-full text-sm"
+                      //   onClick={() => handleGenreClick(genre.name)}
+                    >
+                      {genre.name}
+                    </span>
+                  ))}
+                </div>
+              </h4>
             </div>
             <ScrollArea className="w-full">
               <div className="flex gap-4 py-6">
@@ -729,6 +812,32 @@ const MovieDetail = () => {
                     return <MovieCardSkeleton key={idx} />;
                   })}
                 {recommendGenresMovies.map((movie) => {
+                  return (
+                    <RecommendMovieCard
+                      key={movie.tmdb_id}
+                      movie={movie}
+                      onClick={() => onMovieCardClick(movie.tmdb_id.toString())}
+                    />
+                  );
+                })}
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+          </div>
+
+          <div className="px-2 max-w-[1000px] mx-auto">
+            <div className="flex items-center space-x-6">
+              <h4 className="text-lg">
+                <b>Similar movies to you</b>
+              </h4>
+            </div>
+            <ScrollArea className="w-full">
+              <div className="flex gap-4 py-6">
+                {isSimilarMoviesLoading &&
+                  new Array(10).fill(null).map((_, idx) => {
+                    return <MovieCardSkeleton key={idx} />;
+                  })}
+                {similarMovies.map((movie) => {
                   return (
                     <RecommendMovieCard
                       key={movie.tmdb_id}
