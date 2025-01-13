@@ -25,6 +25,7 @@ import {
   Movie,
   MovieCast,
   MovieKeywords,
+  RecommendMovie,
   Review,
   Video,
 } from "@/app/api/types/movie.type";
@@ -61,6 +62,7 @@ import DeleteModal from "@/components/custom/delete-modal";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { MovieCard } from "@/components/custom/movie-card";
 import { useLazyRetrieveQuery } from "@/app/api/ai/ai-api-slice";
+import { RecommendMovieCard } from "@/components/custom/recommend-movie-card";
 const languageMap: { [key: string]: string } = {
   en: "English",
   vn: "Vietnamese",
@@ -131,7 +133,7 @@ const MovieDetail = () => {
   const hash = window.location.hash.substring(1);
   const [isRecommendGenresMoviesLoading, setIsRecommendGenresMoviesLoading] =
     useState(true);
-  const [recommendGenresMovies, setRecommendGenresMovies] = useState<Movie[]>(
+  const [recommendGenresMovies, setRecommendGenresMovies] = useState<RecommendMovie[]>(
     []
   );
   const [getRecommandMovie] = useLazyRecommendMovieQuery();
@@ -266,7 +268,7 @@ const MovieDetail = () => {
         for (const genre of movie.genres) {
           const { data, error } = await getMoviesFromAIRetriever({
             collection_name: "movies",
-            query: "Genre: "+ genre.toString(),
+            query: "Genre" + genre.name.toString(),
             amount: 10,
             threshold: 0.25,
           });
@@ -278,15 +280,23 @@ const MovieDetail = () => {
             );
             continue;
           }
-          console.log(data?.data?.data?.result);
+          // Giả sử movie.id là ID bạn muốn tránh thêm vào list
+          const movieIdToAvoid = movie.id;
+          
           if (data?.data) {
             const ids = data.data.data.result.map((res) => res.toString());
-            allIds.push(...ids);
+
+            ids.forEach((id) => {
+              if (id.toString() !== movieIdToAvoid.toString() && !allIds.includes(id)) {
+                allIds.push(id);
+              }
+            });
           }
+
           console.log(allIds);
         }
 
-        const allMovies: Movie[] = [];
+        const allMovies: RecommendMovie[] = [];
 
         for (const id of allIds) {
           const response = await getRecommandMovie({ movie_id: id });
@@ -710,7 +720,7 @@ const MovieDetail = () => {
           </div>
           <div className="px-2 max-w-[1000px] mx-auto">
             <div className="flex items-center space-x-6">
-              <h4 className="text-lg">Recommend by genres</h4>
+              <h4 className="text-lg">Recommend by genres of this movie</h4>
             </div>
             <ScrollArea className="w-full">
               <div className="flex gap-4 py-6">
@@ -720,10 +730,10 @@ const MovieDetail = () => {
                   })}
                 {recommendGenresMovies.map((movie) => {
                   return (
-                    <MovieCard
-                      key={movie.id}
+                    <RecommendMovieCard
+                      key={movie.tmdb_id}
                       movie={movie}
-                      onClick={() => onMovieCardClick(movie.id.toString())}
+                      onClick={() => onMovieCardClick(movie.tmdb_id.toString())}
                     />
                   );
                 })}

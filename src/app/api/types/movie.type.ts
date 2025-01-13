@@ -24,6 +24,53 @@ export type Movie =  {
   revenue: number;
 };
 
+export type Trailer = {
+    iso_639_1: string;
+    iso_3166_1: string;
+    name: string;
+    key: string;
+    site: string;
+    size: number;
+    type: string;
+    official: boolean;
+    published_at: string;  // Đổi kiểu Date thành string
+    id: string;
+  };
+  
+  export type Credit = {
+    id: number;
+  };
+  
+  export type RecommendMovie = {
+    adult: boolean;
+    backdrop_path: string;
+    _id: string;
+    tmdb_id: number;
+    title: string;
+    original_language: string;
+    original_title: string;
+    overview: string;
+    poster_path: string;
+    media_type: string;
+    genre_ids: number[];
+    popularity: number;
+    release_date: string;
+    video: boolean;
+    vote_average: number;
+    vote_count: number;
+    tagline: string;
+    genres: Genre[];
+    runtime: number;
+    status: string;
+    budget: number;
+    revenue: number;
+    credits: Credit[];
+    trailers: Trailer[];
+    similar_movies: { id: number; title: string; poster_path?: string; release_date?: string }[];
+    keywords: { id: number; name: string }[];
+    reviews: Review[];
+  };
+
 export type Genre = {
   id: number;
   name: string;
