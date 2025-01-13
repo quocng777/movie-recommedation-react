@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import ReactEmojis from "@souhaildev/reactemojis";
 import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 
 export const ratingScore = {
@@ -79,17 +78,7 @@ export const RatingPicker = (props: RatingPickerProps) => {
                 <Tooltip>
                   <TooltipTrigger>
                     <div key={rating.score} className={`p-2 rounded-full hover:bg-gray-500/60 cursor-pointer ${selectedRating === rating.score ? 'bg-gray-800' : ''}`} onClick={() => {onRatingClick(rating.score)}}>
-                      <ReactEmojis 
-                        emojiStyle="3"
-                        // @ts-ignore
-                        emoji={rating.emoji} 
-                        style={
-                          {
-                            "width": '32px',
-                            "height": '32px',
-                          }
-                        }
-                      />
+                    <p className="text-lg">{rating.emoji}</p>
                   </div>
                   </TooltipTrigger>
                   <TooltipContent>

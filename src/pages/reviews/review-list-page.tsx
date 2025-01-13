@@ -2,7 +2,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAddMovieReviewMutation, useDeleteMovieReviewMutation, useEditMovieReviewMutation, useLazyGetMovieReviewsQuery, useMovieDetailQuery } from "@/app/api/movies/movie-api-slice";
 import { Movie, Review } from "@/app/api/types/movie.type";
 import { useEffect, useState } from "react";
-import Pagination from "@/components/custom/pagination";
 import { useTopBarLoader } from "@/hooks/use-top-loader";
 import { Spinner } from "@/components/custom/spinner";
 import { ReviewCard } from "@/components/custom/review-card";
