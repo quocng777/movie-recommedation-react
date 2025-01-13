@@ -66,7 +66,7 @@ export default function Chatbot() {
           role: 'ai'
         }];
       })
-      navigate(`/movie/${data?.data?.params[0].id}#cast`);
+      navigate(`/movie/${data?.data?.params[0].tmdb_id}#cast`);
     }
   }, [isSuccess, data]);
 
