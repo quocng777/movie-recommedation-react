@@ -1,6 +1,7 @@
 # Node.js with React
 trigger:
 - main
+- azure
 
 pool:
   vmImage: ubuntu-latest
@@ -15,7 +16,6 @@ steps:
     npm install
     npm run build
   displayName: 'npm install and build'
-
 - task: AzureRmWebAppDeployment@4
   inputs:
     ConnectionType: 'AzureRM'
@@ -23,6 +23,3 @@ steps:
     appType: 'webApp'
     WebAppName: 'tmdb2-frontend'
     packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
-# Build a Node.js project that uses React.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
