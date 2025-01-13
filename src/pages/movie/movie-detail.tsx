@@ -25,6 +25,7 @@ import {
   Movie,
   MovieCast,
   MovieKeywords,
+  RecommendMovie,
   Review,
   Video,
 } from "@/app/api/types/movie.type";
@@ -61,6 +62,7 @@ import DeleteModal from "@/components/custom/delete-modal";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { MovieCard } from "@/components/custom/movie-card";
 import { useLazyRetrieveQuery } from "@/app/api/ai/ai-api-slice";
+import { RecommendMovieCard } from "@/components/custom/recommend-movie-card";
 const languageMap: { [key: string]: string } = {
   en: "English",
   vn: "Vietnamese",
@@ -131,7 +133,7 @@ const MovieDetail = () => {
   const hash = window.location.hash.substring(1);
   const [isRecommendGenresMoviesLoading, setIsRecommendGenresMoviesLoading] =
     useState(true);
-  const [recommendGenresMovies, setRecommendGenresMovies] = useState<Movie[]>(
+  const [recommendGenresMovies, setRecommendGenresMovies] = useState<RecommendMovie[]>(
     []
   );
   const [getRecommandMovie] = useLazyRecommendMovieQuery();
@@ -294,7 +296,7 @@ const MovieDetail = () => {
           console.log(allIds);
         }
 
-        const allMovies: Movie[] = [];
+        const allMovies: RecommendMovie[] = [];
 
         for (const id of allIds) {
           const response = await getRecommandMovie({ movie_id: id });
@@ -728,10 +730,10 @@ const MovieDetail = () => {
                   })}
                 {recommendGenresMovies.map((movie) => {
                   return (
-                    <MovieCard
-                      key={movie.id}
+                    <RecommendMovieCard
+                      key={movie.tmdb_id}
                       movie={movie}
-                      onClick={() => onMovieCardClick(movie.id.toString())}
+                      onClick={() => onMovieCardClick(movie.tmdb_id.toString())}
                     />
                   );
                 })}
