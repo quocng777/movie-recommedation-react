@@ -1,6 +1,6 @@
 import { apiSlice } from "../base/api-slice";
-import { AiNavigation } from "../types/ai-navigation.type";
-import { LlmApiRetrieverResponse, RetrieverResult } from "../types/llm.type";
+import { AiNavigation } from "../types/ai-response.type";
+import { LlmApiRetrieverResponse, RetrieverResult } from "../types/ai-response.type";
 import { Response } from "../types/response";
 
 export const aiApiSlice = apiSlice.injectEndpoints({
@@ -13,13 +13,13 @@ export const aiApiSlice = apiSlice.injectEndpoints({
       }),
     }),
     retrieve: builder.query<
-      Response<LlmApiRetrieverResponse<RetrieverResult<string>>>,
+      Response<RetrieverResult<string>>,
       { collection_name: string; query: string; amount: number; threshold: number }
     >({
       query: ({ collection_name, query, amount, threshold }) => ({
         url: `/ai/retriever`,
         method: 'GET',
-        params: { collection_name, query, amount, threshold }, // Truyền params dưới dạng đối tượng
+        params: { collection_name, query, amount, threshold },
       }),
     }),
   }),

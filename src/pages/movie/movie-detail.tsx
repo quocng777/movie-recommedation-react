@@ -288,16 +288,16 @@ const MovieDetail = () => {
           const movieIdToAvoid = movie.id;
 
           if (data?.data) {
-            const ids = data.data.data.result.map((res) => res.toString());
+            // const ids = data.data.data.result.map((res) => res.toString());
 
-            ids.forEach((id) => {
-              if (
-                id.toString() !== movieIdToAvoid.toString() &&
-                !allIds.includes(id)
-              ) {
-                allIds.push(id);
-              }
-            });
+            // ids.forEach((id) => {
+            //   if (
+            //     id.toString() !== movieIdToAvoid.toString() &&
+            //     !allIds.includes(id)
+            //   ) {
+            //     allIds.push(id);
+            //   }
+            // });
           }
 
           console.log(allIds);

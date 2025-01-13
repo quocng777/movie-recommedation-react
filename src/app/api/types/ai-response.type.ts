@@ -1,3 +1,9 @@
+export const AiOption  = {
+  NAVIGATE: 'Navigate',
+  LIST: 'List',
+  NATURAL_TEXT: 'Natural Text',
+}
+
 export enum NavigationRoute {
   SEARCH_PAGE = 'SEARCH_PAGE',
   CAST_PAGE = 'CAST_PAGE',
@@ -13,3 +19,12 @@ export interface AiNavigation {
   metadata: any;
   is_success: boolean;
 }
+
+export type LlmApiRetrieverResponse<T> = {
+  data: T;
+  status: number;
+};
+
+export type RetrieverResult<T> = {
+  result: T[];
+};

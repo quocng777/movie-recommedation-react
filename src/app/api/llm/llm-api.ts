@@ -1,4 +1,4 @@
-import { LlmApiRetrieverResponse, RetrieverResult } from "../types/llm.type";
+import { LlmApiRetrieverResponse, RetrieverResult } from "../types/ai-response.type";
 import { Movie } from "../types/movie.type";
 export const retrieveSimilarItems = async (
   query: string, 

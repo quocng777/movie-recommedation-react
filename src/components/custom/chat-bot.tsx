@@ -16,11 +16,11 @@ import { Button } from "../ui/button";
 import { Send } from "lucide-react";
 import { ChangeEvent, ChangeEventHandler, ReactNode, useEffect, useRef, useState } from "react";
 import { Robot } from "react-bootstrap-icons";
-import { useLazyAiNavigationQuery } from "@/app/api/ai/ai-api-slice";
-import { NavigationRoute } from "@/app/api/types/ai-navigation.type";
+import { useLazyAiNavigationQuery, useLazyRetrieveQuery } from "@/app/api/ai/ai-api-slice";
+import { AiOption, NavigationRoute } from "@/app/api/types/ai-response.type";
 import { useNavigate } from "react-router-dom";
-import { useLazyGetMoviesFromObjectIdsQuery } from "@/app/api/movies/movie-api-slice";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "../ui/select";
+import MovieLink from "./movie-link";
 
 export type Message = {
   role: string;
@@ -30,8 +30,25 @@ export type Message = {
 export default function Chatbot() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const [selectedValue, setSelectedValue] = useState("Navigate");
-  const [getAiNavigation, {isFetching: isGenerating, data, isSuccess, isError}] = useLazyAiNavigationQuery();
+  const [selectedValue, setSelectedValue] = useState(AiOption.NAVIGATE);
+  const [getAiNavigation, {isFetching: isGenerating, data: navigationData, isSuccess: isNavigated, isError: isNavigatedError}] = useLazyAiNavigationQuery();
+  const [getMoviesFromAIRetriever, {isFetching: isRetrieving, data: movieData, isSuccess: isRetrieved, isError: isRetrievedError}] = useLazyRetrieveQuery();
+
+  const aiRequestDispatch = (query: string) => {
+    if (selectedValue === AiOption.NAVIGATE) {
+      getAiNavigation({ query });
+    } 
+    else if (selectedValue === AiOption.LIST) {
+      getMoviesFromAIRetriever({
+        collection_name: "movies",
+        query,
+        amount: 5,
+        threshold: 0.25,
+      });
+    } 
+    else if (selectedValue === AiOption.NATURAL_TEXT) {
+    }
+  }
 
   const messagesRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -44,67 +61,142 @@ export default function Chatbot() {
   }, [messages]);
 
   useEffect(() => {
-    if(!isSuccess) {
+    if (!isNavigated) {
       return;
     }
-    if(data?.data?.route == NavigationRoute.NONE) {
+    console.log("navigationData", navigationData);
+
+    if (navigationData?.data?.route == NavigationRoute.NONE) {
       setMessages((prev) => {
-        return [...prev, {
-          content: "Sorry, I can't find any information with your query 😔",
-          role: 'ai'
-        }];
-      })
-    } else if (data.data?.route == NavigationRoute.SEARCH_PAGE) {
-      const displayParams = data?.data?.params.keyword ? " with keyword" + data?.data?.params.keyword : "";
-      setMessages((prev) => {
-        return [...prev, {
-          content: `I redirected you site to find related movies${displayParams}' 🚀`,
-          role: 'ai'
-        }];
-      })
-      navigate(`/movie/search?query=${data?.data?.params.keyword}`);
-    } else if (data.data?.route == NavigationRoute.MOVIE_PAGE) {
-      const displayParams = data?.data?.params[0].name ? " " + data?.data?.params[0].displayParams : "";
-      setMessages((prev) => {
-        return [...prev, {
-          content: `😆, I found the movie${displayParams}, redirected the detailed site for you 🚀`,
-          role: 'ai'
-        }];
+        return [
+          ...prev,
+          {
+            content: "Sorry, I can't find any information with your query 😔",
+            role: "ai",
+          },
+        ];
       });
-      navigate(`/movie/${data?.data?.params[0].id}`);
-    } else if (data.data?.route == NavigationRoute.GENRE_PAGE) {
-      let displayParams = data?.data?.params.map((item : { name: string, id: number}) => item.name).join(", ");
+    } else if (navigationData.data?.route == NavigationRoute.SEARCH_PAGE) {
+      const displayParams = navigationData?.data?.params.keyword
+        ? " with keyword" + navigationData?.data?.params.keyword
+        : "";
+      setMessages((prev) => {
+        return [
+          ...prev,
+          {
+            content: `I redirected you site to find related movies${displayParams}' 🚀`,
+            role: "ai",
+          },
+        ];
+      });
+      navigate(`/movie/search?query=${navigationData?.data?.params.keyword}`);
+    } else if (navigationData.data?.route == NavigationRoute.MOVIE_PAGE) {
+      const displayParams = navigationData?.data?.params[0].name
+        ? " " + navigationData?.data?.params[0].displayParams
+        : "";
+      setMessages((prev) => {
+        return [
+          ...prev,
+          {
+            content: `😆, I found the movie${displayParams}, redirected the detailed site for you 🚀`,
+            role: "ai",
+          },
+        ];
+      });
+      navigate(`/movie/${navigationData?.data?.params[0].id}`);
+    } else if (navigationData.data?.route == NavigationRoute.GENRE_PAGE) {
+      let displayParams = navigationData?.data?.params
+        .map((item: { name: string; id: number }) => item.name)
+        .join(", ");
       displayParams = displayParams ? " with genres " + displayParams : "";
       setMessages((prev) => {
-        return [...prev, {
-          content: `😆, I found some movies matching your requirement${displayParams}, redirected to the site for you 🚀`,
-          role: 'ai'
-        }];
+        return [
+          ...prev,
+          {
+            content: `😆, I found some movies matching your requirement${displayParams}, redirected to the site for you 🚀`,
+            role: "ai",
+          },
+        ];
       });
-      navigate(`/movie?genres=${data?.data?.params.map((item : { name: string, id: number}) => item.id).join(",")}`);
-    } else if (data.data?.route == NavigationRoute.CAST_PAGE) {
+      navigate(
+        `/movie?genres=${navigationData?.data?.params
+          .map((item: { name: string; id: number }) => item.id)
+          .join(",")}`
+      );
+    } else if (navigationData.data?.route == NavigationRoute.CAST_PAGE) {
       setMessages((prev) => {
-        const displayParams = data?.data?.params[0].name ? " " + data?.data?.params[0].name : "";
-        return [...prev, {
-          content: `😆, I found some actors for the film${displayParams}, redirected the site for you`,
-          role: 'ai'
-        }];
-      })
-      navigate(`/movie/${data?.data?.params[0].id}#cast`);
+        const displayParams = navigationData?.data?.params[0].name
+          ? " " + navigationData?.data?.params[0].name
+          : "";
+        return [
+          ...prev,
+          {
+            content: `😆, I found some actors for the film${displayParams}, redirected the site for you`,
+            role: "ai",
+          },
+        ];
+      });
+      navigate(`/movie/${navigationData?.data?.params[0].id}#cast`);
     }
-  }, [isSuccess, data]);
+  }, [isNavigated, navigationData]);
 
   useEffect(() => {
-    if(!isError) {
+    if (!isRetrieved) {
+      return;
+    }
+    console.log("movieData", movieData);
+
+    if (movieData?.data?.result.length === 0) {
+      setMessages((prev) => {
+        return [
+          ...prev,
+          {
+            content: "Sorry, I can't find any information with your query 😔",
+            role: "ai",
+          },
+        ];
+      });
+    } else {
+      setMessages((prev) => {
+        return [
+          ...prev,
+          {
+            content: (
+              <div>
+                <span>I found some movies related to your query 🚀</span>
+                <ul>
+                  {movieData?.data?.result.map((movie: any) => (
+                    <li key={movie.tmdb_id}>
+                      <MovieLink
+                        movieId={movie.id}
+                        movieName={movie.title}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ),
+            role: "ai",
+          },
+        ];
+      });
+    }
+  }, [isRetrieved, movieData]);
+
+  useEffect(() => {
+    if (!isNavigatedError && !isRetrievedError) {
       return;
     }
     setMessages((prev) => {
-      return [...prev, {
-        content: "🥲, something went wrong. Please try again later.",
-        role: 'ai'
-      }];
-    })
-  }, [isError])
+      return [
+        ...prev,
+        {
+          content: "🥲, something went wrong. Please try again later.",
+          role: "ai",
+        },
+      ];
+    });
+  }, [isNavigatedError, isRetrievedError]);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -118,7 +210,7 @@ export default function Chatbot() {
       }]
     })
     setInput('');
-    getAiNavigation({query: input});
+    aiRequestDispatch(input);
   };
 
   const onInputChange: ChangeEventHandler = (event: ChangeEvent<HTMLInputElement>) => {
@@ -133,9 +225,9 @@ export default function Chatbot() {
           <Select defaultValue={selectedValue} onValueChange={setSelectedValue}>
             <SelectTrigger className="text-xs w-28">{selectedValue}</SelectTrigger>
             <SelectContent>
-              <SelectItem value="Navigate">Navigate</SelectItem>
-              <SelectItem value="Card">Card</SelectItem>
-              <SelectItem value="Text">Text</SelectItem>
+              <SelectItem value={AiOption.NAVIGATE}>{AiOption.NAVIGATE}</SelectItem>
+              <SelectItem value={AiOption.LIST}>{AiOption.LIST}</SelectItem>
+              <SelectItem value={AiOption.NATURAL_TEXT}>{AiOption.NATURAL_TEXT}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -172,7 +264,7 @@ export default function Chatbot() {
             ))}
 
           {/* Loading */}
-          {isGenerating && (
+          {(isGenerating || isRetrieving) && (
             <ChatBubble variant="received">
               <ChatBubbleAvatar src="" fallback="🤖" />
               <ChatBubbleMessage isLoading />
