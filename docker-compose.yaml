@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  frontend:
+    container_name: frontend
+    build:
+      context: .
+      dockerfile: ${DOCKERFILE:-Dockerfile.prod}
+    ports:
+      - "5173:80"
