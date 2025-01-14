@@ -240,7 +240,7 @@ const MovieListPage = () => {
         <title>Movie list</title>
       </Helmet>
       <div className="w-full max-w-[1440px] flex flex-row p-6 space-x-6">
-        <div className="w-[300px] flex-shrink-0 space-y-4">
+        <div className="w-[300px] flex-shrink-0 space-y-4 mt-12">
           <Accordion
             type="single"
             collapsible
@@ -465,7 +465,7 @@ const MovieListPage = () => {
             Apply Filters
           </Button>
         </div>
-        <div className="flex-grow p-6 w-full">
+        <div className="flex-grow px-4 w-full">
           <div className="flex flex-row justify-between items-center mb-4">
             <TooltipProvider>
               <Tooltip>

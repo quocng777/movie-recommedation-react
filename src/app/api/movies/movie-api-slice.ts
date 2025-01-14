@@ -1,7 +1,7 @@
 import { apiSlice } from "../base/api-slice";
 import { Response } from "../types/response";
 import { apiEndpoints } from "../constants";
-import { Movie, MovieCast, MovieCastResponse, MovieMediaType, MovieTrendingDuration, MovieTrendingType, TmdbPageResponse, MovieKeywords, MovieKeywordsResponse, SearchKeyword, MovieVideo, Genre, Review, Rating, RecommendMovie } from "../types/movie.type";
+import { Movie, MovieCast, MovieCastResponse, MovieMediaType, MovieTrendingDuration, MovieTrendingType, TmdbPageResponse, MovieKeywords, MovieKeywordsResponse, SearchKeyword, MovieVideo, Genre, Review, Rating } from "../types/movie.type";
 import { FilterParams } from "../types/params.type";
 import { SortOptions } from "../constants/sort-options";
 
