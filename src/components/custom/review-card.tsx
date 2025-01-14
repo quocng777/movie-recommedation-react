@@ -66,8 +66,8 @@ export const ReviewCard = ({
             </Tooltip>
             <Tooltip>
               <TooltipTrigger>
-                <Button 
-                  className="bg-transparent hover:bg-gray-800" 
+                <Button
+                  className="bg-transparent hover:bg-gray-800"
                   onClick={onDelete}
                 >
                   <Trash2 className="text-white" />
@@ -88,11 +88,11 @@ export const ReviewCard = ({
           }}
           ref={contentRef}
         >
-          <div className="flex flex-col mt-2 p-2">
-            <div
+          <div className="flex flex-col mt-2 p-2  prose prose-invert">
+            <article
               className="text-gray-300 transition-all duration-100"
               dangerouslySetInnerHTML={{ __html: comment }}
-            ></div>
+            ></article>
             {contentRef.current?.scrollHeight &&
               contentRef.current?.scrollHeight > defaultContentHeight &&
               !isExpanded && (
