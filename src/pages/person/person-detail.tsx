@@ -8,7 +8,7 @@ import {
   useLazyPersonCombinedCreditsQuery,
 } from "@/app/api/person/person-api-slice";
 import { getResourceFromTmdb } from "@/lib/helpers/get-resource-tmbd";
-import { Credit, Person } from "@/app/api/types/person.type";
+import { Person } from "@/app/api/types/person.type";
 import { MovieCreditsCard } from "@/components/custom/movie-credits-card";
 
 function getGenderText(gender: number | undefined): string {
