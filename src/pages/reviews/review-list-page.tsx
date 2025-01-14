@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useAddMovieReviewMutation, useDeleteMovieReviewMutation, useEditMovieReviewMutation, useLazyGetMovieReviewsQuery, useMovieDetailQuery } from "@/app/api/movies/movie-api-slice";
 import { Movie, Review } from "@/app/api/types/movie.type";
 import { useEffect, useState } from "react";
@@ -12,13 +12,19 @@ import EditorDialog from "@/components/custom/editor-dialog";
 import dayjs from "dayjs";
 import { toast } from "@/hooks/use-toast";
 import DeleteModal from "@/components/custom/delete-modal";
+import Pagination from "@/components/custom/pagination";
 
 const ReviewListPage = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const movieId = id ? parseInt(id) : 0;
+  const [searchParams] = useSearchParams();
+  const pageFromParams = searchParams.get("page")
+    ? parseInt(searchParams.get("page")!)
+    : 1;
   const { staticStart: startTopBarLoader, complete: completeTopBarLoader } = useTopBarLoader();
 
+  const [currentPage, setCurrentPage] = useState(pageFromParams);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -47,8 +53,8 @@ const ReviewListPage = () => {
       setIsLoading(true);
     }
 
-    getReviews(movieId);
-  }, [movieId, getReviews]);
+    getReviews({movieId, page: currentPage, limit: 10});
+  }, [movieId, currentPage, getReviews]);
 
   useEffect(() => {
     if (isGetReviewsSuccess) {
@@ -73,7 +79,7 @@ const ReviewListPage = () => {
     if (!isAddReviewgSuccess) {
       return;
     }
-    getReviews(movieId);
+    getReviews({ movieId, page: currentPage, limit: 10 });
     setOpenAddReviewDialog(false);
     toast({
       title: "Success",
@@ -96,7 +102,7 @@ const ReviewListPage = () => {
       return;
     }
     setOpenEditReviewDialog(false);
-    getReviews(movieId);
+    getReviews({ movieId, page: currentPage, limit: 10 });
     toast({
       title: "Success",
       description: `Edited review for ${movie?.title}`,
@@ -118,7 +124,7 @@ const ReviewListPage = () => {
       return;
     }
     setOpenDeleteReviewDialog(false);
-    getReviews(movie ? movie.id : 0);
+    getReviews({ movieId, page: currentPage, limit: 10 });
     toast({
       title: "Success",
       description: `Deleted review for ${movie?.title}`,
@@ -131,7 +137,7 @@ const ReviewListPage = () => {
       content: comment,
     });
 
-    getReviews(movieId ? movieId : 0);
+    getReviews({ movieId, page: currentPage, limit: 10 });
   };
 
   const handleEditReview = (reviewId: number, comment: string) => {
@@ -144,6 +150,10 @@ const ReviewListPage = () => {
 
   const handleDeleteReview = (reviewId: number) => {
     deleteReview({ reviewId, movieId });
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   return (
@@ -198,16 +208,25 @@ const ReviewListPage = () => {
         </div>
       </div>
       <div className="max-w-[1200px] container mx-auto p-4">
-        <EditorDialog
-          triggerElement={
-            <Button className="text-gray-200 rounded-full bg-rose-900 text-gray-300 hover:bg-rose-800 hover:text-white py-2 px-4">
-              Add New Review
-            </Button>
-          }
-          open={openAddReviewDialog}
-          onOpenChange={setOpenAddReviewDialog}
-          onSave={handleAddReview}
-        />
+        <div className="flex flex-row justify-between items-center my-2">
+          <h3 className="text-xl font-bold mb-4">
+            {isGetReviewsSuccess && reviewData && reviewData.data && (
+              <span className="inline-flex items-center text-lg font-medium">
+                Showing {reviewData.data.reviews.length} of {reviewData.data.total} reviews
+              </span>
+            )}
+          </h3>
+          <EditorDialog
+            triggerElement={
+              <Button className="text-gray-200 rounded-full bg-rose-900 text-gray-300 hover:bg-rose-800 hover:text-white py-2 px-4">
+                Add New Review
+              </Button>
+            }
+            open={openAddReviewDialog}
+            onOpenChange={setOpenAddReviewDialog}
+            onSave={handleAddReview}
+          />
+        </div>
         <div className="px-8 py-6">
           {isLoading ? (
             <div className="flex justify-center items-center h-40">
@@ -236,13 +255,13 @@ const ReviewListPage = () => {
             </p>
           )}
         </div>
-        {/* {isGetReviewsSuccess && reviewData?.data && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={searchResultData.data?.total_pages!}
-          onPageChange={handlePageChange}
-        />
-      )} */}
+        {isGetReviewsSuccess && reviewData?.data && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={reviewData.data?.total_pages!}
+            onPageChange={handlePageChange}
+          />
+        )}
         <EditorDialog
           open={openEditReviewDialog}
           onOpenChange={setOpenEditReviewDialog}

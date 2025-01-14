@@ -202,9 +202,9 @@ export const movieApiSlice = apiSlice.injectEndpoints({
           })
         }),
 
-        getMovieReviews: builder.query<Response<{total: number, reviews: Review[]}>, number>({
-          query: (movieId) => ({
-            url: `/movies/${movieId}/reviews`,
+        getMovieReviews: builder.query<Response<{total: number, reviews: Review[], total_pages: number, current_page: number}>, {movieId: number, page: number, limit: number}>({
+          query: ({movieId, page, limit}) => ({
+            url: `/movies/${movieId}/reviews?limit=${limit}&page=${page}`,
             method: 'GET',
           })
         }),
