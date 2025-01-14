@@ -270,7 +270,7 @@ const MovieDetail = () => {
       const { data, error: apiError } = await getMoviesFromAIRetriever({
           collection_name: "movies",
           query:
-            "Find recommendation movies based on Genres: " +
+            "Recommendation movies based on Genres: " +
             movie.genres.join(","),
           amount: 10,
           threshold: 0.25,
@@ -739,13 +739,12 @@ const MovieDetail = () => {
             <div className="px-2 max-w-[1000px] mx-auto">
               <div className="flex items-center space-x-6">
                 <h4 className="text-lg whitespace-nowrap">
-                  <b>Recommend by genres of this movie</b>
+                  <b>Based on this movie's genres</b>
                   <div className="flex gap-4 flex-wrap mt-4">
                     {movie.genres?.map((genre) => (
                       <span
                         key={genre.id}
                         className="bg-gray-700 px-4 py-1 rounded-full text-sm"
-                        //   onClick={() => handleGenreClick(genre.name)}
                       >
                         {genre.name}
                       </span>
@@ -764,9 +763,7 @@ const MovieDetail = () => {
                       <MovieCard
                         key={movie.id}
                         movie={movie}
-                        onClick={() =>
-                          onMovieCardClick(movie.id.toString())
-                        }
+                        onClick={() => onMovieCardClick(movie.id.toString())}
                       />
                     );
                   })}
@@ -778,7 +775,7 @@ const MovieDetail = () => {
             <div className="px-2 max-w-[1000px] mx-auto">
               <div className="flex items-center space-x-6">
                 <h4 className="text-lg">
-                  <b>Similar movies to you</b>
+                  <b>Similar movies</b>
                 </h4>
               </div>
               <ScrollArea className="w-full">
@@ -792,9 +789,7 @@ const MovieDetail = () => {
                       <MovieCard
                         key={movie.id}
                         movie={movie}
-                        onClick={() =>
-                          onMovieCardClick(movie.id.toString())
-                        }
+                        onClick={() => onMovieCardClick(movie.id.toString())}
                       />
                     );
                   })}
