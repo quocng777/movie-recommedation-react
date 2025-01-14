@@ -13,6 +13,8 @@ import dayjs from "dayjs";
 import { toast } from "@/hooks/use-toast";
 import DeleteModal from "@/components/custom/delete-modal";
 import Pagination from "@/components/custom/pagination";
+import { useSelector } from "react-redux";
+import { RootState } from "@/app/api/store";
 
 const ReviewListPage = () => {
   const navigate = useNavigate();
@@ -27,6 +29,7 @@ const ReviewListPage = () => {
   const [currentPage, setCurrentPage] = useState(pageFromParams);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const isAuthenticated = useSelector((state: RootState) => !!state.auth.user);
 
   const [getReviews, { data: reviewData, isSuccess: isGetReviewsSuccess }] = useLazyGetMovieReviewsQuery();
   const { data: movieData, isSuccess: isGetMovieSuccess } = useMovieDetailQuery({id : movieId.toString()});
@@ -71,7 +74,8 @@ const ReviewListPage = () => {
     }
     toast({
       title: "Error",
-      description: `Error when added review for ${movie?.title} 😰`,
+      variant: "destructive",
+      description: `Error when added review for ${movie?.title} 😰. ${!isAuthenticated ? "Please log in to use this feature." : ""}`,
     });
   });
 
@@ -93,6 +97,7 @@ const ReviewListPage = () => {
     }
     toast({
       title: "Error",
+      variant: "destructive",
       description: `Error when edited review for ${movie?.title} 😰`,
     });
   });
@@ -115,6 +120,7 @@ const ReviewListPage = () => {
     }
     toast({
       title: "Error",
+      variant: "destructive",
       description: `Error when deleted review for ${movie?.title} 😰`,
     });
   });
