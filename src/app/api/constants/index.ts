@@ -13,7 +13,8 @@ export const apiEndpoints = {
     LIKED_MOVIE: '/movies/liked',
     WATCH_LATER: '/movies/watch-later',
     MOVIE_GENRES: '/tmdb/genre/movie/list',
-    PERSON : "/tmdb/person",
+    // PERSON : "/tmdb/person",
+    PERSON : "/people",
     MOVIE_CREDITS: "/movie_credits"
 };
 

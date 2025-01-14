@@ -47,12 +47,14 @@ const PersonDetail = () => {
       setIsLoading(true);
       getPersonDetail({ person_id });
       getPersonMovieCredit({ person_id });
+      setIsMovieLoading(true);
     }
   }, [person_id]);
   useEffect(() => {
     if (IsSuccessGetPersonDetail && personData) {
       setPerson(personData.data);
       setIsLoading(false);
+      setIsMovieLoading(false);
     }
   }, [IsSuccessGetPersonDetail, personData]);
   useEffect(() => {
@@ -64,7 +66,8 @@ const PersonDetail = () => {
   }, [IsSuccessGetPersonMovieCredit, movieData]);
 
   if (isLoading) return <FallbackScreen />;
-  const sortedCredits = credits
+  if (!person) return <FallbackScreen />;
+  const sortedCredits = person.movie_credits.cast
     .map((credit) => ({
       ...credit,
       releaseYear: credit.release_date
@@ -138,7 +141,7 @@ const PersonDetail = () => {
                 new Array(10).fill(null).map((_, idx) => {
                   return <MovieCardSkeleton key={idx} />;
                 })}
-              {credits.map((credit) => {
+              {person?.movie_credits.cast.map((credit) => {
                 return (
                   <MovieCreditsCard
                     key={credit.id}
