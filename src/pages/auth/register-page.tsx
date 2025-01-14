@@ -102,7 +102,7 @@ const RegisterPage = () => {
               <title>Register</title>
             </Helmet>
             <div className="max-w-[480px] w-full flex justify-center flex-col items-center max-md:hidden">
-                <h3 className=" text-4xl font-semibold">PopcornBox</h3>
+                <h3 className=" text-4xl font-semibold">TMDB2</h3>
                 <img src={authBgImage}/>
             </div>
             <RegisterForm 
