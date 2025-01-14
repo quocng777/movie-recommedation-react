@@ -14,6 +14,7 @@ export type Person = {
   place_of_birth: string;
   popularity: number;
   profile_path: string;
+movie_credits: PersonMovieCreditsResponse<Credit>;
 };
 
 export type PersonMovieCreditsResponse<T> = {
