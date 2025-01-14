@@ -136,10 +136,12 @@ const MovieDetail = () => {
   const castSectionRef = useRef<HTMLDivElement>(null);
   const hash = window.location.hash.substring(1);
   const [isRecommendGenresMoviesLoading, setIsRecommendGenresMoviesLoading] = useState(true);
-  const [recommendGenresMovies, setRecommendGenresMovies] = useState<Movie[]>([]);
   
   const [getMoviesFromAIRetriever] = useLazyRetrieveQuery();
+  const [recommendGenresMovies, setRecommendGenresMovies] = useState<Movie[]>([]);
   const [similarMovies, setSimilarMovies] = useState<Movie[]>([]);
+  const [recommendationError, setRecommendationError] = useState<string | null>(null);
+  const [similarError, setSimilarError] = useState<string | null>(null);
 
   const onLikeMovieClick: MouseEventHandler = () => {
     if (!isAuthenticated) {
@@ -281,7 +283,7 @@ const MovieDetail = () => {
       });
 
       if (apiError || !data?.data) {
-        setError("Error fetching recommendations");
+        setRecommendationError("Error fetching recommendations");
         return;
       }
 
@@ -316,7 +318,7 @@ const MovieDetail = () => {
       });
 
       if (apiError || !data?.data) {
-        setError("Error fetching recommendations");
+        setSimilarError("Error fetching similar movies");
         return;
       }
 
@@ -509,7 +511,10 @@ const MovieDetail = () => {
                 className="w-full h-auto rounded-lg shadow-lg"
               />
             ) : (
-              <DefaultImage alt={movie.title} className="w-52 h-72 rounded-lg shadow-lg" />
+              <DefaultImage
+                alt={movie.title}
+                className="w-52 h-72 rounded-lg shadow-lg"
+              />
             )}
           </div>
 
@@ -518,7 +523,9 @@ const MovieDetail = () => {
               <h1 className="text-5xl font-bold">{movie.title}</h1>
             </div>
             <span className="text-lg">
-              {movie.release_date ? dayjs(movie.release_date).format("MMM DD YYYY") : ""}
+              {movie.release_date
+                ? dayjs(movie.release_date).format("MMM DD YYYY")
+                : ""}
             </span>
             <div className="flex gap-4 flex-wrap mt-4">
               {movie.genres?.map((genre) => (
@@ -777,19 +784,27 @@ const MovieDetail = () => {
               </div>
               <ScrollArea className="w-full">
                 <div className="flex gap-4 py-6">
-                  {isRecommendGenresMoviesLoading &&
-                    new Array(10).fill(null).map((_, idx) => {
-                      return <MovieCardSkeleton key={idx} />;
-                    })}
-                  {recommendGenresMovies.map((movie) => {
-                    return (
-                      <MovieCard
-                        key={movie.id}
-                        movie={movie}
-                        onClick={() => onMovieCardClick(movie.id.toString())}
-                      />
-                    );
-                  })}
+                  {recommendationError ? (
+                    <div>{recommendationError}</div>
+                  ) : (
+                    <>
+                      {isRecommendGenresMoviesLoading &&
+                        new Array(10).fill(null).map((_, idx) => {
+                          return <MovieCardSkeleton key={idx} />;
+                        })}
+                      {recommendGenresMovies.map((movie) => {
+                        return (
+                          <MovieCard
+                            key={movie.id}
+                            movie={movie}
+                            onClick={() =>
+                              onMovieCardClick(movie.id.toString())
+                            }
+                          />
+                        );
+                      })}
+                    </>
+                  )}
                 </div>
                 <ScrollBar orientation="horizontal" />
               </ScrollArea>
@@ -803,19 +818,27 @@ const MovieDetail = () => {
               </div>
               <ScrollArea className="w-full">
                 <div className="flex gap-4 py-6">
-                  {isSimilarMoviesLoading &&
-                    new Array(10).fill(null).map((_, idx) => {
-                      return <MovieCardSkeleton key={idx} />;
-                    })}
-                  {similarMovies.map((movie) => {
-                    return (
-                      <MovieCard
-                        key={movie.id}
-                        movie={movie}
-                        onClick={() => onMovieCardClick(movie.id.toString())}
-                      />
-                    );
-                  })}
+                  {similarError ? (
+                    <div>{similarError}</div>
+                  ) : (
+                    <>
+                      {isSimilarMoviesLoading &&
+                        new Array(10).fill(null).map((_, idx) => {
+                          return <MovieCardSkeleton key={idx} />;
+                        })}
+                      {similarMovies.map((movie) => {
+                        return (
+                          <MovieCard
+                            key={movie.id}
+                            movie={movie}
+                            onClick={() =>
+                              onMovieCardClick(movie.id.toString())
+                            }
+                          />
+                        );
+                      })}
+                    </>
+                  )}
                 </div>
                 <ScrollBar orientation="horizontal" />
               </ScrollArea>
