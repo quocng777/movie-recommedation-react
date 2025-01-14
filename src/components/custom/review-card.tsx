@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { ChevronDoubleDown, ChevronDoubleUp } from "react-bootstrap-icons";
@@ -23,9 +23,16 @@ export const ReviewCard = ({
 }: ReviewCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
+  const [contentHeight, setContentHeight] = useState<number>(0);
   const defaultContentHeight = 120;
   const authUserId = useSelector((state: RootState) => state.auth.user?.id);
   const editable = authUserId === user.id;
+
+  useLayoutEffect(() => {
+    if (contentRef.current) {
+      setContentHeight(contentRef.current.scrollHeight);
+    }
+  }, [comment]);
 
   return (
     <div className="bg-gray-rose-gradient rounded-xl shadow-xl p-4 mb-6 w-full">
@@ -93,23 +100,20 @@ export const ReviewCard = ({
               className="text-gray-300 transition-all duration-100"
               dangerouslySetInnerHTML={{ __html: comment }}
             ></article>
-            {contentRef.current?.scrollHeight &&
-              contentRef.current?.scrollHeight > defaultContentHeight &&
-              !isExpanded && (
-                <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-gray-900/50 to-transparent pointer-events-none"></div>
-              )}
+            {contentHeight > defaultContentHeight && !isExpanded && (
+              <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-gray-900/50 to-transparent pointer-events-none"></div>
+            )}
           </div>
         </div>
 
-        {contentRef.current?.scrollHeight &&
-          contentRef.current?.scrollHeight > defaultContentHeight && (
-            <Button
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="w-full border-none text-gray-200 rounded-full bg-transparent hover:bg-transparent hover:text-rose-700 transition-all duration-200"
-            >
-              {isExpanded ? <ChevronDoubleUp /> : <ChevronDoubleDown />}
-            </Button>
-          )}
+        {contentHeight > defaultContentHeight && (
+          <Button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="w-full border-none text-gray-200 rounded-full bg-transparent hover:bg-transparent hover:text-rose-700 transition-all duration-200"
+          >
+            {isExpanded ? <ChevronDoubleUp /> : <ChevronDoubleDown />}
+          </Button>
+        )}
       </div>
     </div>
   );
