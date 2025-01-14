@@ -1,7 +1,7 @@
 export const AiOption  = {
   NAVIGATE: 'Navigate',
-  LIST: 'List',
-  NATURAL_TEXT: 'Natural Text',
+  LIST: 'Search',
+  NATURAL_TEXT: 'Chat',
 }
 
 export enum NavigationRoute {

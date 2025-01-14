@@ -364,7 +364,8 @@ const MovieDetail = () => {
     setSelectedRating(0);
     toast({
       title: "Error",
-      description: `Error when added rating for ${movie?.title} 😰`,
+      variant: "destructive",
+      description: `Error when added rating for ${movie?.title} 😰. ${!isAuthenticated ? "Please log in to use this feature." : ""}`,
     });
   });
 
@@ -392,9 +393,11 @@ const MovieDetail = () => {
     if (!isAddReviewError) {
       return;
     }
+
     toast({
       title: "Error",
-      description: `Error when added review for ${movie?.title} 😰`,
+      variant: "destructive",
+      description: `Error when added review for ${movie?.title} 😰. ${!isAuthenticated ? "Please log in to use this feature." : ""}`,
     });
   });
 
@@ -416,6 +419,7 @@ const MovieDetail = () => {
     }
     toast({
       title: "Error",
+      variant: "destructive",
       description: `Error when edited review for ${movie?.title} 😰`,
     });
   });
@@ -438,6 +442,7 @@ const MovieDetail = () => {
     }
     toast({
       title: "Error",
+      variant: "destructive",
       description: `Error when deleted review for ${movie?.title} 😰`,
     });
   });
