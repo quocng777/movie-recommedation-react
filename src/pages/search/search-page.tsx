@@ -139,7 +139,7 @@ const SearchPage = () => {
             </p>
         }
       </div>
-      {isGetSearchResultSuccess && searchResultData?.data && (
+      {isGetSearchResultSuccess && searchResultData?.data && searchResultData.data.results.length > 0 && (
         <Pagination
           currentPage={currentPage}
           totalPages={searchResultData.data?.total_pages!}

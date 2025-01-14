@@ -13,8 +13,9 @@ import {
   useDeleteMovieRatingMutation,
   useDeleteMovieReviewMutation,
   useEditMovieReviewMutation,
-  useGetMovieRatingQuery,
+  useLazyGetAverageMovieRatingQuery,
   useLazyGetMovieLatestReviewQuery,
+  useLazyGetMovieRatingQuery,
   useLazyMovieCastQuery,
   useLazyMovieDetailQuery,
   useLazyMovieKeywordsQuery,
@@ -60,6 +61,9 @@ import DeleteModal from "@/components/custom/delete-modal";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useLazyRetrieveQuery } from "@/app/api/ai/ai-api-slice";
 import { MovieCard } from "@/components/custom/movie-card";
+import { get } from "http";
+import dayjs from "dayjs";
+import DefaultImage from "@/components/custom/default-image";
 const languageMap: { [key: string]: string } = {
   en: "English",
   vn: "Vietnamese",
@@ -97,13 +101,15 @@ const MovieDetail = () => {
   const [trailer, setTrailer] = useState<Video | undefined>();
   const [openTrailerDialog, setOpenTrailerDialog] = useState(false);
   const [openRatingPopover, setOpenRatingPopover] = useState(false);
-  const { data: ratingData, isSuccess: isGetRatingSuccess } =
-    useGetMovieRatingQuery(parseInt(id!));
+  const [getRating, { data: ratingData, isSuccess: isGetRatingSuccess }] =
+    useLazyGetMovieRatingQuery();
+  const [getAverageRating, { data: avgRatingData, isSuccess: isGetAverageRatingSuccess }] = useLazyGetAverageMovieRatingQuery();
   const [
     addMovieRating,
     { isSuccess: isAddRatingSuccess, isError: isAddRatingError },
   ] = useAddMovieRatingMutation();
   const [selectedRating, setSelectedRating] = useState(0);
+  const [averageRating, setAverageRating] = useState(0);
   const [deleteMovieRating] = useDeleteMovieRatingMutation();
   const isDbClickCalled = useRef(false);
   const [openAddReviewDialog, setOpenAddReviewDialog] = useState(false);
@@ -130,12 +136,10 @@ const MovieDetail = () => {
   ] = useDeleteMovieReviewMutation();
   const castSectionRef = useRef<HTMLDivElement>(null);
   const hash = window.location.hash.substring(1);
-  const [isRecommendGenresMoviesLoading, setIsRecommendGenresMoviesLoading] =
-    useState(true);
-  const [recommendGenresMovies, setRecommendGenresMovies] = useState<
-    Movie[]
-  >([]);
-
+  const [isRecommendGenresMoviesLoading, setIsRecommendGenresMoviesLoading] = useState(true);
+  const [recommendGenresMovies, setRecommendGenresMovies] = useState<Movie[]>([]);
+  
+  const [getMoviesFromAIRetriever] = useLazyRetrieveQuery();
   const [similarMovies, setSimilarMovies] = useState<Movie[]>([]);
 
   const onLikeMovieClick: MouseEventHandler = () => {
@@ -234,6 +238,7 @@ const MovieDetail = () => {
       setIsSimilarMoviesLoading(true);
       setError(null);
       getMovieDetail({ id });
+      getRating(parseInt(id));
       getMovieCast({ id });
       getMovieKeywords({ id });
       getLatestReviews({ movieId: parseInt(id), limit: 1 });
@@ -243,6 +248,7 @@ const MovieDetail = () => {
   useEffect(() => {
     if (isGetMovieDataSuccess && movieData) {
       setMovie(movieData.data);
+      setAverageRating(movieData?.data?.vote_average!);
       setIsLoading(false);
     }
     if (apiError) {
@@ -258,7 +264,6 @@ const MovieDetail = () => {
     }
   }, [isGetMovieDataSuccess, movieData, apiError]);
 
-  const [getMoviesFromAIRetriever] = useLazyRetrieveQuery();
   
   useEffect(() => {
     const fetchRecommendations = async () => {
@@ -270,10 +275,10 @@ const MovieDetail = () => {
       const { data, error: apiError } = await getMoviesFromAIRetriever({
           collection_name: "movies",
           query:
-            "Recommendation movies based on Genres: " +
+            "Best movies of these genres:" +
             movie.genres.join(","),
           amount: 10,
-          threshold: 0.25,
+          threshold: 0.5,
       });
 
       if (apiError || !data?.data) {
@@ -296,8 +301,8 @@ const MovieDetail = () => {
     const fetchSimilarMovies = async () => {
       if (!movie || !movie.genres) return;
 
-      setIsRecommendGenresMoviesLoading(true);
       setError(null);
+      setIsRecommendGenresMoviesLoading(true);
 
       const { data, error: apiError } = await getMoviesFromAIRetriever({
         collection_name: "movies",
@@ -355,7 +360,16 @@ const MovieDetail = () => {
       return;
     }
     setSelectedRating(ratingData.data?.score!);
+    getAverageRating(parseInt(id!));
   }, [isGetRatingSuccess, ratingData]);
+
+  useEffect(() => {
+    if (!isGetAverageRatingSuccess) {
+      return;
+    }
+    console.log("avgRatingData", avgRatingData);
+    setAverageRating(avgRatingData.data?.vote_average!);
+  }, [isGetAverageRatingSuccess, avgRatingData]);
 
   useEffect(() => {
     if (!isAddRatingError) {
@@ -373,6 +387,7 @@ const MovieDetail = () => {
     if (!isAddRatingSuccess) {
       return;
     }
+    getAverageRating(parseInt(id!));
     toast({
       title: "Success",
       description: `Added rating for ${movie?.title}`,
@@ -488,11 +503,15 @@ const MovieDetail = () => {
         <div className="absolute inset-0 bg-black bg-opacity-60"></div>
         <div className="relative z-10 max-w-5xl mx-auto px-6 py-12 flex gap-8 text-white">
           <div className="w-1/3">
-            <img
-              src={getResourceFromTmdb(movie.poster_path)}
-              alt={movie.title}
-              className="w-full h-auto rounded-lg shadow-lg"
-            />
+            {movie.poster_path ? (
+              <img
+                src={getResourceFromTmdb(movie.poster_path)}
+                alt={movie.title}
+                className="w-full h-auto rounded-lg shadow-lg"
+              />
+            ) : (
+              <DefaultImage alt={movie.title} className="w-52 h-72 rounded-lg shadow-lg" />
+            )}
           </div>
 
           <div className="w-2/3">
@@ -500,7 +519,7 @@ const MovieDetail = () => {
               <h1 className="text-5xl font-bold">{movie.title}</h1>
             </div>
             <span className="text-lg">
-              {new Date(movie.release_date).toLocaleDateString()}
+              {movie.release_date ? dayjs(movie.release_date).format("MMM DD YYYY") : ""}
             </span>
             <div className="flex gap-4 flex-wrap mt-4">
               {movie.genres?.map((genre) => (
@@ -515,7 +534,7 @@ const MovieDetail = () => {
             <div className="flex items-center gap-6 mt-6">
               <div className="flex items-center gap-2">
                 <div className="bg-gray-800 text-white w-12 h-12 rounded-full flex justify-center items-center">
-                  <RatingIndicator rating={movie.vote_average} />
+                  <RatingIndicator rating={averageRating} />
                 </div>
               </div>
               {

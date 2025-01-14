@@ -15,14 +15,14 @@ export const SortOptions = {
     KEY: "primary_release_date.desc",
     NAME: "Release Date (New to Old)",
   },
-  VOTE_AVERAGE_ASC: {
-    KEY: "vote_average.asc",
-    NAME: "Rating (Low to High)",
-  },
-  VOTE_AVERAGE_DESC: {
-    KEY: "vote_average.desc",
-    NAME: "Rating (High to Low)",
-  },
+  // VOTE_AVERAGE_ASC: {
+  //   KEY: "vote_average.asc",
+  //   NAME: "Rating (Low to High)",
+  // },
+  // VOTE_AVERAGE_DESC: {
+  //   KEY: "vote_average.desc",
+  //   NAME: "Rating (High to Low)",
+  // },
   TITLE_ASC: {
     KEY: "original_title.asc",
     NAME: "Title (A-Z)",

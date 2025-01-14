@@ -261,7 +261,7 @@ const ReviewListPage = () => {
             </p>
           )}
         </div>
-        {isGetReviewsSuccess && reviewData?.data && (
+        {isGetReviewsSuccess && reviewData?.data && reviewData.data.reviews.length > 0 && (
           <Pagination
             currentPage={currentPage}
             totalPages={reviewData.data?.total_pages!}
