@@ -18,18 +18,10 @@ export const movieApiSlice = apiSlice.injectEndpoints({
 
         searchMovies: builder.query<Response<TmdbPageResponse<Movie>>, { query: string, page: number }>({
             query: ({ query, page }) => ({
-                url: `${apiEndpoints.MOVIE_SEARCH}`,
+                url: apiEndpoints.MOVIE_SEARCH,
                 params: { query: query, page: page },
                 method: 'GET',
             }),
-            transformResponse: (response: any) => ({
-                ...response,
-                data: {
-                    ...response.data,
-                    totalPages: response.data.total_pages,
-                    totalResults: response.data.total_results
-                }
-            })
         }),
 
         movieGenres: builder.query<Response<{genres: Genre[]}>, void>({
@@ -41,7 +33,7 @@ export const movieApiSlice = apiSlice.injectEndpoints({
 
         movieDetail: builder.query<Response<Movie>, { id: string }>({
             query: ({ id }) => ({
-                url: `${apiEndpoints.MOVIE}/${id}`,
+                url: `${apiEndpoints.MOVIE_DETAIL}/${id}`,
                 method: 'GET',
             }),
         }),
@@ -116,7 +108,7 @@ export const movieApiSlice = apiSlice.injectEndpoints({
 
         popularMovies: builder.query<Response<TmdbPageResponse<Movie>>, void>({
           query: () => ({
-            url: `/tmdb/discover/movie`,
+            url: apiEndpoints.MOVIE_POPULAR,
             method: 'GET',
           })
         }),
@@ -130,7 +122,7 @@ export const movieApiSlice = apiSlice.injectEndpoints({
 
         nowPlaying: builder.query<Response<TmdbPageResponse<Movie>>, void>({
           query: () => ({
-            url: `/tmdb/movie/now_playing`,
+            url: apiEndpoints.MOVIE_NOWPLAYING,
             method: 'GET'
           })
         }),
@@ -139,7 +131,7 @@ export const movieApiSlice = apiSlice.injectEndpoints({
             query: (params) => {
                 const { page, sortValue, fromDate, toDate, selectedGenres, scoreValues, voteValues } = params;
 
-                let url = '/tmdb/discover/movie?';
+                let url = `${apiEndpoints.MOVIE_DISCOVER}?`;
                 url += `page=${page || 1}`;
                 url += `&sort_by=${sortValue || SortOptions.POPULARITY_DESC.KEY}`;
 
@@ -193,6 +185,13 @@ export const movieApiSlice = apiSlice.injectEndpoints({
             url: `/movies/${movieId}/rating`,
             method: 'GET',
           })
+        }),
+
+        getAverageMovieRating: builder.query<Response<{vote_count: number, vote_average: number}>, number>({
+            query: (movieId) => ({
+                url: `/movies/${movieId}/rating/average`,
+                method: 'GET',
+            })
         }),
 
         deleteMovieRating: builder.mutation<void, number>({
@@ -283,6 +282,7 @@ export const {
     useLazyDiscoverMoviesQuery,
     useAddMovieRatingMutation,
     useGetMovieRatingQuery,
+    useLazyGetMovieRatingQuery,
     useDeleteMovieRatingMutation,
     useLazyGetMovieReviewsQuery,
     useLazyGetMovieLatestReviewQuery,
@@ -291,4 +291,5 @@ export const {
     useDeleteMovieReviewMutation,
     useGetRatingsQuery,
     useLazyGetMoviesFromObjectIdsQuery,
+    useLazyGetAverageMovieRatingQuery
 } = movieApiSlice;

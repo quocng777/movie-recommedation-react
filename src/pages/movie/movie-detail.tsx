@@ -13,8 +13,9 @@ import {
   useDeleteMovieRatingMutation,
   useDeleteMovieReviewMutation,
   useEditMovieReviewMutation,
-  useGetMovieRatingQuery,
+  useLazyGetAverageMovieRatingQuery,
   useLazyGetMovieLatestReviewQuery,
+  useLazyGetMovieRatingQuery,
   useLazyMovieCastQuery,
   useLazyMovieDetailQuery,
   useLazyMovieKeywordsQuery,
@@ -60,6 +61,7 @@ import DeleteModal from "@/components/custom/delete-modal";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useLazyRetrieveQuery } from "@/app/api/ai/ai-api-slice";
 import { MovieCard } from "@/components/custom/movie-card";
+import { get } from "http";
 const languageMap: { [key: string]: string } = {
   en: "English",
   vn: "Vietnamese",
@@ -97,13 +99,15 @@ const MovieDetail = () => {
   const [trailer, setTrailer] = useState<Video | undefined>();
   const [openTrailerDialog, setOpenTrailerDialog] = useState(false);
   const [openRatingPopover, setOpenRatingPopover] = useState(false);
-  const { data: ratingData, isSuccess: isGetRatingSuccess } =
-    useGetMovieRatingQuery(parseInt(id!));
+  const [getRating, { data: ratingData, isSuccess: isGetRatingSuccess }] =
+    useLazyGetMovieRatingQuery();
+  const [getAverageRating, { data: avgRatingData, isSuccess: isGetAverageRatingSuccess }] = useLazyGetAverageMovieRatingQuery();
   const [
     addMovieRating,
     { isSuccess: isAddRatingSuccess, isError: isAddRatingError },
   ] = useAddMovieRatingMutation();
   const [selectedRating, setSelectedRating] = useState(0);
+  const [averageRating, setAverageRating] = useState(0);
   const [deleteMovieRating] = useDeleteMovieRatingMutation();
   const isDbClickCalled = useRef(false);
   const [openAddReviewDialog, setOpenAddReviewDialog] = useState(false);
@@ -133,9 +137,10 @@ const MovieDetail = () => {
   const [isRecommendGenresMoviesLoading, setIsRecommendGenresMoviesLoading] =
     useState(true);
   const [recommendGenresMovies, setRecommendGenresMovies] = useState<
-    Movie[]
+  Movie[]
   >([]);
-
+  
+  const [getMoviesFromAIRetriever] = useLazyRetrieveQuery();
   const [similarMovies, setSimilarMovies] = useState<Movie[]>([]);
 
   const onLikeMovieClick: MouseEventHandler = () => {
@@ -234,6 +239,7 @@ const MovieDetail = () => {
       setIsSimilarMoviesLoading(true);
       setError(null);
       getMovieDetail({ id });
+      getRating(parseInt(id));
       getMovieCast({ id });
       getMovieKeywords({ id });
       getLatestReviews({ movieId: parseInt(id), limit: 1 });
@@ -243,6 +249,7 @@ const MovieDetail = () => {
   useEffect(() => {
     if (isGetMovieDataSuccess && movieData) {
       setMovie(movieData.data);
+      setAverageRating(movieData?.data?.vote_average!);
       setIsLoading(false);
     }
     if (apiError) {
@@ -258,7 +265,6 @@ const MovieDetail = () => {
     }
   }, [isGetMovieDataSuccess, movieData, apiError]);
 
-  const [getMoviesFromAIRetriever] = useLazyRetrieveQuery();
   
   useEffect(() => {
     const fetchRecommendations = async () => {
@@ -355,7 +361,16 @@ const MovieDetail = () => {
       return;
     }
     setSelectedRating(ratingData.data?.score!);
+    getAverageRating(parseInt(id!));
   }, [isGetRatingSuccess, ratingData]);
+
+  useEffect(() => {
+    if (!isGetAverageRatingSuccess) {
+      return;
+    }
+    console.log("avgRatingData", avgRatingData);
+    setAverageRating(avgRatingData.data?.vote_average!);
+  }, [isGetAverageRatingSuccess, avgRatingData]);
 
   useEffect(() => {
     if (!isAddRatingError) {
@@ -373,6 +388,7 @@ const MovieDetail = () => {
     if (!isAddRatingSuccess) {
       return;
     }
+    getAverageRating(parseInt(id!));
     toast({
       title: "Success",
       description: `Added rating for ${movie?.title}`,
@@ -515,7 +531,7 @@ const MovieDetail = () => {
             <div className="flex items-center gap-6 mt-6">
               <div className="flex items-center gap-2">
                 <div className="bg-gray-800 text-white w-12 h-12 rounded-full flex justify-center items-center">
-                  <RatingIndicator rating={movie.vote_average} />
+                  <RatingIndicator rating={averageRating} />
                 </div>
               </div>
               {
