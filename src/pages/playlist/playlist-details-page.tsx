@@ -1,9 +1,8 @@
 import { getCurrentAuthentication } from "@/app/api/auth/auth-slice";
 import { useGetMovieFromPlaylistQuery, useGetPlaylistQuery } from "@/app/api/playlist/playlist-api-slice";
-import { PlaylistAccessibility, PlaylistUser } from "@/app/api/types/playlist.type";
+import { PlaylistUser } from "@/app/api/types/playlist.type";
 import { CardViewLayout, PlayListMovieCard } from "@/components/custom/playlist-movie-card";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -71,18 +70,6 @@ export const PlaylistDetailsPage = () => {
                                         <p>Last update {new Date(playlist?.updatedAt).toLocaleDateString('us')}
                                         </p>}
                             </div>
-                            <div className="flex gap-4 mt-4">
-                                {authenticatedUser && authenticatedUser.username == playlist?.user.username && (
-                                    <Button className="rounded-full">
-                                        Edit
-                                    </Button>
-                                )}
-                                {playlist?.accessibility == PlaylistAccessibility.PUBLIC && (
-                                    <Button className="rounded-full">
-                                        Share
-                                    </Button>
-                                )}
-                            </div>
                         </div>
                     </div>
                     <div className="max-w-80">
@@ -94,7 +81,8 @@ export const PlaylistDetailsPage = () => {
                         movies.map((movie) => (
                             <PlayListMovieCard 
                               movieId={movie}
-                              viewLayout={CardViewLayout.GRID} 
+                              viewLayout={CardViewLayout.GRID}
+                              onClick={() => navigate(`/movie/${movie}`)} 
                             />
                         ))
                     }

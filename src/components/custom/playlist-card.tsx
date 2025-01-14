@@ -100,17 +100,17 @@ export const PlaylistCard = (props: PlaylistCardProps) => {
     };
 
     return (
-        <div className="w-[320px] max-lg:w-[240px] relative cursor-pointer group">
+        <div className="w-[320px] max-lg:w-[240px] relative cursor-pointer group ">
             <div className="bg-gray-800 absolute -top-2 inset-x-4 h-4 z-[1] rounded-md" />
             <div className="bg-gray-800 absolute -top-1 inset-x-2 h-4 z-[1] rounded-md border-t border-background"/>
             {
-                playlistInfo && (
+               (
                     <div className="relative z-[4] bg-white rounded-md border-t border-background  max-lg:w-[240px] max-lg:h-[135px] w-[320px] h-[180px] overflow-hidden" onClick={onCardClick}>
-                    <img src={getResourceFromTmdb(playlistInfo?.picture || '')} className="group-hover:blur-[1px]"/>
-                        <div className="bg-background/80 py-1 px-2 absolute bottom-2 flex items-center rounded-md right-2 gap-2">
-                            <Film className="size-4" />
-                            <span className="text-xs font-semibold">{playlistInfo?.moviesQuantity} movies</span>
-                        </div>
+                      <img src={getResourceFromTmdb(playlistInfo?.picture || '')} className="group-hover:blur-[1px]"/>
+                      <div className="bg-background/80 py-1 px-2 absolute bottom-2 flex items-center rounded-md right-2 gap-2">
+                          <Film className="size-4" />
+                          <span className="text-xs font-semibold">{playlistInfo?.moviesQuantity} movies</span>
+                      </div>
                     </div>
                 )
             }
