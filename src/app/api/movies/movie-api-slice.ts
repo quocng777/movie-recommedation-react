@@ -1,7 +1,7 @@
 import { apiSlice } from "../base/api-slice";
 import { Response } from "../types/response";
 import { apiEndpoints } from "../constants";
-import { Movie, MovieCast, MovieCastResponse, MovieMediaType, MovieTrendingDuration, MovieTrendingType, TmdbPageResponse, MovieKeywords, MovieKeywordsResponse, SearchKeyword, MovieVideo, Genre, Review, Rating, RecommendMovie } from "../types/movie.type";
+import { Movie, MovieCast, MovieCastResponse, MovieMediaType, MovieTrendingDuration, MovieTrendingType, TmdbPageResponse, MovieKeywords, MovieKeywordsResponse, SearchKeyword, MovieVideo, Genre, Review, Rating } from "../types/movie.type";
 import { FilterParams } from "../types/params.type";
 import { SortOptions } from "../constants/sort-options";
 
@@ -249,12 +249,13 @@ export const movieApiSlice = apiSlice.injectEndpoints({
             method: 'GET',
           })
         }),
-        recommendMovie:  builder.query<Response<RecommendMovie>, { movie_id: string }>({
-            query: ({movie_id}) => ({
-              url: `/movies/movie/` + movie_id,
-              method: 'GET',
-            })
-          }),
+
+        getMoviesFromObjectIds: builder.query<Response<Movie[]>, { objectIds: string[] }>({
+            query: ({ objectIds }) => ({
+                url: `/movies/get-with-objectids?objectIds=${objectIds.join(",")}`,
+                method: 'GET',
+            }),
+        }),
     })
 });
 
@@ -289,6 +290,5 @@ export const {
     useEditMovieReviewMutation,
     useDeleteMovieReviewMutation,
     useGetRatingsQuery,
-    useLazyRecommendMovieQuery,
-    useRecommendMovieQuery
+    useLazyGetMoviesFromObjectIdsQuery,
 } = movieApiSlice;

@@ -36,35 +36,35 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 export const router = createBrowserRouter([
-    {
-        path: "/person",
-        element: (
-          <Suspense fallback={<FallbackScreen />}>
-            <MainLayout>
-              <Outlet />
-            </MainLayout>
-          </Suspense>
-        ),
-        children: [
-         
-          {
-            path: ":person_id",
-            element: (
-              <Suspense fallback={<FallbackScreen />}>
-                <CastDetail/>
-              </Suspense>
-            ),
-          },
-          {
-            path: "",
-            element: (
-              <Suspense fallback={<FallbackScreen />}>
-                {/* <MovieListPage /> */}
-              </Suspense>
-            ),
-          },
-        ],
-      },
+  {
+      path: "/person",
+      element: (
+        <Suspense fallback={<FallbackScreen />}>
+          <MainLayout>
+            <Outlet />
+          </MainLayout>
+        </Suspense>
+      ),
+      children: [
+        
+        {
+          path: ":person_id",
+          element: (
+            <Suspense fallback={<FallbackScreen />}>
+              <CastDetail/>
+            </Suspense>
+          ),
+        },
+        {
+          path: "",
+          element: (
+            <Suspense fallback={<FallbackScreen />}>
+              {/* <MovieListPage /> */}
+            </Suspense>
+          ),
+        },
+      ],
+    },
   {
     path: "/movie",
     element: (
