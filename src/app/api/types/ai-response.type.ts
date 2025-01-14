@@ -20,11 +20,6 @@ export interface AiNavigation {
   is_success: boolean;
 }
 
-export type LlmApiRetrieverResponse<T> = {
-  data: T;
-  status: number;
-};
-
-export type RetrieverResult<T> = {
-  result: T[];
+export type RetrieverResult = {
+  result: [];
 };

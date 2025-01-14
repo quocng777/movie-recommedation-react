@@ -1,6 +1,6 @@
 import { apiSlice } from "../base/api-slice";
 import { AiNavigation } from "../types/ai-response.type";
-import { LlmApiRetrieverResponse, RetrieverResult } from "../types/ai-response.type";
+import { RetrieverResult } from "../types/ai-response.type";
 import { Response } from "../types/response";
 
 export const aiApiSlice = apiSlice.injectEndpoints({
@@ -13,7 +13,7 @@ export const aiApiSlice = apiSlice.injectEndpoints({
       }),
     }),
     retrieve: builder.query<
-      Response<RetrieverResult<string>>,
+      Response<RetrieverResult>,
       { collection_name: string; query: string; amount: number; threshold: number }
     >({
       query: ({ collection_name, query, amount, threshold }) => ({

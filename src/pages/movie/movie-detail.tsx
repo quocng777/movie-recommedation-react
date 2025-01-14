@@ -18,14 +18,12 @@ import {
   useLazyMovieCastQuery,
   useLazyMovieDetailQuery,
   useLazyMovieKeywordsQuery,
-  useLazyRecommendMovieQuery,
   useTrailerVideoQuery,
 } from "@/app/api/movies/movie-api-slice";
 import {
   Movie,
   MovieCast,
   MovieKeywords,
-  RecommendMovie,
   Review,
   Video,
 } from "@/app/api/types/movie.type";
@@ -61,7 +59,7 @@ import { ReviewCard } from "@/components/custom/review-card";
 import DeleteModal from "@/components/custom/delete-modal";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useLazyRetrieveQuery } from "@/app/api/ai/ai-api-slice";
-import { RecommendMovieCard } from "@/components/custom/recommend-movie-card";
+import { MovieCard } from "@/components/custom/movie-card";
 const languageMap: { [key: string]: string } = {
   en: "English",
   vn: "Vietnamese",
@@ -135,11 +133,10 @@ const MovieDetail = () => {
   const [isRecommendGenresMoviesLoading, setIsRecommendGenresMoviesLoading] =
     useState(true);
   const [recommendGenresMovies, setRecommendGenresMovies] = useState<
-    RecommendMovie[]
+    Movie[]
   >([]);
 
-  const [similarMovies, setSimilarMovies] = useState<RecommendMovie[]>([]);
-  const [getRecommandMovie] = useLazyRecommendMovieQuery();
+  const [similarMovies, setSimilarMovies] = useState<Movie[]>([]);
 
   const onLikeMovieClick: MouseEventHandler = () => {
     if (!isAuthenticated) {
@@ -197,10 +194,12 @@ const MovieDetail = () => {
     deleteMovieRating(movie?.id!);
     setSelectedRating(0);
   };
+
   const onMovieCardClick = (id: string) => {
     navigate("/movie/" + id);
     return;
   };
+
   const handleAddReview = (comment: string) => {
     addReview({
       movieId: parseInt(id!),
@@ -258,7 +257,9 @@ const MovieDetail = () => {
       setIsLoading(false);
     }
   }, [isGetMovieDataSuccess, movieData, apiError]);
+
   const [getMoviesFromAIRetriever] = useLazyRetrieveQuery();
+  
   useEffect(() => {
     const fetchRecommendations = async () => {
       if (!movie || !movie.genres.length) return;
@@ -266,64 +267,31 @@ const MovieDetail = () => {
       setIsRecommendGenresMoviesLoading(true);
       setError(null);
 
-      try {
-        const allIds: string[] = [];
+      const { data, error: apiError } = await getMoviesFromAIRetriever({
+          collection_name: "movies",
+          query:
+            "Find recommendation movies based on Genres: " +
+            movie.genres.join(","),
+          amount: 10,
+          threshold: 0.25,
+      });
 
-        for (const genre of movie.genres) {
-          const { data, error } = await getMoviesFromAIRetriever({
-            collection_name: "movies",
-            query: "Genre" + genre.name.toString(),
-            amount: 10,
-            threshold: 0.25,
-          });
-
-          if (error) {
-            console.error(
-              `Error fetching retriever for genre ${genre}:`,
-              error
-            );
-            continue;
-          }
-          // Giả sử movie.id là ID bạn muốn tránh thêm vào list
-          const movieIdToAvoid = movie.id;
-
-          if (data?.data) {
-            // const ids = data.data.data.result.map((res) => res.toString());
-
-            // ids.forEach((id) => {
-            //   if (
-            //     id.toString() !== movieIdToAvoid.toString() &&
-            //     !allIds.includes(id)
-            //   ) {
-            //     allIds.push(id);
-            //   }
-            // });
-          }
-
-          console.log(allIds);
-        }
-
-        const allMovies: RecommendMovie[] = [];
-
-        for (const id of allIds) {
-          const response = await getRecommandMovie({ movie_id: id });
-
-          if (response.status === "fulfilled" && response.data) {
-            allMovies.push(response.data?.data!);
-          }
-        }
-
-        setRecommendGenresMovies(allMovies);
-        console.log("Fetched recommendations for all IDs:", allIds);
-      } catch (err) {
-        console.error("Error fetching recommendations:", err);
-      } finally {
-        setIsRecommendGenresMoviesLoading(false);
+      if (apiError || !data?.data) {
+        setError("Error fetching recommendations");
+        return;
       }
+
+      const movies = data.data.result.filter(
+        (item: any) => item.id !== movie.id
+      );
+
+      setRecommendGenresMovies(movies);
+      setIsRecommendGenresMoviesLoading(false);
     };
 
     fetchRecommendations();
   }, [movie]);
+
   useEffect(() => {
     const fetchSimilarMovies = async () => {
       if (!movie || !movie.genres) return;
@@ -331,59 +299,29 @@ const MovieDetail = () => {
       setIsRecommendGenresMoviesLoading(true);
       setError(null);
 
-      try {
-        const allIds: string[] = [];
-        const genre = movie.genres; // genres giờ là một đối tượng
+      const { data, error: apiError } = await getMoviesFromAIRetriever({
+        collection_name: "movies",
+        query:
+          `Genre:${movie.genres.join(",")}` +
+          " \n " +
+          `Title:${movie.title}` +
+          " \n " +
+          `Overview:${movie.overview}`,
+        amount: 10,
+        threshold: 0.5,
+      });
 
-        const { data, error } = await getMoviesFromAIRetriever({
-          collection_name: "movies",
-          query:
-            `Genre:${genre.join(",")}` +
-            " \n " +
-            `Title:${movie.title}` +
-            " \n " +
-            `Overview:${movie.overview}`,
-          amount: 10,
-          threshold: 0.25,
-        });
-
-        if (error) {
-          return;
-        }
-
-        const movieIdToAvoid = movie.id;
-
-        if (data?.data) {
-          const ids = data.data.data.result.map((res) => res.toString());
-
-          ids.forEach((id) => {
-            if (
-              id.toString() !== movieIdToAvoid.toString() &&
-              !allIds.includes(id)
-            ) {
-              allIds.push(id);
-            }
-          });
-        }
-
-        console.log("Unique movie IDs fetched:", allIds);
-
-        const allMovies: RecommendMovie[] = [];
-
-        for (const id of allIds) {
-          const response = await getRecommandMovie({ movie_id: id });
-
-          if (response.status === "fulfilled" && response.data) {
-            allMovies.push(response.data?.data!);
-          }
-        }
-        setSimilarMovies(allMovies);
-        console.log("Fetched recommendations for all IDs:", allIds);
-      } catch (err) {
-        console.error("Error fetching recommendations:", err);
-      } finally {
-        setIsSimilarMoviesLoading(false);
+      if (apiError || !data?.data) {
+        setError("Error fetching recommendations");
+        return;
       }
+
+      const movies = data.data.result.filter(
+        (item: any) => item.id !== movie.id
+      );
+      
+      setSimilarMovies(movies);
+      setIsSimilarMoviesLoading(false);
     };
 
     fetchSimilarMovies();
@@ -515,6 +453,7 @@ const MovieDetail = () => {
       description: `Deleted review for ${movie?.title}`,
     });
   }, [isDeleteReviewSuccess]);
+  
   useLayoutEffect(() => {
     if (hash == "cast" && castSectionRef.current) {
       castSectionRef.current.scrollIntoView({
@@ -822,11 +761,11 @@ const MovieDetail = () => {
                     })}
                   {recommendGenresMovies.map((movie) => {
                     return (
-                      <RecommendMovieCard
-                        key={movie.tmdb_id}
+                      <MovieCard
+                        key={movie.id}
                         movie={movie}
                         onClick={() =>
-                          onMovieCardClick(movie.tmdb_id.toString())
+                          onMovieCardClick(movie.id.toString())
                         }
                       />
                     );
@@ -850,11 +789,11 @@ const MovieDetail = () => {
                     })}
                   {similarMovies.map((movie) => {
                     return (
-                      <RecommendMovieCard
-                        key={movie.tmdb_id}
+                      <MovieCard
+                        key={movie.id}
                         movie={movie}
                         onClick={() =>
-                          onMovieCardClick(movie.tmdb_id.toString())
+                          onMovieCardClick(movie.id.toString())
                         }
                       />
                     );
