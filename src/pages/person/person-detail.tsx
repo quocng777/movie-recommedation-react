@@ -24,7 +24,6 @@ const PersonDetail = () => {
   const navigate = useNavigate();
   const { person_id } = useParams<{ person_id: string }>();
   const [person, setPerson] = useState<Person>();
-  const [credits, setCredits] = useState<Credit[]>([]);
   const [isMovieLoading, setIsMovieLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
 
@@ -73,7 +72,6 @@ const PersonDetail = () => {
       if (!movieData.data?.cast!) {
         setHasError(true);
       } else {
-        setCredits(movieData.data?.cast!);
         setIsMovieLoading(false);
       }
     }
