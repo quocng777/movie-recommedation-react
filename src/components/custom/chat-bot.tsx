@@ -42,8 +42,8 @@ export default function Chatbot() {
       getMoviesFromAIRetriever({
         collection_name: "movies",
         query,
-        amount: 5,
-        threshold: 0.25,
+        amount: 10,
+        threshold: 0.5,
       });
     } 
     else if (selectedValue === AiOption.NATURAL_TEXT) {
@@ -164,7 +164,7 @@ export default function Chatbot() {
             content: (
               <div>
                 <span>I found some movies related to your query 🚀</span>
-                <ul>
+                <ul className="list-disc pl-4 space-y-2">
                   {movieData?.data?.result.map((movie: any) => (
                     <li key={movie.tmdb_id}>
                       <MovieLink
@@ -227,7 +227,6 @@ export default function Chatbot() {
             <SelectContent>
               <SelectItem value={AiOption.NAVIGATE}>{AiOption.NAVIGATE}</SelectItem>
               <SelectItem value={AiOption.LIST}>{AiOption.LIST}</SelectItem>
-              <SelectItem value={AiOption.NATURAL_TEXT}>{AiOption.NATURAL_TEXT}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -241,7 +240,7 @@ export default function Chatbot() {
           <ChatBubble variant="received">
             <ChatBubbleAvatar src="" fallback="🤖" />
             <ChatBubbleMessage>
-              Hello! What does you want to search on TMDB2?
+              Hello! What do you want to search on TMDB2?
             </ChatBubbleMessage>
           </ChatBubble>
 

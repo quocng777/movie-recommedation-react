@@ -17,7 +17,7 @@ const MovieLink = ({ movieId, movieName }: MovieCardMiniProps) => {
       )}
     >
       <span className="font-semibold">{movieName}</span>
-      <ExternalLinkIcon className="h-4 w-4" />
+      <ExternalLinkIcon className="h-4 w-4 shrink-0" />
     </Link>
   );
 }
