@@ -1,10 +1,8 @@
-import { getCurrentAuthentication } from "@/app/api/auth/auth-slice";
 import { useGetMovieFromPlaylistQuery, useGetPlaylistQuery } from "@/app/api/playlist/playlist-api-slice";
 import { PlaylistUser } from "@/app/api/types/playlist.type";
 import { CardViewLayout, PlayListMovieCard } from "@/components/custom/playlist-movie-card";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import playfulCatImg from "@/assets/playful-cat.svg";
 import { Helmet } from "react-helmet";
@@ -15,7 +13,6 @@ export const PlaylistDetailsPage = () => {
     const [movies, setMovies] = useState<number[]>([]);
     const [ id ] = playlistId?.split('')!;
     const {data: playlistData, isSuccess, isError} = useGetPlaylistQuery(Number(id));
-    const authenticatedUser = useSelector(getCurrentAuthentication);
     const navigate = useNavigate();
 
     const {data: movieData, isSuccess: isGetMoviesSuccess} = useGetMovieFromPlaylistQuery({
