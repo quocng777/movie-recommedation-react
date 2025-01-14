@@ -61,7 +61,6 @@ import DeleteModal from "@/components/custom/delete-modal";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useLazyRetrieveQuery } from "@/app/api/ai/ai-api-slice";
 import { MovieCard } from "@/components/custom/movie-card";
-import { get } from "http";
 import dayjs from "dayjs";
 import DefaultImage from "@/components/custom/default-image";
 const languageMap: { [key: string]: string } = {

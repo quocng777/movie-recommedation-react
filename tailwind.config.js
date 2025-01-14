@@ -1,5 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 import tailwindcssAnimate from "tailwindcss-animate";
+import tailwindTypography from "@tailwindcss/typography";
+
 
 export default {
     darkMode: ["class"],
@@ -54,7 +56,7 @@ export default {
   			}
   		},
 			backgroundImage: {
-				'discover-bg': "url('https://hips.hearstapps.com/hmg-prod/images/spiderman-cruzando-el-multiverso-pelicula-estreno-647b17a4c14ca.jpg?crop=1xw:1xh;center,top&resize=1200:*')",
+				'discover-bg': "url('https://hips.hearstapps.com/hmg-prod/images/spiderman-cruzando-el-multiverso-pelicula-estreno-647b17a4c14ca.jpg?crop=1xw:1xh;center,top&resize=1200😘')",
 				'gray-rose-gradient': 'linear-gradient(235deg, rgb(17, 24, 39) 40%,rgb(43, 18, 30) 99%)'
 			},
 			keyframes: {
@@ -73,5 +75,5 @@ export default {
 			},
   	}
   },
-	plugins: [tailwindcssAnimate, require('@tailwindcss/typography')],
+	plugins: [tailwindcssAnimate, tailwindTypography],
 }
