@@ -18,7 +18,6 @@ import {
   useLazyMovieCastQuery,
   useLazyMovieDetailQuery,
   useLazyMovieKeywordsQuery,
-  useLazyRecommendMovieQuery,
   useTrailerVideoQuery,
 } from "@/app/api/movies/movie-api-slice";
 import {
@@ -59,8 +58,8 @@ import DialogEditor from "@/components/custom/editor-dialog";
 import { ReviewCard } from "@/components/custom/review-card";
 import DeleteModal from "@/components/custom/delete-modal";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { MovieCard } from "@/components/custom/movie-card";
 import { useLazyRetrieveQuery } from "@/app/api/ai/ai-api-slice";
+import { MovieCard } from "@/components/custom/movie-card";
 const languageMap: { [key: string]: string } = {
   en: "English",
   vn: "Vietnamese",
@@ -75,6 +74,8 @@ const MovieDetail = () => {
   const [movieKeywords, setMovieKeywords] = useState<MovieKeywords[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isMovieCastLoading, setIsMovieCastLoading] = useState(true);
+  const [isSimilarMoviesLoading, setIsSimilarMoviesLoading] = useState(true);
+
   const { isLiked, likeMovie, isInWatchLaterList, watchLater } =
     useMovieActions(Number(id));
   const isAuthenticated = useSelector((state: RootState) => !!state.auth.user);
@@ -131,10 +132,11 @@ const MovieDetail = () => {
   const hash = window.location.hash.substring(1);
   const [isRecommendGenresMoviesLoading, setIsRecommendGenresMoviesLoading] =
     useState(true);
-  const [recommendGenresMovies, setRecommendGenresMovies] = useState<Movie[]>(
-    []
-  );
-  const [getRecommandMovie] = useLazyRecommendMovieQuery();
+  const [recommendGenresMovies, setRecommendGenresMovies] = useState<
+    Movie[]
+  >([]);
+
+  const [similarMovies, setSimilarMovies] = useState<Movie[]>([]);
 
   const onLikeMovieClick: MouseEventHandler = () => {
     if (!isAuthenticated) {
@@ -192,10 +194,12 @@ const MovieDetail = () => {
     deleteMovieRating(movie?.id!);
     setSelectedRating(0);
   };
+
   const onMovieCardClick = (id: string) => {
     navigate("/movie/" + id);
     return;
   };
+
   const handleAddReview = (comment: string) => {
     addReview({
       movieId: parseInt(id!),
@@ -227,6 +231,7 @@ const MovieDetail = () => {
       setIsLoading(true);
       setIsMovieCastLoading(true);
       setIsRecommendGenresMoviesLoading(true);
+      setIsSimilarMoviesLoading(true);
       setError(null);
       getMovieDetail({ id });
       getMovieCast({ id });
@@ -252,7 +257,9 @@ const MovieDetail = () => {
       setIsLoading(false);
     }
   }, [isGetMovieDataSuccess, movieData, apiError]);
+
   const [getMoviesFromAIRetriever] = useLazyRetrieveQuery();
+  
   useEffect(() => {
     const fetchRecommendations = async () => {
       if (!movie || !movie.genres.length) return;
@@ -260,53 +267,64 @@ const MovieDetail = () => {
       setIsRecommendGenresMoviesLoading(true);
       setError(null);
 
-      try {
-        const allIds: string[] = [];
+      const { data, error: apiError } = await getMoviesFromAIRetriever({
+          collection_name: "movies",
+          query:
+            "Recommendation movies based on Genres: " +
+            movie.genres.join(","),
+          amount: 10,
+          threshold: 0.25,
+      });
 
-        for (const genre of movie.genres) {
-          const { data, error } = await getMoviesFromAIRetriever({
-            collection_name: "movies",
-            query: "Genre: "+ genre.toString(),
-            amount: 10,
-            threshold: 0.25,
-          });
-
-          if (error) {
-            console.error(
-              `Error fetching retriever for genre ${genre}:`,
-              error
-            );
-            continue;
-          }
-          console.log(data?.data?.data?.result);
-          if (data?.data) {
-            const ids = data.data.data.result.map((res) => res.toString());
-            allIds.push(...ids);
-          }
-          console.log(allIds);
-        }
-
-        const allMovies: Movie[] = [];
-
-        for (const id of allIds) {
-          const response = await getRecommandMovie({ movie_id: id });
-
-          if (response.status === "fulfilled" && response.data) {
-            allMovies.push(response.data?.data!);
-          }
-        }
-
-        setRecommendGenresMovies(allMovies);
-        console.log("Fetched recommendations for all IDs:", allIds);
-      } catch (err) {
-        console.error("Error fetching recommendations:", err);
-        // setError("Failed to fetch recommendations");
-      } finally {
-        setIsRecommendGenresMoviesLoading(false);
+      if (apiError || !data?.data) {
+        setError("Error fetching recommendations");
+        return;
       }
+
+      const movies = data.data.result.filter(
+        (item: any) => item.id !== movie.id
+      );
+
+      setRecommendGenresMovies(movies);
+      setIsRecommendGenresMoviesLoading(false);
     };
 
     fetchRecommendations();
+  }, [movie]);
+
+  useEffect(() => {
+    const fetchSimilarMovies = async () => {
+      if (!movie || !movie.genres) return;
+
+      setIsRecommendGenresMoviesLoading(true);
+      setError(null);
+
+      const { data, error: apiError } = await getMoviesFromAIRetriever({
+        collection_name: "movies",
+        query:
+          `Genre:${movie.genres.join(",")}` +
+          " \n " +
+          `Title:${movie.title}` +
+          " \n " +
+          `Overview:${movie.overview}`,
+        amount: 10,
+        threshold: 0.5,
+      });
+
+      if (apiError || !data?.data) {
+        setError("Error fetching recommendations");
+        return;
+      }
+
+      const movies = data.data.result.filter(
+        (item: any) => item.id !== movie.id
+      );
+      
+      setSimilarMovies(movies);
+      setIsSimilarMoviesLoading(false);
+    };
+
+    fetchSimilarMovies();
   }, [movie]);
 
   useEffect(() => {
@@ -346,7 +364,8 @@ const MovieDetail = () => {
     setSelectedRating(0);
     toast({
       title: "Error",
-      description: `Error when added rating for ${movie?.title} 😰`,
+      variant: "destructive",
+      description: `Error when added rating for ${movie?.title} 😰. ${!isAuthenticated ? "Please log in to use this feature." : ""}`,
     });
   });
 
@@ -374,9 +393,11 @@ const MovieDetail = () => {
     if (!isAddReviewError) {
       return;
     }
+
     toast({
       title: "Error",
-      description: `Error when added review for ${movie?.title} 😰`,
+      variant: "destructive",
+      description: `Error when added review for ${movie?.title} 😰. ${!isAuthenticated ? "Please log in to use this feature." : ""}`,
     });
   });
 
@@ -398,6 +419,7 @@ const MovieDetail = () => {
     }
     toast({
       title: "Error",
+      variant: "destructive",
       description: `Error when edited review for ${movie?.title} 😰`,
     });
   });
@@ -420,6 +442,7 @@ const MovieDetail = () => {
     }
     toast({
       title: "Error",
+      variant: "destructive",
       description: `Error when deleted review for ${movie?.title} 😰`,
     });
   });
@@ -435,6 +458,7 @@ const MovieDetail = () => {
       description: `Deleted review for ${movie?.title}`,
     });
   }, [isDeleteReviewSuccess]);
+  
   useLayoutEffect(() => {
     if (hash == "cast" && castSectionRef.current) {
       castSectionRef.current.scrollIntoView({
@@ -632,7 +656,10 @@ const MovieDetail = () => {
           ref={castSectionRef}
         >
           <div className="px-2">
-            <h2 className="text-lg font-bold">Cast</h2>
+            <div className="flex items-center space-x-2 font-semibold">
+              <span className="w-1 h-8 bg-rose-600"></span>
+              <span className="text-xl text-white">Casts</span>
+            </div>
             <ScrollArea className="w-full overflow-x-auto">
               <div className="flex gap-4 py-6">
                 {isMovieCastLoading &&
@@ -708,28 +735,73 @@ const MovieDetail = () => {
               View all
             </Button>
           </div>
-          <div className="px-2 max-w-[1000px] mx-auto">
-            <div className="flex items-center space-x-6">
-              <h4 className="text-lg">Recommend by genres</h4>
+
+          <div className="ml-2">
+            <div className="flex items-center space-x-2 font-semibold mb-2">
+              <span className="w-1 h-8 bg-rose-600"></span>
+              <span className="text-xl text-white">Recommendations</span>
             </div>
-            <ScrollArea className="w-full">
-              <div className="flex gap-4 py-6">
-                {isRecommendGenresMoviesLoading &&
-                  new Array(10).fill(null).map((_, idx) => {
-                    return <MovieCardSkeleton key={idx} />;
-                  })}
-                {recommendGenresMovies.map((movie) => {
-                  return (
-                    <MovieCard
-                      key={movie.id}
-                      movie={movie}
-                      onClick={() => onMovieCardClick(movie.id.toString())}
-                    />
-                  );
-                })}
+            <div className="px-2 max-w-[1000px] mx-auto">
+              <div className="flex items-center space-x-6">
+                <h4 className="text-lg whitespace-nowrap">
+                  <b>Based on this movie's genres</b>
+                  <div className="flex gap-4 flex-wrap mt-4">
+                    {movie.genres?.map((genre) => (
+                      <span
+                        key={genre.id}
+                        className="bg-gray-700 px-4 py-1 rounded-full text-sm"
+                      >
+                        {genre.name}
+                      </span>
+                    ))}
+                  </div>
+                </h4>
               </div>
-              <ScrollBar orientation="horizontal" />
-            </ScrollArea>
+              <ScrollArea className="w-full">
+                <div className="flex gap-4 py-6">
+                  {isRecommendGenresMoviesLoading &&
+                    new Array(10).fill(null).map((_, idx) => {
+                      return <MovieCardSkeleton key={idx} />;
+                    })}
+                  {recommendGenresMovies.map((movie) => {
+                    return (
+                      <MovieCard
+                        key={movie.id}
+                        movie={movie}
+                        onClick={() => onMovieCardClick(movie.id.toString())}
+                      />
+                    );
+                  })}
+                </div>
+                <ScrollBar orientation="horizontal" />
+              </ScrollArea>
+            </div>
+
+            <div className="px-2 max-w-[1000px] mx-auto">
+              <div className="flex items-center space-x-6">
+                <h4 className="text-lg">
+                  <b>Similar movies</b>
+                </h4>
+              </div>
+              <ScrollArea className="w-full">
+                <div className="flex gap-4 py-6">
+                  {isSimilarMoviesLoading &&
+                    new Array(10).fill(null).map((_, idx) => {
+                      return <MovieCardSkeleton key={idx} />;
+                    })}
+                  {similarMovies.map((movie) => {
+                    return (
+                      <MovieCard
+                        key={movie.id}
+                        movie={movie}
+                        onClick={() => onMovieCardClick(movie.id.toString())}
+                      />
+                    );
+                  })}
+                </div>
+                <ScrollBar orientation="horizontal" />
+              </ScrollArea>
+            </div>
           </div>
         </div>
 

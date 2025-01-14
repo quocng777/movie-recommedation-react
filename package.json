@@ -30,6 +30,7 @@
     "@react-oauth/google": "^0.12.1",
     "@reduxjs/toolkit": "^2.4.0",
     "@shadcn/ui": "^0.0.4",
+    "@tailwindcss/typography": "^0.5.16",
     "@types/quill": "^2.0.14",
     "@types/react-copy-to-clipboard": "^5.0.7",
     "@types/react-helmet": "^6.1.11",

@@ -8,7 +8,7 @@ import {
   useLazyPersonCombinedCreditsQuery,
 } from "@/app/api/person/person-api-slice";
 import { getResourceFromTmdb } from "@/lib/helpers/get-resource-tmbd";
-import { Credit, Person } from "@/app/api/types/person.type";
+import { Person } from "@/app/api/types/person.type";
 import { MovieCreditsCard } from "@/components/custom/movie-credits-card";
 
 function getGenderText(gender: number | undefined): string {
@@ -24,18 +24,26 @@ const PersonDetail = () => {
   const navigate = useNavigate();
   const { person_id } = useParams<{ person_id: string }>();
   const [person, setPerson] = useState<Person>();
-  const [credits, setCredits] = useState<Credit[]>([]);
   const [isMovieLoading, setIsMovieLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
 
   const [isLoading, setIsLoading] = useState(true);
 
   const [
     getPersonDetail,
-    { data: personData, isSuccess: IsSuccessGetPersonDetail },
+    {
+      data: personData,
+      isSuccess: IsSuccessGetPersonDetail,
+      isError: isErrorGetPersonDetail,
+    },
   ] = useLazyPersonDetailQuery();
   const [
     getPersonMovieCredit,
-    { data: movieData, isSuccess: IsSuccessGetPersonMovieCredit },
+    {
+      data: movieData,
+      isSuccess: IsSuccessGetPersonMovieCredit,
+      isError: isErrorGetPersonMovieCredit,
+    },
   ] = useLazyPersonCombinedCreditsQuery();
 
   const onMovieClick = (movie_id: string) => {
@@ -46,25 +54,54 @@ const PersonDetail = () => {
     if (person_id) {
       setIsLoading(true);
       getPersonDetail({ person_id });
+
       getPersonMovieCredit({ person_id });
+      setIsMovieLoading(true);
     }
-  }, [person_id]);
+  }, [person_id, getPersonDetail, getPersonMovieCredit]);
+
   useEffect(() => {
     if (IsSuccessGetPersonDetail && personData) {
       setPerson(personData.data);
       setIsLoading(false);
+      setIsMovieLoading(false);
     }
   }, [IsSuccessGetPersonDetail, personData]);
   useEffect(() => {
     if (IsSuccessGetPersonMovieCredit && movieData) {
-      console.log(movieData.data?.cast!);
-      setCredits(movieData.data?.cast!);
-      setIsMovieLoading(false);
+      if (!movieData.data?.cast!) {
+        setHasError(true);
+      } else {
+        setIsMovieLoading(false);
+      }
     }
   }, [IsSuccessGetPersonMovieCredit, movieData]);
 
+  useEffect(() => {
+    if (isErrorGetPersonDetail) {
+      setHasError(true);
+      setIsLoading(false);
+    }
+  }, [
+    isErrorGetPersonDetail,
+    isErrorGetPersonMovieCredit,
+    IsSuccessGetPersonDetail,
+    IsSuccessGetPersonMovieCredit,
+  ]);
   if (isLoading) return <FallbackScreen />;
-  const sortedCredits = credits
+
+  if (hasError || !person || !person.movie_credits) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center">
+        <h1 className="text-2xl font-bold text-white">Person Not Found</h1>
+        <p className="text-white mt-2">
+          We couldn't find the person you were looking for. Please check the ID
+          and try again.
+        </p>
+      </div>
+    );
+  }
+  const sortedCredits = person.movie_credits.cast
     .map((credit) => ({
       ...credit,
       releaseYear: credit.release_date
@@ -130,7 +167,7 @@ const PersonDetail = () => {
         </p>
         <div className="max-w-[1300px] w-full">
           <div className="max-w-[1300px] flex items-center space-x-6">
-            <span className="font-bold">Known for</span>
+            <span className="font-bold">Acting list:</span>
           </div>
           <ScrollArea className="w-full">
             <div className="flex gap-4 py-6">
@@ -138,7 +175,7 @@ const PersonDetail = () => {
                 new Array(10).fill(null).map((_, idx) => {
                   return <MovieCardSkeleton key={idx} />;
                 })}
-              {credits.map((credit) => {
+              {person?.movie_credits.cast.map((credit) => {
                 return (
                   <MovieCreditsCard
                     key={credit.id}

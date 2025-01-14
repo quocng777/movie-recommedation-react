@@ -202,9 +202,9 @@ export const movieApiSlice = apiSlice.injectEndpoints({
           })
         }),
 
-        getMovieReviews: builder.query<Response<{total: number, reviews: Review[]}>, number>({
-          query: (movieId) => ({
-            url: `/movies/${movieId}/reviews`,
+        getMovieReviews: builder.query<Response<{total: number, reviews: Review[], total_pages: number, current_page: number}>, {movieId: number, page: number, limit: number}>({
+          query: ({movieId, page, limit}) => ({
+            url: `/movies/${movieId}/reviews?limit=${limit}&page=${page}`,
             method: 'GET',
           })
         }),
@@ -249,12 +249,13 @@ export const movieApiSlice = apiSlice.injectEndpoints({
             method: 'GET',
           })
         }),
-        recommendMovie:  builder.query<Response<Movie>, { movie_id: string }>({
-            query: ({movie_id}) => ({
-              url: `/movies/` + movie_id,
-              method: 'GET',
-            })
-          }),
+
+        getMoviesFromObjectIds: builder.query<Response<Movie[]>, { objectIds: string[] }>({
+            query: ({ objectIds }) => ({
+                url: `/movies/get-with-objectids?objectIds=${objectIds.join(",")}`,
+                method: 'GET',
+            }),
+        }),
     })
 });
 
@@ -289,6 +290,5 @@ export const {
     useEditMovieReviewMutation,
     useDeleteMovieReviewMutation,
     useGetRatingsQuery,
-    useLazyRecommendMovieQuery,
-    useRecommendMovieQuery
+    useLazyGetMoviesFromObjectIdsQuery,
 } = movieApiSlice;

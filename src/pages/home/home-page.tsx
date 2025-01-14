@@ -123,7 +123,7 @@ const Homepage = () => {
 
     const onSearchSuggestionClick = (keyword: string) => {
       setSearchQuery(keyword);
-      navigate(`/search?query=${encodeURIComponent(keyword.trim())}`)
+      navigate(`/movie/search?query=${encodeURIComponent(keyword.trim())}`)
     };
 
     return (
