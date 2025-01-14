@@ -62,6 +62,8 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useLazyRetrieveQuery } from "@/app/api/ai/ai-api-slice";
 import { MovieCard } from "@/components/custom/movie-card";
 import { get } from "http";
+import dayjs from "dayjs";
+import DefaultImage from "@/components/custom/default-image";
 const languageMap: { [key: string]: string } = {
   en: "English",
   vn: "Vietnamese",
@@ -134,11 +136,8 @@ const MovieDetail = () => {
   ] = useDeleteMovieReviewMutation();
   const castSectionRef = useRef<HTMLDivElement>(null);
   const hash = window.location.hash.substring(1);
-  const [isRecommendGenresMoviesLoading, setIsRecommendGenresMoviesLoading] =
-    useState(true);
-  const [recommendGenresMovies, setRecommendGenresMovies] = useState<
-  Movie[]
-  >([]);
+  const [isRecommendGenresMoviesLoading, setIsRecommendGenresMoviesLoading] = useState(true);
+  const [recommendGenresMovies, setRecommendGenresMovies] = useState<Movie[]>([]);
   
   const [getMoviesFromAIRetriever] = useLazyRetrieveQuery();
   const [similarMovies, setSimilarMovies] = useState<Movie[]>([]);
@@ -276,10 +275,10 @@ const MovieDetail = () => {
       const { data, error: apiError } = await getMoviesFromAIRetriever({
           collection_name: "movies",
           query:
-            "Recommendation movies based on Genres: " +
+            "Best movies of these genres:" +
             movie.genres.join(","),
           amount: 10,
-          threshold: 0.25,
+          threshold: 0.5,
       });
 
       if (apiError || !data?.data) {
@@ -302,8 +301,8 @@ const MovieDetail = () => {
     const fetchSimilarMovies = async () => {
       if (!movie || !movie.genres) return;
 
-      setIsRecommendGenresMoviesLoading(true);
       setError(null);
+      setIsRecommendGenresMoviesLoading(true);
 
       const { data, error: apiError } = await getMoviesFromAIRetriever({
         collection_name: "movies",
@@ -504,11 +503,15 @@ const MovieDetail = () => {
         <div className="absolute inset-0 bg-black bg-opacity-60"></div>
         <div className="relative z-10 max-w-5xl mx-auto px-6 py-12 flex gap-8 text-white">
           <div className="w-1/3">
-            <img
-              src={getResourceFromTmdb(movie.poster_path)}
-              alt={movie.title}
-              className="w-full h-auto rounded-lg shadow-lg"
-            />
+            {movie.poster_path ? (
+              <img
+                src={getResourceFromTmdb(movie.poster_path)}
+                alt={movie.title}
+                className="w-full h-auto rounded-lg shadow-lg"
+              />
+            ) : (
+              <DefaultImage alt={movie.title} className="w-52 h-72 rounded-lg shadow-lg" />
+            )}
           </div>
 
           <div className="w-2/3">
@@ -516,7 +519,7 @@ const MovieDetail = () => {
               <h1 className="text-5xl font-bold">{movie.title}</h1>
             </div>
             <span className="text-lg">
-              {new Date(movie.release_date).toLocaleDateString()}
+              {movie.release_date ? dayjs(movie.release_date).format("MMM DD YYYY") : ""}
             </span>
             <div className="flex gap-4 flex-wrap mt-4">
               {movie.genres?.map((genre) => (
