@@ -9,6 +9,7 @@ import { CustomGoogleLogin, CustomGoogleLoginProps } from "@/components/custom/g
 import loginFormSchema from "@/lib/validation/login-form-schema"
 import { Link } from "react-router-dom"
 import { MouseEventHandler } from "react"
+import { EnvVariable } from "@/configuration/env-variable"
 
 export type  RegisterFormProps = {
     form: UseFormReturn<z.infer<typeof loginFormSchema>, any, undefined >,
@@ -29,7 +30,7 @@ const LoginForm = (props: RegisterFormProps) => {
                 <div>
                     <p>Login with</p>
                     <div className="w-full flex justify-center">
-                        <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID}>
+                        <GoogleOAuthProvider clientId={EnvVariable.GOOGLE_OAUTH_CLIENT_ID}>
                             <CustomGoogleLogin onGoogleAuthSuccess={onGoogleAuthSuccess} onGoogleAuthError={onGoogleAuthError} />
                         </GoogleOAuthProvider>
                     </div>

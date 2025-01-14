@@ -224,7 +224,7 @@ const ReviewListPage = () => {
           </h3>
           <EditorDialog
             triggerElement={
-              <Button className="text-gray-200 rounded-full bg-rose-900 text-gray-300 hover:bg-rose-800 hover:text-white py-2 px-4">
+              <Button className="rounded-full bg-rose-900 text-gray-300 hover:bg-rose-800 hover:text-white py-2 px-4">
                 Add New Review
               </Button>
             }
