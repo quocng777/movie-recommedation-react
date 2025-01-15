@@ -20,6 +20,7 @@ function getGenderText(gender: number | undefined): string {
   };
   return gender !== undefined ? genderMap[gender] || "Unknown" : "Unknown";
 }
+
 const PersonDetail = () => {
   const navigate = useNavigate();
   const { person_id } = useParams<{ person_id: string }>();
@@ -37,28 +38,20 @@ const PersonDetail = () => {
       isError: isErrorGetPersonDetail,
     },
   ] = useLazyPersonDetailQuery();
-  const [
-    getPersonMovieCredit,
-    {
-      data: movieData,
-      isSuccess: IsSuccessGetPersonMovieCredit,
-      isError: isErrorGetPersonMovieCredit,
-    },
-  ] = useLazyPersonCombinedCreditsQuery();
 
   const onMovieClick = (movie_id: string) => {
     navigate("/movie/" + movie_id);
     return;
   };
+
   useEffect(() => {
     if (person_id) {
       setIsLoading(true);
       getPersonDetail({ person_id });
 
-      getPersonMovieCredit({ person_id });
       setIsMovieLoading(true);
     }
-  }, [person_id, getPersonDetail, getPersonMovieCredit]);
+  }, [person_id, getPersonDetail]);
 
   useEffect(() => {
     if (IsSuccessGetPersonDetail && personData) {
@@ -67,15 +60,6 @@ const PersonDetail = () => {
       setIsMovieLoading(false);
     }
   }, [IsSuccessGetPersonDetail, personData]);
-  useEffect(() => {
-    if (IsSuccessGetPersonMovieCredit && movieData) {
-      if (!movieData.data?.cast!) {
-        setHasError(true);
-      } else {
-        setIsMovieLoading(false);
-      }
-    }
-  }, [IsSuccessGetPersonMovieCredit, movieData]);
 
   useEffect(() => {
     if (isErrorGetPersonDetail) {
@@ -84,9 +68,7 @@ const PersonDetail = () => {
     }
   }, [
     isErrorGetPersonDetail,
-    isErrorGetPersonMovieCredit,
     IsSuccessGetPersonDetail,
-    IsSuccessGetPersonMovieCredit,
   ]);
   if (isLoading) return <FallbackScreen />;
 
