@@ -5,7 +5,6 @@ import { FallbackScreen } from "@/components/custom/fallback-screen";
 import { MovieCardSkeleton } from "@/components/custom/movie-card-sekeleton";
 import {
   useLazyPersonDetailQuery,
-  useLazyPersonCombinedCreditsQuery,
 } from "@/app/api/person/person-api-slice";
 import { getResourceFromTmdb } from "@/lib/helpers/get-resource-tmbd";
 import { Person } from "@/app/api/types/person.type";
