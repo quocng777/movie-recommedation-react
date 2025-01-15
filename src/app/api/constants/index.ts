@@ -6,7 +6,6 @@ export const apiEndpoints = {
     ME: '/users/me',
     MOVIE_TRENDING: '/movies/trending',
     MOVIE_SEARCH: '/movies/search',
-    TV_SEARCH: '/tmdb/search/tv',
     MOVIE: "/tmdb/movie",
     MOVIE_DETAIL: "/movies/detail",
     MOVIE_POPULAR: "/movies/popular",
